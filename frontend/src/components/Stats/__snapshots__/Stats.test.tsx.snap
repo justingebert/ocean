@@ -1,0 +1,39 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Stats Component > renders a snapshot of the component 1`] = `
+<DocumentFragment>
+  <div
+    class="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6"
+  >
+    <dt
+      class="text-sm font-medium text-gray-500 truncate"
+    >
+      Active Users
+    </dt>
+    <dd
+      class="mt-1 text-3xl font-semibold text-gray-900"
+    >
+      234
+    </dd>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Stats Component renders a snapshot of the component 1`] = `
+<DocumentFragment>
+  <div
+    class="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6"
+  >
+    <dt
+      class="text-sm font-medium text-gray-500 truncate"
+    >
+      Active Users
+    </dt>
+    <dd
+      class="mt-1 text-3xl font-semibold text-gray-900"
+    >
+      234
+    </dd>
+  </div>
+</DocumentFragment>
+`;
