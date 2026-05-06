@@ -347,7 +347,7 @@ systemctl restart apache2
 
 ### Docker Images
 
-This project provides a docker image with PostgreSQL, MySQL, MongoDB and Adminer in the file `backend/docker-compose.yml`.
+This project provides a docker image with PostgreSQL, MongoDB and Adminer in the file `backend/docker-compose.yml`.
 
 ### Play framework
 

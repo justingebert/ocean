@@ -1,9 +1,7 @@
-version: "3.1"
-
 services:
   # Ldap authentication server
   openldap:
-    image: bitnami/openldap:2
+    image: bitnamilegacy/openldap:2
     ports:
       - "1389:1389"
       - "1636:1636"
@@ -34,34 +32,20 @@ services:
       POSTGRES_DB: internal
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-  # MySQL for managed databases
-  mysql_cluster:
-    depends_on:
-      - openldap
-    image: mysql:5.7
-    restart: always
-    ports:
-      - 3306:3306
-    environment:
-      MYSQL_ROOT_PASSWORD: bar
-      MYSQL_DATABASE: internal
-      MYSQL_USER: foo
-      MYSQL_PASSWORD: bar
   # MongoDB for managed databases    
   mongodb_cluster:
-    image: mongo
+    image: mongo:5
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: toor
     ports:
       - 27017:27017
-  # Postgres CLI tool    
+  # Postgres CLI tool
   adminer:
     depends_on:
       - postgres_orm
       - pg_cluster
-      - mysql_cluster
     image: adminer
     restart: always
     ports:
