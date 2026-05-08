@@ -94,3 +94,8 @@ fabric.properties
 .idea
 
 plans
+
+# Local env files (committed: .env.example only)
+.env
+.env.local
+.env.*.local

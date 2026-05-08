@@ -12,7 +12,7 @@ services:
       - LDAP_PASSWORDS=password1,password2
   # Postgres for ORM
   postgres_orm:
-    image: postgres
+    image: postgres:12-alpine
     restart: always
     ports:
       - 5432:5432
@@ -46,7 +46,7 @@ services:
     depends_on:
       - postgres_orm
       - pg_cluster
-    image: adminer
+    image: adminer:5
     restart: always
     ports:
       - 8080:8080

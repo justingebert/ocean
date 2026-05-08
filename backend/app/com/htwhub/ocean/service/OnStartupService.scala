@@ -19,7 +19,6 @@ class OnStartupService @Inject() (config: Configuration, postgreSQLEngine: Postg
   onStartup()
 
   def onStartup(): Future[List[Vector[Int]]] = {
-    print("hi")
     val job1 = checkLdapRole()
     val job2 = checkGenericRole()
     val jobs = List(job1, job2)

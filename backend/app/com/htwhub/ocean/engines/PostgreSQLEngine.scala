@@ -187,7 +187,6 @@ class PostgreSQLEngine @Inject() (config: Configuration)(implicit ec: ExecutionC
     } yield {
 
       val dbURL = s"jdbc:postgresql://${server}:${port}/${dbName}?user=${user}&password=${password}"
-      println(dbURL)
       val db = Database.forURL(dbURL)
       val accessPublicSchemaStatement = sql"""GRANT CREATE,USAGE ON SCHEMA public TO public"""
       val f: Future[Vector[Int]] = db.run(accessPublicSchemaStatement.as[Int])
