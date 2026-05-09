@@ -35,3 +35,10 @@ dist-ssr
 
 .env.example
 !.env.example
+
+# TLS certificates / private keys (kept local only)
+cert/
+*.key
+*.pem
+*.crt
+*.cert
