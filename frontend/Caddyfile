@@ -1,0 +1,18 @@
+# port 80 (HTTP) on every interface inside the container. TLS will live one layer up (outer proxy), so this stays plain HTTP.
+:80 {
+	root * /usr/share/caddy
+	encode gzip zstd
+
+	# asset bundles: long-cache, and a missing one should 404, not fallback to index.html.
+	@assets path /assets/*
+	handle @assets {
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+
+	# unknown paths serve index.html so React Router resolves them.
+	handle {
+		try_files {path} /index.html
+		file_server
+	}
+}

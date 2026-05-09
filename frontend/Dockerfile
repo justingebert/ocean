@@ -1,0 +1,35 @@
+FROM node:22-alpine AS build
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+ARG VITE_API_URL
+ARG VITE_POSTGRESQL_HOSTNAME
+ARG VITE_POSTGRESQL_PORT=5432
+ARG VITE_MONGODB_HOSTNAME
+ARG VITE_MONGODB_PORT=27017
+ARG VITE_ADMINER_URL
+ARG VITE_ISSUE_LINK
+
+ENV VITE_API_URL=$VITE_API_URL \
+    VITE_POSTGRESQL_HOSTNAME=$VITE_POSTGRESQL_HOSTNAME \
+    VITE_POSTGRESQL_PORT=$VITE_POSTGRESQL_PORT \
+    VITE_MONGODB_HOSTNAME=$VITE_MONGODB_HOSTNAME \
+    VITE_MONGODB_PORT=$VITE_MONGODB_PORT \
+    VITE_ADMINER_URL=$VITE_ADMINER_URL \
+    VITE_ISSUE_LINK=$VITE_ISSUE_LINK
+
+RUN npm run build
+
+FROM caddy:2-alpine AS runtime
+
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY --from=build /app/dist /usr/share/caddy
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget -qO- http://127.0.0.1/ >/dev/null 2>&1 || exit 1
