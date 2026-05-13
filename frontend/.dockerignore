@@ -21,7 +21,6 @@ storybook-static
 
 snyk-report.html
 docs
-deploy.sh
 
 .DS_Store
 .vscode
