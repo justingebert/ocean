@@ -1,68 +1,62 @@
+name: ocean-dev
+
 services:
-  # Ldap authentication server
   openldap:
     image: bitnamilegacy/openldap:2
+    environment:
+      LDAP_ADMIN_USERNAME: admin
+      LDAP_ADMIN_PASSWORD: adminpassword
+      LDAP_USERS: user01,user02
+      LDAP_PASSWORDS: password1,password2
     ports:
       - "1389:1389"
       - "1636:1636"
-    environment:
-      - LDAP_ADMIN_USERNAME=admin
-      - LDAP_ADMIN_PASSWORD=adminpassword
-      - LDAP_USERS=user01,user02
-      - LDAP_PASSWORDS=password1,password2
-  # internal postgres for metadata of deployed dbs
+
   postgres_orm:
     image: postgres:12-alpine
-    restart: always
-    ports:
-      - 5432:5432
     environment:
       POSTGRES_DB: internal
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_orm_data:/var/lib/postgresql/data
-  # Postgres for managed databases
+
   pg_cluster:
-    depends_on:
-      - openldap
     image: postgres:12.20
-    restart: always
-    ports:
-      - 5555:5432
     environment:
       POSTGRES_DB: internal
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    ports:
+      - "5555:5432"
     volumes:
       - pg_cluster_data:/var/lib/postgresql/data
-  # MongoDB for managed databases
+
   mongodb_cluster:
     image: mongo:5
-    restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: toor
     ports:
-      - 27017:27017
+      - "27017:27017"
     volumes:
       - mongodb_cluster_data:/data/db
-  # Postgres CLI tool
+
   adminer:
+    image: adminer:5
     depends_on:
       - postgres_orm
       - pg_cluster
-    image: adminer:5
-    restart: always
     ports:
-      - 8080:8080
+      - "8080:8080"
 
-  # --- Application services (full-stack profile only) ---
-  # `docker compose --profile full up` boots backend + frontend on top.
   backend:
     profiles: ["full"]
     build:
       context: ./backend
+    image: ocean-backend:dev
     env_file: .env
     depends_on:
       - postgres_orm
@@ -71,24 +65,24 @@ services:
       - openldap
     ports:
       - "9000:9000"
-    restart: unless-stopped
+
   frontend:
     profiles: ["full"]
     build:
       context: ./frontend
       args:
-        VITE_API_URL: ${VITE_API_URL}
-        VITE_POSTGRESQL_HOSTNAME: ${VITE_POSTGRESQL_HOSTNAME}
-        VITE_POSTGRESQL_PORT: ${VITE_POSTGRESQL_PORT}
-        VITE_MONGODB_HOSTNAME: ${VITE_MONGODB_HOSTNAME}
-        VITE_MONGODB_PORT: ${VITE_MONGODB_PORT}
-        VITE_ADMINER_URL: ${VITE_ADMINER_URL}
-        VITE_ISSUE_LINK: ${VITE_ISSUE_LINK}
+        VITE_API_URL: ${VITE_API_URL:-/v1}
+        VITE_POSTGRESQL_HOSTNAME: ${VITE_POSTGRESQL_HOSTNAME:-localhost}
+        VITE_POSTGRESQL_PORT: ${VITE_POSTGRESQL_PORT:-5555}
+        VITE_MONGODB_HOSTNAME: ${VITE_MONGODB_HOSTNAME:-localhost}
+        VITE_MONGODB_PORT: ${VITE_MONGODB_PORT:-27017}
+        VITE_ADMINER_URL: ${VITE_ADMINER_URL:-http://localhost:8080/}
+        VITE_ISSUE_LINK: ${VITE_ISSUE_LINK:-https://github.com/HTWHub/ocean/issues}
+    image: ocean-frontend:dev
     depends_on:
       - backend
     ports:
-      - "8090:80"
-    restart: unless-stopped
+      - "5193:80"
 
 volumes:
   postgres_orm_data:

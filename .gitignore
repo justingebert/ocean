@@ -100,4 +100,7 @@ plans
 .env.local
 .env.*.local
 
-.DS_Store
+**/.DS_Store
+
+CLAUDE.md
+WORK_LOG.md
