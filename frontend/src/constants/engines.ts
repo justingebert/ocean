@@ -1,4 +1,4 @@
-import { IEngineOption } from "../components/Form/EngineGroup/EngineOption";
+import { IEngineOption } from "../components/forms/EngineGroup/EngineOption";
 
 import mongodbLogo from "../img/mongodb-logo.svg";
 import postgresqlLogo from "../img/postgresql-logo.svg";

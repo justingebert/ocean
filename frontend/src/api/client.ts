@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { decodeJwt as joseDecodeJwt } from "jose";
+import { decodeJwt as joseDecodeJwt, type JWTPayload } from "jose";
 
 import { loginFailed } from "../redux/slices/session/sessionSlice";
 import { AppDispatch } from "../redux/store";
@@ -29,7 +29,7 @@ export const axiosInstance = axios.create({
  * @param token - The JWT string to decode.
  * @returns The decoded JwtPayload or null if invalid.
  */
-export const decodeJwt = (token: string): Record<string, any> | null => {
+export const decodeJwt = (token: string): JWTPayload | null => {
   try {
     const decoded = joseDecodeJwt(token); // Decodes the token's payload without verifying the signature
     return decoded;
@@ -68,12 +68,13 @@ export const setupRequestInterceptors = (dispatch: AppDispatch) => {
         return Promise.reject(error);
       }
       // If the refresh token request itself fails, log the user out
-      if (originalRequest.url === baseURL + "/auth/refresh-token") {
+      const isRefreshRequest = originalRequest.url?.endsWith("/auth/refresh-token");
+      if (isRefreshRequest) {
         delete originalRequest.headers.Authorization;
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         dispatch(loginFailed("Refresh token expired."));
-        return Promise.resolve(undefined); // Gracefully stops execution
+        return Promise.reject(error);
       }
       // Handle unauthorized (401) errors by attempting token refresh
       if (error.response?.status === 401) {

@@ -12,7 +12,7 @@ import { UpstreamDatabaseProperties } from "../../types/database";
 import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
 import { Alert } from "../Feedback/Alert/Alert";
 import Headline from "../Headline";
-import { EngineGroup } from "../Form/EngineGroup/EngineGroup";
+import { EngineGroup } from "./EngineGroup/EngineGroup";
 import { EngineTypeValues } from "../../types/engine";
 
 /**

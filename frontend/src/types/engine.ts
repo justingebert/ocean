@@ -1,9 +1,6 @@
 export const EngineType = Object.freeze({
-    PostgreSQL: "P" as "P",
-    MongoDB: "M" as "M",
-});
+    PostgreSQL: "P",
+    MongoDB: "M",
+} as const);
 
-// ✅ Define a type explicitly
 export type EngineTypeValues = (typeof EngineType)[keyof typeof EngineType];
-
-console.log("🚀 EngineType initialized:", EngineType);
