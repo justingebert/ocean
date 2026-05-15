@@ -20,13 +20,14 @@ import com.htwhub.ocean.service.UserService
 import java.sql.Timestamp
 import java.time.Instant
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.when
 import org.mongodb.scala.Completed
-import org.scalatest.AsyncWordSpec
-import org.scalatest.Matchers
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AsyncWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import scala.concurrent.Future
 
@@ -65,7 +66,7 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
           Instance(InstanceId(1), UserId(1), "name", PostgreSQLEngineType, Timestamp.from(Instant.now))
         )
         val instanceService = mock[InstanceService]
-        when(instanceService.getUserInstances(any[UserId])).thenReturn(Future(instances))
+        when(instanceService.getUserInstances(UserId(anyLong()))).thenReturn(Future(instances))
 
         val databaseManager = createDatabaseManager(instanceService = instanceService)
 
@@ -84,7 +85,7 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
         val instanceServiceException: InstanceService.Exceptions.InternalError =
           InstanceService.Exceptions.InternalError("")
         val instanceService = mock[InstanceService]
-        when(instanceService.getUserInstances(any[UserId])).thenReturn(Future.failed(instanceServiceException))
+        when(instanceService.getUserInstances(UserId(anyLong()))).thenReturn(Future.failed(instanceServiceException))
         val databaseManager = createDatabaseManager(instanceService = instanceService)
 
         // Act
@@ -101,12 +102,13 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
         // Arrange
         val instance = Instance(InstanceId(1), user.id, "name", PostgreSQLEngineType, Timestamp.from(Instant.now))
         val instanceService = mock[InstanceService]
-        when(instanceService.addInstance(any[Instance], any[UserId])).thenReturn(Future(instance))
+        when(instanceService.addInstance(any[Instance], UserId(anyLong()))).thenReturn(Future(instance))
 
         val postgreSQLEngine = mock[PostgreSQLEngine]
         when(postgreSQLEngine.createDatabase(any[String])).thenReturn(Future(Vector(1)))
         when(postgreSQLEngine.revokePublicAccess(any[String])).thenReturn(Future(Vector(1)))
         when(postgreSQLEngine.grantDatabaseAccess(any[String], any[String])).thenReturn(Future(Vector(1)))
+        when(postgreSQLEngine.grantAccessToPublicSchema(any[String])).thenReturn(Future(Vector(1)))
 
         val mongoDBEngine = mock[MongoDBEngine]
         when(mongoDBEngine.createDatabase(any[String])).thenReturn(Future(Completed()))
@@ -135,7 +137,7 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
         // Arrange
         val instance = Instance(InstanceId(1), user.id, "name", MongoDBSQLEngineType, Timestamp.from(Instant.now))
         val instanceService = mock[InstanceService]
-        when(instanceService.addInstance(any[Instance], any[UserId])).thenReturn(Future(instance))
+        when(instanceService.addInstance(any[Instance], UserId(anyLong()))).thenReturn(Future(instance))
 
         val mongoDBEngine = mock[MongoDBEngine]
         when(mongoDBEngine.createDatabase(any[String])).thenReturn(Future(Completed()))
@@ -181,20 +183,22 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
 
         // Collect instance data
         val instanceService = mock[InstanceService]
-        when(instanceService.getUserInstanceById(any[InstanceId], any[UserId])).thenReturn(Future(instance))
-        when(instanceService.deleteInstance(any[InstanceId], any[UserId])).thenReturn(Future(1))
+        when(instanceService.getUserInstanceById(InstanceId(anyLong()), UserId(anyLong()))).thenReturn(Future(instance))
+        when(instanceService.deleteInstance(InstanceId(anyLong()), UserId(anyLong()))).thenReturn(Future(1))
 
         // roles delete process
         val roleService = mock[RoleService]
-        when(roleService.getRolesByInstanceId(any[InstanceId], any[UserId])).thenReturn(Future(roles))
-        when(roleService.deleteRolesByInstanceId(any[InstanceId], any[UserId])).thenReturn(Future(1))
+        when(roleService.getRolesByInstanceId(InstanceId(anyLong()), UserId(anyLong()))).thenReturn(Future(roles))
+        when(roleService.deleteRolesByInstanceId(InstanceId(anyLong()), UserId(anyLong()))).thenReturn(Future(1))
 
         // invitation delete process
         val invitationService = mock[InvitationService]
-        when(invitationService.getInvitationsByInstanceId(any[InstanceId], any[UserId])).thenReturn(Future(invitations))
+        when(invitationService.getInvitationsByInstanceId(InstanceId(anyLong()), UserId(anyLong())))
+          .thenReturn(Future(invitations))
         val userService = mock[UserService]
         when(userService.getUsersByIds(any[List[UserId]])).thenReturn(Future(List(invitedUser)))
-        when(invitationService.deleteInvitationsByIds(any[List[InvitationId]], any[UserId])).thenReturn(Future(List(1)))
+        when(invitationService.deleteInvitationsByIds(any[List[InvitationId]], UserId(anyLong())))
+          .thenReturn(Future(List(1)))
 
         // PostgreSQL engine process
         val postgreSQLEngine = mock[PostgreSQLEngine]

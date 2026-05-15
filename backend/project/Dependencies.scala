@@ -21,7 +21,7 @@ object Dependencies {
 
     // test
     val scalaTest = "3.2.19"
-    val mockito = "3.12.4"
+    val scalaTestPlusMockito = "3.2.19.0"
   }
 
   val compile = Seq(
@@ -45,7 +45,7 @@ object Dependencies {
 
   val test: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % Version.scalaTest,
-    "org.mockito" % "mockito-core" % Version.mockito,
+    "org.scalatestplus" %% "mockito-5-18" % Version.scalaTestPlusMockito,
   ).map(_ % "test")
 
   val all: Seq[ModuleID] = compile ++ test

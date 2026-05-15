@@ -30,7 +30,7 @@ class MetricService @Inject() (instanceRepository: InstanceRepository, userRepos
   def withPrivilegeOrFail[R](user: User, callback: () => Future[R]): Future[R] =
     user.employeeType match {
       case string: String if string.contains("Staff") => callback()
-      case _               => Future.failed(AccessDenied())
+      case _                                          => Future.failed(AccessDenied())
     }
 }
 

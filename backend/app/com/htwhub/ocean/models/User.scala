@@ -27,6 +27,6 @@ object User {
 final case class UserId(value: Long) extends AnyVal
 
 object UserId {
-  implicit lazy val columnUserIdMapper = MappedColumnType.base[UserId,Long](_.value, UserId(_))
+  implicit lazy val columnUserIdMapper = MappedColumnType.base[UserId, Long](_.value, UserId(_))
   implicit lazy val userIdFormat: Format[UserId] = implicitly[Format[Long]].inmap(UserId.apply, _.value)
 }

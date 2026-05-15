@@ -118,8 +118,10 @@ class DatabaseManager @Inject() (
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
       instanceOwner <- userService.getUserById(instance.userId)
       job1 <- instance match {
-        case value: Instance if instance.engine == PostgreSQLEngineType => deleteDatabaseForPostgreSQL(value, instanceOwner)
-        case value: Instance if instance.engine == MongoDBSQLEngineType => deleteDatabaseForMongoDB(value, instanceOwner)
+        case value: Instance if instance.engine == PostgreSQLEngineType =>
+          deleteDatabaseForPostgreSQL(value, instanceOwner)
+        case value: Instance if instance.engine == MongoDBSQLEngineType =>
+          deleteDatabaseForMongoDB(value, instanceOwner)
       }
     } yield job1
 

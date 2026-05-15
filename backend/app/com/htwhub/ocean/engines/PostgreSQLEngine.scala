@@ -1,13 +1,15 @@
 package com.htwhub.ocean.engines
 
 import com.typesafe.config.ConfigFactory
-import play.api.Configuration
-
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.{Await, ExecutionContext, Future}
+import play.api.Configuration
 import scala.concurrent.duration.DurationInt
-import scala.util.{Failure, Success}
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.util.Failure
+import scala.util.Success
 
 @Singleton
 class PostgreSQLEngine @Inject() (config: Configuration)(implicit ec: ExecutionContext) {
@@ -99,33 +101,33 @@ class PostgreSQLEngine @Inject() (config: Configuration)(implicit ec: ExecutionC
     db.run(reassignedOwnedByStatement.as[Int])
   }
 
-  def getJDBCConnection(dbName:String):Future[Database]= {
+  def getJDBCConnection(dbName: String): Future[Database] = {
     val serverName = Future {
       config.getOptional[String]("pg_cluster.properties.serverName")
     } flatMap {
       case Some(value) => Future.successful(value)
-      case None => Future.failed(new Error())
+      case None        => Future.failed(new Error())
     }
 
     val portNumber = Future {
       config.getOptional[String]("pg_cluster.properties.portNumber")
     } flatMap {
       case Some(value) => Future.successful(value)
-      case None => Future.failed(new Error())
+      case None        => Future.failed(new Error())
     }
 
     val userName = Future {
       config.getOptional[String]("pg_cluster.properties.user")
     } flatMap {
       case Some(value) => Future.successful(value)
-      case None => Future.failed(new Error())
+      case None        => Future.failed(new Error())
     }
 
     val userPassword = Future {
       config.getOptional[String]("pg_cluster.properties.password")
     } flatMap {
       case Some(value) => Future.successful(value)
-      case None => Future.failed(new Error())
+      case None        => Future.failed(new Error())
     }
 
     for {
@@ -134,19 +136,21 @@ class PostgreSQLEngine @Inject() (config: Configuration)(implicit ec: ExecutionC
       user <- userName
       password <- userPassword
     } yield {
-      val dbURL= s"jdbc:postgresql://${server}:${port}/${dbName}?user=${user}&password=${password}"
+      val dbURL = s"jdbc:postgresql://${server}:${port}/${dbName}?user=${user}&password=${password}"
       Database.forURL(dbURL)
     }
   }
 
-  def grantAccess(db:Database):Future[Vector[Int]]={
+  def grantAccess(db: Database): Future[Vector[Int]] = {
     val accessPublicSchemaStatement = sql"""GRANT CREATE,USAGE ON SCHEMA public TO public"""
     db.run(accessPublicSchemaStatement.as[Int])
   }
 
-  def grantAccessToPublicSchema(dbName:String): Future[Vector[Int]]= {
-    for {dbCon <- getJDBCConnection(dbName)
-         res <- grantAccess(dbCon)} yield{
+  def grantAccessToPublicSchema(dbName: String): Future[Vector[Int]] =
+    for {
+      dbCon <- getJDBCConnection(dbName)
+      res <- grantAccess(dbCon)
+    } yield {
       dbCon.close
       res
     }
@@ -204,5 +208,4 @@ class PostgreSQLEngine @Inject() (config: Configuration)(implicit ec: ExecutionC
     }
     x
   }*/
-  }
 }

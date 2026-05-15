@@ -1,7 +1,7 @@
 package com.htwhub.ocean.concurrent
 
-import org.apache.pekko.actor.ActorSystem
 import javax.inject.Inject
+import org.apache.pekko.actor.ActorSystem
 import play.api.libs.concurrent.CustomExecutionContext
 
 /** Provides custom execution contexts for database operations.

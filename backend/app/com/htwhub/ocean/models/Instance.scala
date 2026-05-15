@@ -41,10 +41,9 @@ object Instance {
   val MongoDBSQLEngineType: EngineType = "M"
 }
 
-
 final case class InstanceId(value: Long) extends AnyVal
 
 object InstanceId {
-  implicit lazy val columnInstanceIdMapper = MappedColumnType.base[InstanceId,Long](_.value, InstanceId(_))
+  implicit lazy val columnInstanceIdMapper = MappedColumnType.base[InstanceId, Long](_.value, InstanceId(_))
   implicit lazy val instanceIdFormat: Format[InstanceId] = implicitly[Format[Long]].inmap(InstanceId.apply, _.value)
 }

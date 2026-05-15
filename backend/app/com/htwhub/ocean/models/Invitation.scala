@@ -32,11 +32,10 @@ object Invitation {
   implicit lazy val invitationFormat: OFormat[Invitation] = Json.format[Invitation]
 }
 
-
 final case class InvitationId(value: Long) extends AnyVal
 
 object InvitationId {
-  implicit lazy val columnInvitationIdMapper = MappedColumnType.base[InvitationId,Long](_.value, InvitationId(_))
+  implicit lazy val columnInvitationIdMapper = MappedColumnType.base[InvitationId, Long](_.value, InvitationId(_))
   implicit lazy val invitationIdFormat: Format[InvitationId] =
     implicitly[Format[Long]].inmap(InvitationId.apply, _.value)
 }

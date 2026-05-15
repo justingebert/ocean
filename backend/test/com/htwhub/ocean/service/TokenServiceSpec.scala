@@ -8,16 +8,15 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import java.io.File
 import java.time.Instant
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.Assertion
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
-import org.scalatestplus.mockito.MockitoSugar
 import pdi.jwt.algorithms.JwtHmacAlgorithm
 import pdi.jwt.Jwt
 import play.api.libs.json.Json
 import play.api.Configuration
 
-class TokenServiceSpec extends WordSpec with Matchers with MockitoSugar {
+class TokenServiceSpec extends AnyWordSpec with Matchers {
 
   val myConfigFile = new File("conf/application.test.conf")
   val parsedConfig: Config = ConfigFactory.parseFile(myConfigFile)
@@ -75,7 +74,7 @@ class TokenServiceSpec extends WordSpec with Matchers with MockitoSugar {
 
         // Assert
         optAuthResponse match {
-          case None => fail
+          case None => fail()
           case Some(authResponse) =>
             checkAuthResponse(
               authResponse,
@@ -108,7 +107,7 @@ class TokenServiceSpec extends WordSpec with Matchers with MockitoSugar {
         // Assert
         optAuthResponse match {
           case None => succeed
-          case _    => fail
+          case _    => fail()
         }
       }
     }
