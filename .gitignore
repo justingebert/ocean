@@ -101,6 +101,3 @@ plans
 .env.*.local
 
 **/.DS_Store
-
-CLAUDE.md
-WORK_LOG.md

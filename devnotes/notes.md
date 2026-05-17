@@ -14,8 +14,9 @@
 
 
 ## stuff learned
+- https://ai-master.htw-berlin.de/files/Stg/AI/AntragvirtuellerServer.pdf
 - TLS certificates
 - Caddy
 - Docker compose override
 - lima -> cool and easy for local vms
-- https://ai-master.htw-berlin.de/files/Stg/AI/AntragvirtuellerServer.pdf
+- Ansible overview 
