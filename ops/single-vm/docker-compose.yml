@@ -1,0 +1,46 @@
+name: ocean
+
+services:
+  openldap:
+    image: bitnamilegacy/openldap:2
+    restart: unless-stopped
+    env_file: ${OCEAN_CONFIG_DIR:-/etc/ocean}/openldap.env
+
+  postgres_orm:
+    image: postgres:12-alpine
+    restart: unless-stopped
+    env_file: ${OCEAN_CONFIG_DIR:-/etc/ocean}/postgres_orm.env
+    volumes:
+      - ${OCEAN_DATA_DIR:-/srv/ocean}/postgres_orm/data:/var/lib/postgresql/data
+
+  pg_cluster:
+    image: postgres:12.20
+    restart: unless-stopped
+    env_file: ${OCEAN_CONFIG_DIR:-/etc/ocean}/pg_cluster.env
+    volumes:
+      - ${OCEAN_DATA_DIR:-/srv/ocean}/pg_cluster/data:/var/lib/postgresql/data
+
+  mongodb_cluster:
+    image: mongo:5
+    restart: unless-stopped
+    env_file: ${OCEAN_CONFIG_DIR:-/etc/ocean}/mongodb_cluster.env
+    volumes:
+      - ${OCEAN_DATA_DIR:-/srv/ocean}/mongodb_cluster/data:/data/db
+
+  backend:
+    image: ${BACKEND_IMAGE:-ocean-backend:latest}
+    restart: unless-stopped
+    env_file: ${OCEAN_CONFIG_DIR:-/etc/ocean}/backend.env
+    depends_on:
+      - postgres_orm
+      - pg_cluster
+      - mongodb_cluster
+      - openldap
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-ocean-frontend:latest}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"

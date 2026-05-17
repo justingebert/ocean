@@ -23,4 +23,4 @@ This repository is structured in three different parts.
 
 ## Documentation
 
-For full documentation, visit [htwhub.github.io/ocean](https://htwhub.github.io/ocean/).
+TODO
