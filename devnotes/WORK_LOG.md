@@ -6,9 +6,16 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets — whatever shape fits (free notes, **Did** / **Why** / **Result** / **Notes** / **Problems**). No file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
+## 2026-05-18/19 - migrate single vm local deployment to Ansible
+- Replaced two-pass bash+ansible dance with a single ansible playbook: image builds moved into `community.docker.docker_image` tasks (tagged `build`), so `lima-up.sh` is now just `limactl start` + one `ansible-playbook` call.
+- Builds run inside the VM against the Lima host-mount path, no rsync needed.
+- Added `requirements.yml` for the docker collection; `python3-docker` SDK installed via apt; `force_build` var lets users skip rebuild on no-change runs.
+
 ## 2026-05-17 - plan out deployment in detail
 
 ## 2026-05-17 - first local lima vm setup
+- use bash scripts, kinda janky but works
+- openldap doesnt work on arm vm
 
 ## 2026-05-15 — Test out gl-ai container registry
 - Tried pushing/pulling local image to the GitLab registry.
