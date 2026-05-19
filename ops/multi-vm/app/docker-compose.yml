@@ -1,0 +1,33 @@
+name: ocean-app
+
+services:
+  openldap:
+    image: bitnamilegacy/openldap:2
+    restart: unless-stopped
+    env_file: /etc/ocean/openldap.env
+
+  postgres_orm:
+    image: postgres:12-alpine
+    restart: unless-stopped
+    env_file: /etc/ocean/postgres_orm.env
+    volumes:
+      - /srv/ocean/postgres_orm/data:/var/lib/postgresql/data
+
+  backend:
+    image: ${BACKEND_IMAGE:-ocean-backend:latest}
+    restart: unless-stopped
+    env_file: /etc/ocean/backend.env
+    extra_hosts:
+      - "pg-vm:host-gateway"
+      - "mongo-vm:host-gateway"
+    depends_on:
+      - postgres_orm
+      - openldap
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-ocean-frontend:latest}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"

@@ -1,0 +1,23 @@
+- name: Base setup on all hosts
+  hosts: all
+  become: true
+  roles:
+    - base
+
+- name: Provision pg-vm
+  hosts: pg
+  become: true
+  roles:
+    - pg
+
+- name: Provision mongo-vm
+  hosts: mongo
+  become: true
+  roles:
+    - mongo
+
+- name: Provision app-vm
+  hosts: app
+  become: true
+  roles:
+    - app

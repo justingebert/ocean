@@ -1,0 +1,31 @@
+- name: Stage docker-compose.yml
+  ansible.builtin.copy:
+    src: "{{ compose_src }}"
+    dest: "{{ etc_ocean }}/docker-compose.yml"
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0640"
+
+- name: Stage pg_cluster.env
+  ansible.builtin.copy:
+    src: "{{ env_src }}/pg_cluster.env.example"
+    dest: "{{ etc_ocean }}/pg_cluster.env"
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0600"
+    force: false
+
+- name: Create pg_cluster data dir
+  ansible.builtin.file:
+    path: "{{ data_root }}/pg_cluster/data"
+    state: directory
+    owner: "999"
+    group: "999"
+    mode: "0700"
+
+- name: Bring up pg compose stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ etc_ocean }}"
+    state: present
+    remove_orphans: true
+  tags: compose

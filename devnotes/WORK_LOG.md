@@ -6,6 +6,15 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets — whatever shape fits (free notes, **Did** / **Why** / **Result** / **Notes** / **Problems**). No file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
+## 2026-05-19 brainstorm about how to manage secrets:
+- 5 options considered: Ansible Valut, SOPS, Gitlab Vars, External Secret manager and manual env
+- learning towards SOPS or gitlab vars
+- gitlab vars seems better because of possible accident commits using sops
+
+## 2026-05-19 — CI pipeline draft
+- Added `.gitlab-ci.yml` skeleton: `test → build → deploy`, backend/frontend split in parallel, all jobs manual, main-only.
+- Build stage builds + pushes to GitLab Container Registry (`sha` + `latest`). Deploy is a placeholder until Ansible is wired in.
+
 ## 2026-05-18/19 - migrate single vm local deployment to Ansible
 - Replaced two-pass bash+ansible dance with a single ansible playbook: image builds moved into `community.docker.docker_image` tasks (tagged `build`), so `lima-up.sh` is now just `limactl start` + one `ansible-playbook` call.
 - Builds run inside the VM against the Lima host-mount path, no rsync needed.

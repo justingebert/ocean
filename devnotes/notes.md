@@ -9,10 +9,11 @@
 - add mongo-express to mongosever
 - env files for vms as gitlab secrets or secret files
 - make sure PR cant execute ansible code on vm
-
+- add precommit hooks with husky
 
 ## Questions:
 - what about certificate renewal?
+- sops or gitlab vars for secrets?
 
 
 ## stuff learned

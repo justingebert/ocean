@@ -1,0 +1,70 @@
+- name: Stage docker-compose.yml
+  ansible.builtin.copy:
+    src: "{{ compose_src }}"
+    dest: "{{ etc_ocean }}/docker-compose.yml"
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0640"
+
+- name: Stage env files
+  ansible.builtin.copy:
+    src: "{{ env_src }}/{{ item }}.env.example"
+    dest: "{{ etc_ocean }}/{{ item }}.env"
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0600"
+    force: false
+  loop:
+    - compose
+    - backend
+    - postgres_orm
+    - openldap
+
+- name: Create postgres_orm data dir
+  ansible.builtin.file:
+    path: "{{ data_root }}/postgres_orm/data"
+    state: directory
+    owner: "70"
+    group: "70"
+    mode: "0700"
+
+- name: Build backend image
+  community.docker.docker_image:
+    name: ocean-backend
+    tag: latest
+    source: build
+    force_source: "{{ force_build | bool }}"
+    build:
+      path: "{{ repo_root }}/backend"
+      network: host
+      pull: false
+  tags: build
+
+- name: Build frontend image
+  community.docker.docker_image:
+    name: ocean-frontend
+    tag: latest
+    source: build
+    force_source: "{{ force_build | bool }}"
+    build:
+      path: "{{ repo_root }}/frontend"
+      network: host
+      pull: false
+      args:
+        VITE_API_URL: /v1
+        VITE_POSTGRESQL_HOSTNAME: localhost
+        VITE_POSTGRESQL_PORT: "55432"
+        VITE_MONGODB_HOSTNAME: localhost
+        VITE_MONGODB_PORT: "57017"
+        VITE_ADMINER_URL: ""
+        VITE_ISSUE_LINK: https://github.com/HTWHub/ocean/issues
+  tags: build
+
+- name: Bring up app compose stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ etc_ocean }}"
+    env_files:
+      - "{{ etc_ocean }}/compose.env"
+    state: present
+    remove_orphans: true
+  tags: compose

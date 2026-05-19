@@ -1,0 +1,4 @@
+ocean_user: ocean
+etc_ocean: /etc/ocean
+data_root: /srv/ocean
+repo_root: "{{ playbook_dir }}/../.."

@@ -18,10 +18,7 @@ portForwards:
     hostIP: 127.0.0.1
 
 message: |
-  Ocean single-VM test instance is ready.
+  Ocean app-vm is ready.
 
-  Next:
-    ops/single-vm/lima-up.sh
-
-  The frontend is forwarded to:
+  Frontend forwarded to:
     http://127.0.0.1:8088

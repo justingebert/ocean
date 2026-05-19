@@ -1,0 +1,20 @@
+all:
+  children:
+    app:
+      hosts:
+        ocean-app:
+          ansible_host: lima-ocean-app
+          ansible_ssh_common_args: "-F {{ lookup('env', 'HOME') }}/.lima/ocean-app/ssh.config"
+          ansible_python_interpreter: /usr/bin/python3
+    pg:
+      hosts:
+        ocean-pg:
+          ansible_host: lima-ocean-pg
+          ansible_ssh_common_args: "-F {{ lookup('env', 'HOME') }}/.lima/ocean-pg/ssh.config"
+          ansible_python_interpreter: /usr/bin/python3
+    mongo:
+      hosts:
+        ocean-mongo:
+          ansible_host: lima-ocean-mongo
+          ansible_ssh_common_args: "-F {{ lookup('env', 'HOME') }}/.lima/ocean-mongo/ssh.config"
+          ansible_python_interpreter: /usr/bin/python3

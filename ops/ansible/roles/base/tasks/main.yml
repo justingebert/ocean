@@ -1,0 +1,45 @@
+- name: Install base packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - git
+      - python3-docker
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install Docker Engine + compose plugin
+  ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
+  args:
+    creates: /usr/bin/docker
+
+- name: Enable and start Docker
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Create ocean user, add to docker group
+  ansible.builtin.user:
+    name: "{{ ocean_user }}"
+    shell: /bin/bash
+    groups: docker
+    append: true
+    create_home: true
+
+- name: Create config dir
+  ansible.builtin.file:
+    path: "{{ etc_ocean }}"
+    state: directory
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0750"
+
+- name: Create data root
+  ansible.builtin.file:
+    path: "{{ data_root }}"
+    state: directory
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0750"

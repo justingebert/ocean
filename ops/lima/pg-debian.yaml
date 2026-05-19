@@ -1,0 +1,22 @@
+minimumLimaVersion: 2.0.0
+
+base:
+  - template:_images/debian-13
+  - template:_default/mounts
+
+cpus: 2
+memory: 3GiB
+disk: 40GiB
+
+containerd:
+  system: false
+  user: false
+
+portForwards:
+  - guestPort: 5432
+    hostPort: 55432
+    hostIP: 127.0.0.1
+
+message: |
+  Ocean pg-vm is ready.
+  Managed Postgres reachable on host loopback: 127.0.0.1:55432
