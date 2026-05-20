@@ -1,0 +1,32 @@
+# Connectivity probe from GitLab runner to uni VMs.
+
+probe-vm:
+  stage: test
+  image: alpine:latest
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      when: manual
+  variables:
+    VM_HOSTS: "ocean-jg.f4.htw-berlin.de ocean-mongo.f4.htw-berlin.de ocean-pg.f4.htw-berlin.de"
+  script:
+    - apk add --no-cache iputils openssh-client netcat-openbsd bind-tools curl
+    - echo "=== runner identity ==="
+    - hostname
+    - ip -4 addr
+    - curl -s ifconfig.me || true
+    - echo
+    - |
+      for host in $VM_HOSTS; do
+        echo
+        echo "############################################"
+        echo "### $host"
+        echo "############################################"
+        echo "--- DNS ---"
+        nslookup "$host" || true
+        echo "--- ICMP ---"
+        ping -c 3 -W 2 "$host" || true
+        echo "--- TCP probes ---"
+        nc -zv -w 3 "$host" 22 || true
+        nc -zv -w 3 "$host" 80 || true
+        nc -zv -w 3 "$host" 443 || true
+      done
