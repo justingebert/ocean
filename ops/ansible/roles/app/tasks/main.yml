@@ -1,3 +1,38 @@
+- name: Ensure remote repo root exists
+  ansible.builtin.file:
+    path: "{{ repo_root }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+
+# synchronize pushes over SSH as ansible_user, not via sudo on the remote.
+- name: Sync backend build context to VM
+  ansible.posix.synchronize:
+    src: "{{ playbook_dir }}/../../backend/"
+    dest: "{{ repo_root }}/backend/"
+    delete: true
+    rsync_opts:
+      - "--exclude=target"
+      - "--exclude=.bsp"
+      - "--exclude=.metals"
+      - "--exclude=.bloop"
+      - "--exclude=project/target"
+      - "--exclude=project/project"
+      - "--exclude=logs"
+  become: false
+
+- name: Sync frontend build context to VM
+  ansible.posix.synchronize:
+    src: "{{ playbook_dir }}/../../frontend/"
+    dest: "{{ repo_root }}/frontend/"
+    delete: true
+    rsync_opts:
+      - "--exclude=node_modules"
+      - "--exclude=dist"
+      - "--exclude=.vite"
+  become: false
+
 - name: Stage docker-compose.yml
   ansible.builtin.copy:
     src: "{{ compose_src }}"
@@ -13,7 +48,7 @@
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0600"
-    force: false
+    force: true
   loop:
     - compose
     - backend
@@ -38,6 +73,7 @@
       path: "{{ repo_root }}/backend"
       network: host
       pull: false
+      args: "{{ build_proxy_args }}"
   tags: build
 
 - name: Build frontend image
@@ -50,14 +86,7 @@
       path: "{{ repo_root }}/frontend"
       network: host
       pull: false
-      args:
-        VITE_API_URL: /v1
-        VITE_POSTGRESQL_HOSTNAME: localhost
-        VITE_POSTGRESQL_PORT: "55432"
-        VITE_MONGODB_HOSTNAME: localhost
-        VITE_MONGODB_PORT: "57017"
-        VITE_ADMINER_URL: ""
-        VITE_ISSUE_LINK: https://github.com/HTWHub/ocean/issues
+      args: "{{ vite_build_args | combine(build_proxy_args) }}"
   tags: build
 
 - name: Bring up app compose stack

@@ -17,9 +17,6 @@ services:
     image: ${BACKEND_IMAGE:-ocean-backend:latest}
     restart: unless-stopped
     env_file: /etc/ocean/backend.env
-    extra_hosts:
-      - "pg-vm:host-gateway"
-      - "mongo-vm:host-gateway"
     depends_on:
       - postgres_orm
       - openldap

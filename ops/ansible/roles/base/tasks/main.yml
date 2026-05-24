@@ -5,14 +5,38 @@
       - curl
       - git
       - python3-docker
+      - rsync
     state: present
     update_cache: true
     cache_valid_time: 3600
 
 - name: Install Docker Engine + compose plugin
-  ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
-  args:
-    creates: /usr/bin/docker
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure docker.service systemd dropin dir
+  ansible.builtin.file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    mode: "0755"
+  when: docker_proxy_url is defined
+
+- name: Configure Docker daemon HTTP proxy
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/docker.service.d/http-proxy.conf
+    mode: "0644"
+    content: |
+      [Service]
+      Environment="HTTP_PROXY={{ docker_proxy_url }}"
+      Environment="HTTPS_PROXY={{ docker_proxy_url }}"
+      Environment="NO_PROXY={{ docker_no_proxy | default('localhost,127.0.0.1') }}"
+  when: docker_proxy_url is defined
+  notify: Restart docker
 
 - name: Enable and start Docker
   ansible.builtin.systemd:

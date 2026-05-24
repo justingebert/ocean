@@ -3,6 +3,7 @@
 - when db creation fails it leaves danling orphan in the postgres orm metadata
 - untrusted ca certificate for gitlab container registry
   - ca certicate needs rto be added to machine as trusted
+- mongodb admin users needs to be set once, for a new one data dir needs to be deleted or, manually created
 
 
 ## Ideas

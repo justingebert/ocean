@@ -1,4 +1,13 @@
-env_src: "{{ repo_root }}/ops/multi-vm/env"
-compose_src: "{{ repo_root }}/ops/multi-vm/app/docker-compose.yml"
+compose_src: "{{ playbook_dir }}/../../ops/compose/app/docker-compose.yml"
+repo_root: /home/ansible/ocean
 
 force_build: true # Set -e force_build=false to skip rebuilds when images already exist.
+
+vite_build_args:
+  VITE_API_URL: /v1
+  VITE_POSTGRESQL_HOSTNAME: ocean-pg.f4.htw-berlin.de
+  VITE_POSTGRESQL_PORT: "5432"
+  VITE_MONGODB_HOSTNAME: ocean-mongo.f4.htw-berlin.de
+  VITE_MONGODB_PORT: "27017"
+  VITE_ADMINER_URL: ""
+  VITE_ISSUE_LINK: https://github.com/HTWHub/ocean/issues

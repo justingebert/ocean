@@ -14,7 +14,7 @@ Three deployable parts plus docs:
 - `frontend/Dockerfile` — multi-stage Vite build → `caddy:2-alpine` serving `/usr/share/caddy`, SPA fallback in `frontend/Caddyfile`. `VITE_*` injected via `--build-arg` at build time.
 - `backend/Dockerfile` — multi-stage `eclipse-temurin:17-jdk-jammy` + sbt → `sbt dist` → `eclipse-temurin:17-jre-jammy` runtime running `bin/backend` as the unprivileged `play` user. All runtime config (DB hosts, secrets, LDAP) flows in via env vars resolved by HOCON `${?VAR}` overrides.
 
-Current deployment target is `ops/single-vm/docker-compose.yml`: one VM runs frontend, backend, internal Postgres, managed Postgres, MongoDB, and OpenLDAP on one Docker network; only the frontend publishes port 80. `ops/multi-vm/` is a future draft for the three-VM university setup. There is no CI/CD pipeline yet.
+Deploy target is the three-VM HTW setup: `ops/compose/app/docker-compose.yml` (frontend + backend + internal Postgres + LDAP), `ops/compose/pg/docker-compose.yml` (managed Postgres), `ops/compose/mongo/docker-compose.yml` (managed MongoDB). Provisioned via `ops/ansible/` against `inventory.prod.yml`. Env templates in `ops/compose/env/`. No CI/CD pipeline yet.
 
 ## Running things locally
 

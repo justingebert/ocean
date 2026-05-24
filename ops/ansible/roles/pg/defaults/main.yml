@@ -1,2 +1,1 @@
-env_src: "{{ repo_root }}/ops/multi-vm/env"
-compose_src: "{{ repo_root }}/ops/multi-vm/pg/docker-compose.yml"
+compose_src: "{{ playbook_dir }}/../../ops/compose/pg/docker-compose.yml"

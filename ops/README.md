@@ -1,3 +1,90 @@
 # ops/
 
 Deployment and VM-operation files for Ocean.
+
+- `bootstrap/bootstrap-vm.sh` — one-shot script that creates the `ansible` user on a fresh VM.
+- `ansible/` — playbook + roles that provision the three VMs (`app`, `pg`, `mongo`).
+- `compose/` — docker-compose files and `.env.example` templates staged onto each VM by the playbook.
+
+> **HTW network note:** the VMs have no direct internet access. All outbound HTTP(S) goes through the HTW web proxy at `http://webproxy.rz.htw-berlin.de:3128`. 
+
+## Bootstrap a new VM (once per VM)
+
+The playbook logs in as the `ansible` user. To create that user on a fresh VM:
+
+1. Copy ssh pubkey
+   ```sh
+   cat ~/.ssh/id_ed25519.pub
+   ```
+2. Copy the bootstrap script to the VM:
+   ```sh
+   scp ops/bootstrap/bootstrap-vm.sh <user>@<vm>.f4.htw-berlin.de:/tmp/
+   ```
+3. SSH in, become root, run the script with the pubkey as argument:
+   ```sh
+   ssh <user>@<vm>.f4.htw-berlin.de
+   su -
+   bash /tmp/bootstrap-vm.sh "ssh-ed25519 AAAA... your-key"
+   ```
+4. Verify from the laptop:
+   ```sh
+   ssh ansible@<vm>.f4.htw-berlin.de sudo whoami   # → root
+   ```
+
+## Open the firewall (manual, once per VM)
+
+The HTW base image ships with `/root/firewall.sh` — a default-DROP iptables script. Edit it as root, then re-run.
+
+**app-vm** — uncomment HTTP/HTTPS inbound for the world (or restrict to the HTW network):
+
+```sh
+ssh ansible@<vm>.f4.htw-berlin.de
+sudo -e /root/firewall.sh
+```
+
+Uncomment in the script:
+```sh
+# Welt
+iptables -A INPUT -p tcp --dport 80  -j ACCEPT
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+```
+(or, for HTW-only access, uncomment the `141.45.0.0/16,10.4.0.0/16` variants instead.)
+
+**pg-vm** — add a rule for Postgres `:5432`:
+
+```sh
+iptables -A INPUT -s 141.45.0.0/16,10.4.0.0/16 -p tcp --dport 5432 -j ACCEPT
+```
+
+**mongo-vm** — add a rule for Mongo `:27017`:
+
+```sh
+iptables -A INPUT -s 141.45.0.0/16,10.4.0.0/16 -p tcp --dport 27017 -j ACCEPT
+```
+
+Then on each VM:
+
+```sh
+sudo /root/firewall.sh        # applies + persists to /etc/firewall.conf
+sudo iptables -L INPUT -n     # verify
+```
+
+The script writes `/etc/firewall.conf` and an `if-up.d` hook, so rules survive reboot.
+
+
+## Deploy with Ansible
+
+From `ops/ansible/`:
+
+```sh
+ansible-galaxy install -r requirements.yml          # first time only
+ansible -i inventory.yml all -m ping                # connectivity check
+ansible-playbook -i inventory.yml playbook.yml      # full deploy
+
+# Target a single tier
+ansible-playbook -i inventory.yml playbook.yml --limit pg,mongo
+ansible-playbook -i inventory.yml playbook.yml --limit app
+
+# Skip image rebuilds when only re-staging compose/envs
+ansible-playbook -i inventory.yml playbook.yml --limit app -e force_build=false
+```

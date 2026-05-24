@@ -6,7 +6,24 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets — whatever shape fits (free notes, **Did** / **Why** / **Result** / **Notes** / **Problems**). No file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
-## 2026-05-19 brainstorm about how to manage secrets:
+## 2026-05-24 ansible-playbook run on all VMs, http working
+- first real deployment on VM with ansible, readable without tls
+- works great
+
+## 2026-05-23 first real ansible against prod VM
+- adjust firewall on app vm manually to test first ansible run
+- failing docker install with curl
+- failing pull because htw webproxy isnt configured in defualt docker deamon
+
+## 2026-05-20 - clarify open quesitons, plan first deployment in detail from laptop to vm
+- firewall rules for the VM?
+- ansible roles 
+- brainstorm about how to make deployment idempotent and not clutter the vms
+- think about how to set up anisble user -> maybe bashscript
+
+## 2026-05-20 - email for gitlab runner vm
+
+## 2026-05-19 - brainstorm about how to manage secrets:
 - 5 options considered: Ansible Valut, SOPS, Gitlab Vars, External Secret manager and manual env
 - learning towards SOPS or gitlab vars
 - gitlab vars seems better because of possible accident commits using sops

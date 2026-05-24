@@ -1,0 +1,23 @@
+all:
+  vars:
+    ansible_user: ansible
+    ansible_python_interpreter: /usr/bin/python3
+    # HTW outbound HTTP(S) only reachable via this proxy.
+    docker_proxy_url: http://webproxy.rz.htw-berlin.de:3128
+    build_proxy_args:
+      HTTP_PROXY: "{{ docker_proxy_url }}"
+      HTTPS_PROXY: "{{ docker_proxy_url }}"
+      NO_PROXY: localhost,127.0.0.1
+  children:
+    app:
+      hosts:
+        ocean-app:
+          ansible_host: ocean-jg.f4.htw-berlin.de
+    pg:
+      hosts:
+        ocean-pg:
+          ansible_host: ocean-pg.f4.htw-berlin.de
+    mongo:
+      hosts:
+        ocean-mongo:
+          ansible_host: ocean-mongo.f4.htw-berlin.de
