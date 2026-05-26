@@ -4,7 +4,20 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 ## Format
 
-One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets — whatever shape fits (free notes, **Did** / **Why** / **Result** / **Notes** / **Problems**). No file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
+One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
+
+## 2026-05-25 — version-upgrade roadmap
+- analysed stack versions: PG 12 + Mongo 5 both EOL; pgjdbc 42.2.21 has a SQLi CVE; mongo driver 2.9 can't talk to Mongo 7
+- wrote `plans/upgrades.md` (phases 10.0–10.6), tightened ROADMAP Phase 10 to point at it
+- two couplings flagged: Mongo server bump forces a MongoDBEngine rewrite (`Completed` type gone in driver 4.0); PG majors need dump/restore with role/globals capture, not a tag swap
+- targets set conservative LTS: PG 17, Mongo 7. Scala 3 + frontend deferred
+- noted openldap is on frozen bitnamilegacy image *and* in the prod auth path — needs a decision
+
+## 2026-05-24 — add TLS
+- new tls ansible role
+- enforce tls on database connections
+- update proxy to use tls
+- check for ca trust on machines and jvm
 
 ## 2026-05-24 ansible-playbook run on all VMs, http working
 - first real deployment on VM with ansible, readable without tls

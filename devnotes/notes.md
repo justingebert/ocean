@@ -16,6 +16,7 @@
 ## Questions:
 - what about certificate renewal?
 - sops or gitlab vars for secrets?
+- admin tool?
 
 
 ## stuff learned
@@ -26,6 +27,7 @@
 - lima -> cool and easy for local vms
 - Ansible overview 
 - htw vms outgoign traffic gets routed thortugh a forward webproxy
+- monogdb cert needs to be combined
 
 ## TODOs
 - [ ] write down how to set up vm for ansible (ssh key setup)

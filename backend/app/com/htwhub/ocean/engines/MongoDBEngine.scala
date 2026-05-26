@@ -19,7 +19,8 @@ sealed case class MongoDBConfiguration(
   databaseName: String,
   portNumber: Int,
   username: String,
-  password: String
+  password: String,
+  tls: Boolean
 )
 
 @Singleton
@@ -35,6 +36,7 @@ class MongoDBEngine @Inject() (config: Configuration)(implicit ec: ExecutionCont
       .builder()
       // Todo: check for port
       .applyToClusterSettings(block => block.hosts(List(new ServerAddress(conf.serverName, 27017)).asJava))
+      .applyToSslSettings(block => block.enabled(conf.tls))
       .credential(credential)
       .build()
   }
@@ -45,7 +47,8 @@ class MongoDBEngine @Inject() (config: Configuration)(implicit ec: ExecutionCont
     val portNumber = config.get[Int]("mongodb_cluster.portNumber")
     val username = config.get[String]("mongodb_cluster.username")
     val password = config.get[String]("mongodb_cluster.password")
-    MongoDBConfiguration(serverName, databaseName, portNumber, username, password)
+    val tls = config.get[Boolean]("mongodb_cluster.tls")
+    MongoDBConfiguration(serverName, databaseName, portNumber, username, password, tls)
   }
 
   def createDatabase(databaseName: String): Future[Completed] = {

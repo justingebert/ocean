@@ -130,13 +130,19 @@ class PostgreSQLEngine @Inject() (config: Configuration)(implicit ec: ExecutionC
       case None        => Future.failed(new Error())
     }
 
+    val sslMode = config.getOptional[String]("pg_cluster.properties.sslmode").getOrElse("disable")
+    val sslFactory = config
+      .getOptional[String]("pg_cluster.properties.sslfactory")
+      .getOrElse("org.postgresql.ssl.DefaultJavaSSLFactory")
+
     for {
       server <- serverName
       port <- portNumber
       user <- userName
       password <- userPassword
     } yield {
-      val dbURL = s"jdbc:postgresql://${server}:${port}/${dbName}?user=${user}&password=${password}"
+      val dbURL =
+        s"jdbc:postgresql://${server}:${port}/${dbName}?user=${user}&password=${password}&sslmode=${sslMode}&sslfactory=${sslFactory}"
       Database.forURL(dbURL)
     }
   }

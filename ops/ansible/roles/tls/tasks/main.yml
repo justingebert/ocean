@@ -1,0 +1,35 @@
+# Stage TLS material for the host on /etc/ocean/tls/.
+- name: Ensure TLS dir exists
+  ansible.builtin.file:
+    path: "{{ etc_ocean }}/tls"
+    state: directory
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0755"
+
+- name: Copy server cert (fullchain)
+  ansible.builtin.copy:
+    src: "{{ tls_src }}/{{ tls_cert_file }}"
+    dest: "{{ etc_ocean }}/tls/cert.pem"
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0644"
+
+- name: Copy private key
+  ansible.builtin.copy:
+    src: "{{ tls_src }}/{{ tls_key_file }}"
+    dest: "{{ etc_ocean }}/tls/key.pem"
+    owner: "{{ tls_key_uid }}"
+    group: "{{ tls_key_uid }}"
+    mode: "0600"
+
+- name: Assemble mongo combined.pem (key + cert)
+  ansible.builtin.shell: |
+    set -euo pipefail
+    cat {{ etc_ocean }}/tls/key.pem {{ etc_ocean }}/tls/cert.pem > {{ etc_ocean }}/tls/combined.pem
+    chown {{ tls_key_uid }}:{{ tls_key_uid }} {{ etc_ocean }}/tls/combined.pem
+    chmod 0600 {{ etc_ocean }}/tls/combined.pem
+  args:
+    executable: /bin/bash
+  when: "'mongo' in group_names"
+  changed_when: true

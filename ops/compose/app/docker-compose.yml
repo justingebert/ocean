@@ -24,7 +24,12 @@ services:
   frontend:
     image: ${FRONTEND_IMAGE:-ocean-frontend:latest}
     restart: unless-stopped
+    environment:
+      OCEAN_HOSTNAME: ${OCEAN_HOSTNAME}
+    volumes:
+      - /etc/ocean/tls:/etc/caddy/tls:ro
     depends_on:
       - backend
     ports:
       - "80:80"
+      - "443:443"

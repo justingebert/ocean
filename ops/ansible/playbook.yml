@@ -4,6 +4,13 @@
   roles:
     - base
 
+- name: Stage TLS material on all hosts
+  hosts: all
+  become: true
+  roles:
+    - tls
+  tags: tls
+
 - name: Provision pg-vm
   hosts: pg
   become: true

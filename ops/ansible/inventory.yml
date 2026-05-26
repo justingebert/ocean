@@ -8,16 +8,26 @@ all:
       HTTP_PROXY: "{{ docker_proxy_url }}"
       HTTPS_PROXY: "{{ docker_proxy_url }}"
       NO_PROXY: localhost,127.0.0.1
+    tls_src: "{{ playbook_dir }}/../certs"
   children:
     app:
       hosts:
         ocean-app:
           ansible_host: ocean-jg.f4.htw-berlin.de
+          tls_cert_file: ocean-jg.pem
+          tls_key_file: ocean-jg.f4.htw-berlin.de.key
+          tls_key_uid: "{{ ocean_user }}"
     pg:
       hosts:
         ocean-pg:
           ansible_host: ocean-pg.f4.htw-berlin.de
+          tls_cert_file: ocean-pg.pem
+          tls_key_file: ocean-pg.f4.htw-berlin.de.key
+          tls_key_uid: "999"   # postgres image runs as UID 999
     mongo:
       hosts:
         ocean-mongo:
           ansible_host: ocean-mongo.f4.htw-berlin.de
+          tls_cert_file: ocean-mongo.pem
+          tls_key_file: ocean-mongo.f4.htw-berlin.de.key
+          tls_key_uid: "999"   # mongo image runs as UID 999

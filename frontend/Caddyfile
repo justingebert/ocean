@@ -1,5 +1,6 @@
-# port 80 (HTTP) on every interface inside the container. TLS will live one layer up (outer proxy), so this stays plain HTTP.
-:80 {
+{$OCEAN_HOSTNAME} {
+	tls /etc/caddy/tls/cert.pem /etc/caddy/tls/key.pem
+
 	root * /usr/share/caddy
 	encode gzip zstd
 
@@ -21,4 +22,8 @@
 		try_files {path} /index.html
 		file_server
 	}
+}
+
+:80 {
+	redir https://{host}{uri} permanent
 }

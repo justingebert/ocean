@@ -10,8 +10,8 @@ Three deployable parts plus docs:
 - `frontend/` — current React 19 + Vite + Tailwind 4 UI (professor uploaded separately after the initial repo drop).
 - `docs/` — Docsify site (static).
 
-`docker-compose.yaml` spins up *development dependencies only* by default (OpenLDAP, Postgres × 2, MongoDB). Add `--profile tools` for Adminer and `--profile full` to build/run the backend and frontend containers. Both images exist:
-- `frontend/Dockerfile` — multi-stage Vite build → `caddy:2-alpine` serving `/usr/share/caddy`, SPA fallback in `frontend/Caddyfile`. `VITE_*` injected via `--build-arg` at build time.
+`docker-compose.yaml` spins up the local development dependencies only (OpenLDAP, Postgres × 2, MongoDB, Adminer). The backend and frontend run directly via `sbt run` / `npm run dev` against those deps; their container images are built for the VM deploy by Ansible, not run locally. Both Dockerfiles still exist:
+- `frontend/Dockerfile` — multi-stage Vite build → `caddy:2-alpine` serving `/usr/share/caddy`. `VITE_*` injected via `--build-arg` at build time. `frontend/Caddyfile` terminates TLS for `OCEAN_HOSTNAME` (cert mounted at `/etc/caddy/tls`) and does the SPA fallback; it is the only Caddyfile — no separate dev/prod split.
 - `backend/Dockerfile` — multi-stage `eclipse-temurin:17-jdk-jammy` + sbt → `sbt dist` → `eclipse-temurin:17-jre-jammy` runtime running `bin/backend` as the unprivileged `play` user. All runtime config (DB hosts, secrets, LDAP) flows in via env vars resolved by HOCON `${?VAR}` overrides.
 
 Deploy target is the three-VM HTW setup: `ops/compose/app/docker-compose.yml` (frontend + backend + internal Postgres + LDAP), `ops/compose/pg/docker-compose.yml` (managed Postgres), `ops/compose/mongo/docker-compose.yml` (managed MongoDB). Provisioned via `ops/ansible/` against `inventory.prod.yml`. Env templates in `ops/compose/env/`. No CI/CD pipeline yet.
@@ -21,9 +21,7 @@ Deploy target is the three-VM HTW setup: `ops/compose/app/docker-compose.yml` (f
 Development dependencies (LDAP, three DB clusters):
 
 ```sh
-docker compose up                              # deps only
-docker compose --profile tools up              # deps + Adminer
-docker compose --profile full up --build       # deps + backend + frontend containers
+docker compose up                              # all local dev deps (LDAP, 3 DB clusters, Adminer)
 ```
 
 Backend (Play, SBT) from `backend/`:

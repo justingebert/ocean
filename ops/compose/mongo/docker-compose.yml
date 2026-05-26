@@ -9,3 +9,9 @@ services:
       - "27017:27017"
     volumes:
       - /srv/ocean/mongodb_cluster/data:/data/db
+      - /etc/ocean/tls:/etc/ssl/ocean:ro
+    command:
+      - mongod
+      - --tlsMode=requireTLS
+      - --tlsCertificateKeyFile=/etc/ssl/ocean/combined.pem
+      - --auth

@@ -83,11 +83,11 @@ export class Database extends BaseModel {
    */
   public connectionString(psqlUsername?: string): string {
     if (this.props.engine === EngineType.PostgreSQL) {
-      return `psql -U ${psqlUsername} -h ${this.hostname} -p ${this.port} -d ${this.props.name}`;
+      return `psql "postgresql://${psqlUsername}@${this.hostname}:${this.port}/${this.props.name}?sslmode=verify-full"`;
     } else if (this.props.engine === EngineType.MongoDB) {
       return `mongodb://${this.hostname}:${this.port.toString()}/?authSource=${
         this.props.name
-      }`;
+      }&tls=true`;
     } else {
       const assertNever = (_: never): string => "";
       return assertNever(this.props.engine);

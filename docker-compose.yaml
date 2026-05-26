@@ -52,38 +52,6 @@ services:
     ports:
       - "8080:8080"
 
-  backend:
-    profiles: ["full"]
-    build:
-      context: ./backend
-    image: ocean-backend:dev
-    env_file: .env
-    depends_on:
-      - postgres_orm
-      - pg_cluster
-      - mongodb_cluster
-      - openldap
-    ports:
-      - "9000:9000"
-
-  frontend:
-    profiles: ["full"]
-    build:
-      context: ./frontend
-      args:
-        VITE_API_URL: ${VITE_API_URL:-/v1}
-        VITE_POSTGRESQL_HOSTNAME: ${VITE_POSTGRESQL_HOSTNAME:-localhost}
-        VITE_POSTGRESQL_PORT: ${VITE_POSTGRESQL_PORT:-5555}
-        VITE_MONGODB_HOSTNAME: ${VITE_MONGODB_HOSTNAME:-localhost}
-        VITE_MONGODB_PORT: ${VITE_MONGODB_PORT:-27017}
-        VITE_ADMINER_URL: ${VITE_ADMINER_URL:-http://localhost:8080/}
-        VITE_ISSUE_LINK: ${VITE_ISSUE_LINK:-https://github.com/HTWHub/ocean/issues}
-    image: ocean-frontend:dev
-    depends_on:
-      - backend
-    ports:
-      - "5193:80"
-
 volumes:
   postgres_orm_data:
   pg_cluster_data:

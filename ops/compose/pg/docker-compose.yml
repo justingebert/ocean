@@ -9,3 +9,11 @@ services:
       - "5432:5432"
     volumes:
       - /srv/ocean/pg_cluster/data:/var/lib/postgresql/data
+      - /etc/ocean/tls:/etc/ssl/ocean:ro
+      - /etc/ocean/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    command: >-
+      postgres
+      -c ssl=on
+      -c ssl_cert_file=/etc/ssl/ocean/cert.pem
+      -c ssl_key_file=/etc/ssl/ocean/key.pem
+      -c hba_file=/etc/postgresql/pg_hba.conf
