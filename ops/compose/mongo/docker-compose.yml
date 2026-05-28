@@ -14,4 +14,6 @@ services:
       - mongod
       - --tlsMode=requireTLS
       - --tlsCertificateKeyFile=/etc/ssl/ocean/combined.pem
+      - --setParameter=tlsUseSystemCA=true
+      - --tlsAllowConnectionsWithoutCertificates
       - --auth

@@ -4,6 +4,7 @@
 - untrusted ca certificate for gitlab container registry
   - ca certicate needs rto be added to machine as trusted
 - mongodb admin users needs to be set once, for a new one data dir needs to be deleted or, manually created
+- could not connect to mongodb -> by default client tls certificate required, turned off as parameter
 
 
 ## Ideas
@@ -17,6 +18,7 @@
 - what about certificate renewal?
 - sops or gitlab vars for secrets?
 - admin tool?
+- does reboot -> firewall.sh wipe docker firewall stuff?
 
 
 ## stuff learned

@@ -28,6 +28,15 @@ RUN sbt -batch dist \
 # --- runtime stage ---
 FROM eclipse-temurin:17-jre-jammy AS runtime
 
+# add dfn root ca to nvm truststore
+# decided against USE_SYSTEM_CA_CERTS since this needs to run entrypoint with root
+COPY docker/dfn-community-root-ca-2022.pem /tmp/dfn-root-ca.pem
+RUN keytool -importcert -noprompt -trustcacerts \
+      -alias dfn-community-root-ca-2022 \
+      -file /tmp/dfn-root-ca.pem \
+      -keystore "$JAVA_HOME/lib/security/cacerts" -storepass changeit \
+ && rm /tmp/dfn-root-ca.pem
+
 # unprivliged user -> no running jvm as root
 RUN useradd --system --uid 1000 --no-create-home --home-dir /opt/backend play
 
