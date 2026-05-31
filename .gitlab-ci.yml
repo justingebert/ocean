@@ -96,7 +96,7 @@ deploy:app:
     - install -m 600 .secure_files/ocean-jg.pem ops/certs/ocean-jg.pem
     - install -m 600 .secure_files/ocean-jg.f4.htw-berlin.de.key ops/certs/ocean-jg.f4.htw-berlin.de.key
     - install -m 600 .secure_files/backend.env.example ops/compose/env/backend.env.example
-    - install -m 600 .secure_files/postgres_orm.example ops/compose/env/postgres_orm.env.example
+    - install -m 600 .secure_files/postgres_orm.env.example ops/compose/env/postgres_orm.env.example
     - cd ops/ansible
     - |
       GITLAB_REGISTRY_USER="$CI_REGISTRY_USER" \
