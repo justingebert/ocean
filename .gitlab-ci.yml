@@ -1,32 +1,99 @@
-# Connectivity probe from GitLab runner to uni VMs.
+stages:
+  - build
+  - deploy
 
-probe-vm:
-  stage: test
-  image: alpine:latest
+variables:
+  BACKEND_IMAGE: "$CI_REGISTRY_IMAGE/backend"
+  FRONTEND_IMAGE: "$CI_REGISTRY_IMAGE/frontend"
+  VITE_API_URL: /v1
+  VITE_POSTGRESQL_HOSTNAME: ocean-pg.f4.htw-berlin.de
+  VITE_POSTGRESQL_PORT: "5432"
+  VITE_MONGODB_HOSTNAME: ocean-mongo.f4.htw-berlin.de
+  VITE_MONGODB_PORT: "27017"
+  VITE_ADMINER_URL: ""
+  VITE_ISSUE_LINK: https://github.com/HTWHub/ocean/issues
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  OUTBOUND_PROXY_URL: &outbound_proxy_url "http://webproxy.rz.htw-berlin.de:3128"
+  OUTBOUND_NO_PROXY: &outbound_no_proxy "localhost,127.0.0.1,docker,docker:2375,docker:2376,ocean-jg.f4.htw-berlin.de,ocean-pg.f4.htw-berlin.de,ocean-mongo.f4.htw-berlin.de"
+  HTTP_PROXY: *outbound_proxy_url
+  HTTPS_PROXY: *outbound_proxy_url
+  NO_PROXY: *outbound_no_proxy
+  http_proxy: *outbound_proxy_url
+  https_proxy: *outbound_proxy_url
+  no_proxy: *outbound_no_proxy
+
+default:
+  tags:
+    - ocean
+
+.build_image:
+  stage: build
+  image: docker:24-cli
+  services:
+    - name: docker:24-dind
+      command: ["--tls=false"]
   rules:
-    - if: $CI_COMMIT_BRANCH
-      when: manual
-  variables:
-    VM_HOSTS: "ocean-jg.f4.htw-berlin.de ocean-mongo.f4.htw-berlin.de ocean-pg.f4.htw-berlin.de"
+    - if: $CI_COMMIT_BRANCH == "main"
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+
+build:backend:
+  extends: .build_image
   script:
-    - apk add --no-cache iputils openssh-client netcat-openbsd bind-tools curl
-    - echo "=== runner identity ==="
-    - hostname
-    - ip -4 addr
-    - curl -s ifconfig.me || true
-    - echo
+    - docker build -t "$BACKEND_IMAGE:$CI_COMMIT_SHORT_SHA" -t "$BACKEND_IMAGE:latest" backend
+    - docker push "$BACKEND_IMAGE:$CI_COMMIT_SHORT_SHA"
+    - docker push "$BACKEND_IMAGE:latest"
+
+build:frontend:
+  extends: .build_image
+  script:
     - |
-      for host in $VM_HOSTS; do
-        echo
-        echo "############################################"
-        echo "### $host"
-        echo "############################################"
-        echo "--- DNS ---"
-        nslookup "$host" || true
-        echo "--- ICMP ---"
-        ping -c 3 -W 2 "$host" || true
-        echo "--- TCP probes ---"
-        nc -zv -w 3 "$host" 22 || true
-        nc -zv -w 3 "$host" 80 || true
-        nc -zv -w 3 "$host" 443 || true
-      done
+      docker build \
+        --build-arg VITE_API_URL="$VITE_API_URL" \
+        --build-arg VITE_POSTGRESQL_HOSTNAME="$VITE_POSTGRESQL_HOSTNAME" \
+        --build-arg VITE_POSTGRESQL_PORT="$VITE_POSTGRESQL_PORT" \
+        --build-arg VITE_MONGODB_HOSTNAME="$VITE_MONGODB_HOSTNAME" \
+        --build-arg VITE_MONGODB_PORT="$VITE_MONGODB_PORT" \
+        --build-arg VITE_ADMINER_URL="$VITE_ADMINER_URL" \
+        --build-arg VITE_ISSUE_LINK="$VITE_ISSUE_LINK" \
+        -t "$FRONTEND_IMAGE:$CI_COMMIT_SHORT_SHA" \
+        -t "$FRONTEND_IMAGE:latest" \
+        frontend
+    - docker push "$FRONTEND_IMAGE:$CI_COMMIT_SHORT_SHA"
+    - docker push "$FRONTEND_IMAGE:latest"
+
+deploy:app:
+  stage: deploy
+  image: alpine:3.20
+  needs:
+    - build:backend
+    - build:frontend
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  before_script:
+    - apk add --no-cache ansible bash curl openssh-client rsync
+    - ansible-galaxy collection install -r ops/ansible/requirements.yml
+    - install -m 700 -d ~/.ssh
+    - if [ -f "$ANSIBLE_SSH_PRIVATE_KEY" ]; then cp "$ANSIBLE_SSH_PRIVATE_KEY" ~/.ssh/id_ed25519; else printf '%s\n' "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519; fi
+    - chmod 600 ~/.ssh/id_ed25519
+    - ssh-keyscan ocean-jg.f4.htw-berlin.de >> ~/.ssh/known_hosts
+  script:
+    - export SECURE_FILES_DOWNLOAD_PATH=.secure_files
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    - install -m 700 -d ops/certs ops/compose/env
+    - install -m 600 .secure_files/ocean-jg.pem ops/certs/ocean-jg.pem
+    - install -m 600 .secure_files/ocean-jg.f4.htw-berlin.de.key ops/certs/ocean-jg.f4.htw-berlin.de.key
+    - install -m 600 .secure_files/backend.env.example ops/compose/env/backend.env.example
+    - install -m 600 .secure_files/postgres_orm.example ops/compose/env/postgres_orm.env.example
+    - cd ops/ansible
+    - |
+      GITLAB_REGISTRY_USER="$CI_REGISTRY_USER" \
+      GITLAB_REGISTRY_PASSWORD="$CI_REGISTRY_PASSWORD" \
+      ansible-playbook \
+        -i inventory.yml \
+        playbook.yml \
+        --limit app \
+        -e "backend_image=$BACKEND_IMAGE:$CI_COMMIT_SHORT_SHA" \
+        -e "frontend_image=$FRONTEND_IMAGE:$CI_COMMIT_SHORT_SHA"

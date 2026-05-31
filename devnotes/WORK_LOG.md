@@ -6,6 +6,12 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
+## 2026-05-31 GitLab runner and first CI deploy setup
+- Added Ansible-managed setup for the new GitLab runner VM.
+- Wired CI toward image build, registry push, and manual app deployment.
+- Clarified proxy handling for VM outbound access and GitLab runner operation.
+- Planned first real pipeline test around GitLab variables and secure files for deployment secrets.
+
 ## 2026-05-31 migrate image builds
 - moved on vm images to gitlab registry
 
