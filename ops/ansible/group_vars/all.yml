@@ -2,3 +2,11 @@ ocean_user: ocean
 etc_ocean: /etc/ocean
 data_root: /srv/ocean
 env_src: "{{ playbook_dir }}/../../ops/compose/env"
+outbound_no_proxy: localhost,127.0.0.1,docker
+outbound_proxy_env:
+  HTTP_PROXY: "{{ outbound_proxy_url | default('') }}"
+  HTTPS_PROXY: "{{ outbound_proxy_url | default('') }}"
+  http_proxy: "{{ outbound_proxy_url | default('') }}"
+  https_proxy: "{{ outbound_proxy_url | default('') }}"
+  NO_PROXY: "{{ outbound_no_proxy }}"
+  no_proxy: "{{ outbound_no_proxy }}"

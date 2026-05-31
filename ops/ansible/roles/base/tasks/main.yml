@@ -24,7 +24,7 @@
     path: /etc/systemd/system/docker.service.d
     state: directory
     mode: "0755"
-  when: docker_proxy_url is defined
+  when: outbound_proxy_url is defined and outbound_proxy_url | length > 0
 
 - name: Configure Docker daemon HTTP proxy
   ansible.builtin.copy:
@@ -32,10 +32,10 @@
     mode: "0644"
     content: |
       [Service]
-      Environment="HTTP_PROXY={{ docker_proxy_url }}"
-      Environment="HTTPS_PROXY={{ docker_proxy_url }}"
-      Environment="NO_PROXY=localhost,127.0.0.1"
-  when: docker_proxy_url is defined
+      Environment="HTTP_PROXY={{ outbound_proxy_url }}"
+      Environment="HTTPS_PROXY={{ outbound_proxy_url }}"
+      Environment="NO_PROXY={{ outbound_no_proxy }}"
+  when: outbound_proxy_url is defined and outbound_proxy_url | length > 0
   notify: Restart docker
 
 - name: Enable and start Docker

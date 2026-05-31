@@ -6,6 +6,14 @@
     group: "{{ ocean_user }}"
     mode: "0640"
 
+- name: Stage compose env file
+  ansible.builtin.template:
+    src: compose.env.j2
+    dest: "{{ etc_ocean }}/compose.env"
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0600"
+
 - name: Stage env files
   ansible.builtin.copy:
     src: "{{ env_src }}/{{ item }}.env.example"
@@ -15,7 +23,6 @@
     mode: "0600"
     force: true
   loop:
-    - compose
     - backend
     - postgres_orm
 

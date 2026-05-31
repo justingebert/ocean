@@ -101,6 +101,5 @@ ansible -i inventory.yml all -m ping                # connectivity check
 ansible-playbook -i inventory.yml playbook.yml      # full deploy
 
 # Target a single tier
-ansible-playbook -i inventory.yml playbook.yml --limit pg,mongo
 ansible-playbook -i inventory.yml playbook.yml --limit app
 ```

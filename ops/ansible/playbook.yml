@@ -4,8 +4,8 @@
   roles:
     - base
 
-- name: Stage TLS material on all hosts
-  hosts: all
+- name: Stage TLS material on app/db hosts
+  hosts: app:pg:mongo
   become: true
   roles:
     - tls
@@ -28,3 +28,9 @@
   become: true
   roles:
     - app
+
+- name: Provision GitLab runner VM
+  hosts: ops
+  become: true
+  roles:
+    - gitlab-runner

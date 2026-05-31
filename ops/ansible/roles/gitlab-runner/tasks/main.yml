@@ -1,0 +1,99 @@
+- name: Check GitLab Runner apt repository
+  ansible.builtin.stat:
+    path: /etc/apt/sources.list.d/runner_gitlab-runner.list
+  register: gitlab_runner_repo
+
+- name: Download GitLab Runner apt repository setup script
+  ansible.builtin.get_url:
+    url: https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh
+    dest: /tmp/gitlab-runner-repo.sh
+    mode: "0755"
+  environment: "{{ outbound_proxy_env }}"
+  when: not gitlab_runner_repo.stat.exists
+
+- name: Add GitLab Runner apt repository
+  ansible.builtin.command:
+    argv:
+      - /tmp/gitlab-runner-repo.sh
+  environment: "{{ outbound_proxy_env }}"
+  changed_when: true
+  when: not gitlab_runner_repo.stat.exists
+
+- name: Install GitLab Runner
+  ansible.builtin.apt:
+    name: gitlab-runner
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  environment: "{{ outbound_proxy_env }}"
+
+- name: Allow GitLab Runner to use Docker
+  ansible.builtin.user:
+    name: gitlab-runner
+    groups: docker
+    append: true
+  notify: Restart gitlab-runner
+
+- name: Ensure GitLab Runner systemd dropin dir
+  ansible.builtin.file:
+    path: /etc/systemd/system/gitlab-runner.service.d
+    state: directory
+    mode: "0755"
+  when: outbound_proxy_url is defined and outbound_proxy_url | length > 0
+
+- name: Configure GitLab Runner HTTP proxy
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/gitlab-runner.service.d/http-proxy.conf
+    mode: "0644"
+    content: |
+      [Service]
+      Environment="HTTP_PROXY={{ outbound_proxy_url }}"
+      Environment="HTTPS_PROXY={{ outbound_proxy_url }}"
+      Environment="NO_PROXY={{ outbound_no_proxy }}"
+  when: outbound_proxy_url is defined and outbound_proxy_url | length > 0
+  notify: Restart gitlab-runner
+
+- name: Check for local GitLab Runner registration
+  ansible.builtin.command:
+    argv:
+      - grep
+      - -q
+      - '^[[:space:]]*\[\[runners\]\]'
+      - /etc/gitlab-runner/config.toml
+  register: gitlab_runner_config
+  changed_when: false
+  failed_when: false
+
+- name: Require a runner token for first registration
+  ansible.builtin.assert:
+    that:
+      - gitlab_runner_token | length > 0
+      - gitlab_runner_token is not search('\s')
+    fail_msg: "Set GITLAB_RUNNER_TOKEN to only the token value from GitLab, not the full register command."
+  when: gitlab_runner_config.rc != 0
+
+- name: Register GitLab Runner
+  ansible.builtin.shell: |
+    set -euo pipefail
+    privileged_arg=""
+    if [ "{{ gitlab_runner_docker_privileged | bool | lower }}" = "true" ]; then
+      privileged_arg="--docker-privileged"
+    fi
+
+    gitlab-runner register \
+      --non-interactive \
+      --url "{{ gitlab_runner_url }}" \
+      --token "$GITLAB_RUNNER_TOKEN" \
+      --executor "{{ gitlab_runner_executor }}" \
+      --docker-image "{{ gitlab_runner_docker_image }}" \
+      $privileged_arg
+  args:
+    executable: /bin/bash
+  environment: "{{ outbound_proxy_env | combine({'GITLAB_RUNNER_TOKEN': gitlab_runner_token}) }}"
+  when: gitlab_runner_config.rc != 0
+
+- name: Enable and start GitLab Runner
+  ansible.builtin.systemd:
+    name: gitlab-runner
+    enabled: true
+    state: started

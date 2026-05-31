@@ -3,9 +3,13 @@ all:
     ansible_user: ansible
     ansible_python_interpreter: /usr/bin/python3
     # HTW outbound HTTP(S) only reachable via this proxy.
-    docker_proxy_url: http://webproxy.rz.htw-berlin.de:3128
+    outbound_proxy_url: http://webproxy.rz.htw-berlin.de:3128
     tls_src: "{{ playbook_dir }}/../certs"
   children:
+    ops:
+      hosts:
+        ocean-ops:
+          ansible_host: ocean-ops.f4.htw-berlin.de
     app:
       hosts:
         ocean-app:
