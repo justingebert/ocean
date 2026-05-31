@@ -103,7 +103,4 @@ ansible-playbook -i inventory.yml playbook.yml      # full deploy
 # Target a single tier
 ansible-playbook -i inventory.yml playbook.yml --limit pg,mongo
 ansible-playbook -i inventory.yml playbook.yml --limit app
-
-# Skip image rebuilds when only re-staging compose/envs
-ansible-playbook -i inventory.yml playbook.yml --limit app -e force_build=false
 ```

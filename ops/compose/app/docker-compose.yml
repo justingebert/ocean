@@ -1,11 +1,6 @@
 name: ocean-app
 
 services:
-  openldap:
-    image: bitnamilegacy/openldap:2
-    restart: unless-stopped
-    env_file: /etc/ocean/openldap.env
-
   postgres_orm:
     image: postgres:12-alpine
     restart: unless-stopped
@@ -17,14 +12,15 @@ services:
 
   backend:
     image: ${BACKEND_IMAGE:-ocean-backend:latest}
+    pull_policy: ${BACKEND_PULL_POLICY:-missing}
     restart: unless-stopped
     env_file: /etc/ocean/backend.env
     depends_on:
       - postgres_orm
-      - openldap
 
   frontend:
     image: ${FRONTEND_IMAGE:-ocean-frontend:latest}
+    pull_policy: ${FRONTEND_PULL_POLICY:-missing}
     restart: unless-stopped
     environment:
       OCEAN_HOSTNAME: ${OCEAN_HOSTNAME}

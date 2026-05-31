@@ -34,7 +34,7 @@
       [Service]
       Environment="HTTP_PROXY={{ docker_proxy_url }}"
       Environment="HTTPS_PROXY={{ docker_proxy_url }}"
-      Environment="NO_PROXY={{ docker_no_proxy | default('localhost,127.0.0.1') }}"
+      Environment="NO_PROXY=localhost,127.0.0.1"
   when: docker_proxy_url is defined
   notify: Restart docker
 

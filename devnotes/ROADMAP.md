@@ -23,7 +23,7 @@ Out of v1: observability stack, SQL-injection refactor, architecture changes, k8
 
 ### Phase 2 — Compose integration ✅
 
-- `profiles: ["full"]` on `backend` + `frontend`. Caddy reverse-proxies `/v1` → `backend:9000`. Named volumes for DB persistence.
+- add docker images to compsoe and test,
 
 ### Phase 3 — Code quality 
 
@@ -35,27 +35,16 @@ Out of v1: observability stack, SQL-injection refactor, architecture changes, k8
 
 Rehearse the whole prod stack on one VM locally before touching anything at HTW.
 
-- One Lima VM runs the full stack: frontend (Caddy :80), backend, `postgres_orm`, `pg_cluster`, `mongodb_cluster`, `openldap` (local stand-in for HTW LDAP).
-- Bootstrap is bash for now (`ops/single-vm/bootstrap.sh`); becomes Ansible in the next phase.
-- Secrets live in `ops/single-vm/env/*.env`, never in the repo.
-- Verify: clean Lima up → working Ocean reachable on localhost; full login + DB-create flow passes.
-
 ### Phase 5 — Ansible takes over bootstrap ✅
 
 Same single Lima VM, different provisioning mechanism. Replaces shell history with a checked-in source of truth.
 
 - Base role (OS prep, Docker, deploy user, firewall) + app role (compose + env + ports).
 - Inventory targets the Lima VM.
-- Verify: second `ansible-playbook` run is a no-op (idempotency gate); stack still works.
 
 ### Phase 6 — Three local Lima VMs (mirror uni topology) ✅
 
 Split the single VM into `app-vm` / `pg-vm` / `mongo-vm` on a Lima-internal network. Same Ansible, per-host roles.
-
-- `app-vm`: frontend, backend, `postgres_orm`. Only public ports.
-- `pg-vm`: `pg_cluster` (+ Adminer). DB port open to `app-vm` only.
-- `mongo-vm`: `mongodb_cluster`. DB port open to `app-vm` only.
-- Backend points at the other VMs by internal IP via the existing `*_HOSTNAME` seam.
 - Verify: end-to-end login + DB-create across the three VMs; DB ports unreachable from any host other than `app-vm`; tear-down + redeploy clean.
 
 ### Phase 7 — GitLab CI pipeline (build only, no deploy) - BLOCKED by CICD runner setup
@@ -74,20 +63,10 @@ Last local-only phase. Resolve everything that cannot be tried for the first tim
 - HTW-issued per-VM TLS cert + key: storage path, mount strategy, renewal cadence, CA root for the JVM trust store (LDAPS).
 - Inbound source CIDRs confirmed: who may SSH, who may reach :80/:443, who may reach DB ports.
 - Self-hosted GitLab runner on `ocean-ops` — HTW GitLab has no shared runners. Ansible role provisions Docker + `gitlab-runner`, registers against the project with a registration token from CI/CD settings, executor `docker`. Runner reaches the app/pg/mongo VMs over SSH; only `ocean-ops` needs egress to `gitlab.htw-berlin.de`.
-- Verify: rehearse the runner role against a Lima stand-in for `ocean-ops`; a CI job picks up on the registered runner and runs a remote `ansible-playbook --check` against a target host; cert + CA-root mounting rehearsed end-to-end locally.
 
 ### Phase 9 — Deploy to HTW VMs ✅
 
-Same artifacts, same playbooks, real targets. Dry-run first, every time.
-
-- `app-vm` first, base role only → confirm SSH/firewall didn't lock us out → app role.
-- Then `pg-vm` + `mongo-vm`; repoint `app-vm` backend at them.
-- Apply the runner role to `ocean-ops`; register it against the HTW GitLab project; confirm the runner picks up a no-op job.
-- TLS terminated at the frontend on `app-vm` (:80 → :443); HTW CA root in the backend JVM trust store; LDAPS verifies without bypasses.
-- CI deploy stage flips from placeholder to `ansible-playbook` against the uni inventory, run by the `ocean-ops` runner, behind a manual approval gate.
-- Verify: push to `main` → click deploy → new image live; full smoke (login + DB create + persistence across VM reboot).
-
-See `plans/deployment.md` for the detailed phase-by-phase verify steps from Phase 4 onward.
+deploy app stack to the three HTW VMs, test end-to-end in prod.
 
 ### Phase 10 — Version upgrades (post-baseline)
 

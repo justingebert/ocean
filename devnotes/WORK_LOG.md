@@ -6,6 +6,13 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
+## 2026-05-31 migrate image builds
+- moved on vm images to gitlab registry
+
+## 2026-05-30 Draft: firewall into Ansible (roles/firewall)
+- Took the per-VM HTW `firewall.sh` (iptables) into IaC instead of hand-editing each VM. Option A: one Jinja template of the common ruleset, per-host deltas as inventory vars.
+- Per-host vars: `firewall_inbound_tcp_ports` (app 80/443, mongo 27017, pg 5432) and `firewall_extra_rules` (app-only: docker-bridge egress + LDAPS 636 to AD). Kept the HTW base ruleset verbatim incl. SSH-from-HTW (lockout safety) and their `/etc/firewall.conf` + if-up.d persistence.
+
 ## 2026-05-28
 - get ldap running in prod vm (had issue with cert, was jsut a typo in the docker Volume)
 

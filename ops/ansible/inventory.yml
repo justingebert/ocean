@@ -4,10 +4,6 @@ all:
     ansible_python_interpreter: /usr/bin/python3
     # HTW outbound HTTP(S) only reachable via this proxy.
     docker_proxy_url: http://webproxy.rz.htw-berlin.de:3128
-    build_proxy_args:
-      HTTP_PROXY: "{{ docker_proxy_url }}"
-      HTTPS_PROXY: "{{ docker_proxy_url }}"
-      NO_PROXY: localhost,127.0.0.1
     tls_src: "{{ playbook_dir }}/../certs"
   children:
     app:
