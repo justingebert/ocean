@@ -6,6 +6,16 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
+## get adminer running, think about prod adminer setup, also managed postgrtes stuff
+- local needs adjusted hbd config and deployed needs proxy for tls
+- prod needs a proxy for tls and postgres auth adjustments for local without ssl
+- ldap auth wasnt workign when conencting to managed psotgres, problems was missing lien in hba
+
+## get cicd running
+- test ci with runner
+- some debugging
+- ansible docker package has some versio issues
+
 ## 2026-05-31 GitLab runner and first CI deploy setup
 - Added Ansible-managed setup for the new GitLab runner VM.
 - Wired CI toward image build, registry push, and manual app deployment.

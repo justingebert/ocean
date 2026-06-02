@@ -50,9 +50,10 @@ iptables -A INPUT -p tcp --dport 443 -j ACCEPT
 ```
 (or, for HTW-only access, uncomment the `141.45.0.0/16,10.4.0.0/16` variants instead.)
 
-**pg-vm** — add a rule for Postgres `:5432`:
+**pg-vm** — add rules for Adminer HTTPS and Postgres:
 
 ```sh
+iptables -A INPUT -s 141.45.0.0/16,10.4.0.0/16 -p tcp --dport 443  -j ACCEPT
 iptables -A INPUT -s 141.45.0.0/16,10.4.0.0/16 -p tcp --dport 5432 -j ACCEPT
 ```
 

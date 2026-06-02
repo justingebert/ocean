@@ -25,6 +25,8 @@ services:
 
   pg_cluster:
     image: postgres:12.20
+    depends_on:
+      - openldap
     environment:
       POSTGRES_DB: internal
       POSTGRES_USER: postgres
@@ -33,6 +35,10 @@ services:
       - "5555:5432"
     volumes:
       - pg_cluster_data:/var/lib/postgresql/data
+#      - ./ops/compose/pg/pg_hba.local.conf:/etc/postgresql/pg_hba.conf:ro
+#    command: >-
+#      postgres
+#      -c hba_file=/etc/postgresql/pg_hba.conf
 
   mongodb_cluster:
     image: mongo:5
@@ -46,6 +52,8 @@ services:
 
   adminer:
     image: adminer:5
+    environment:
+      ADMINER_DEFAULT_SERVER: "pg_cluster:5432"
     depends_on:
       - postgres_orm
       - pg_cluster

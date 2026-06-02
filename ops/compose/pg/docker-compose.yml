@@ -17,3 +17,23 @@ services:
       -c ssl_cert_file=/etc/ssl/ocean/cert.pem
       -c ssl_key_file=/etc/ssl/ocean/key.pem
       -c hba_file=/etc/postgresql/pg_hba.conf
+
+  adminer:
+    image: adminer:5
+    restart: unless-stopped
+    environment:
+      ADMINER_DEFAULT_SERVER: pg_cluster:5432
+      PGSSLMODE: disable
+    depends_on:
+      - pg_cluster
+
+  adminer_proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - adminer
+    ports:
+      - "443:443"
+    volumes:
+      - /etc/ocean/Caddyfile:/etc/caddy/Caddyfile:ro
+      - /etc/ocean/tls:/etc/caddy/tls:ro

@@ -1,0 +1,9 @@
+ocean-pg.f4.htw-berlin.de {
+	tls /etc/caddy/tls/cert.pem /etc/caddy/tls/key.pem
+	encode gzip zstd
+	reverse_proxy adminer:8080
+}
+
+:80 {
+	redir https://{host}{uri} permanent
+}

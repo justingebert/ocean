@@ -5,6 +5,8 @@
   - ca certicate needs rto be added to machine as trusted
 - mongodb admin users needs to be set once, for a new one data dir needs to be deleted or, manually created
 - could not connect to mongodb -> by default client tls certificate required, turned off as parameter
+- local docker compose adminer only works with custom hba config
+- ldap auth wasn't working when connecting to managed postgres, problems was missing lien in hba
 
 
 ## Ideas
@@ -19,6 +21,7 @@
 - sops or gitlab vars for secrets?
 - admin tool?
 - does reboot -> firewall.sh wipe docker firewall stuff?
+- does mongo have any auth?
 
 
 ## stuff learned

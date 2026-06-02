@@ -17,5 +17,5 @@ vite_build_args:
   VITE_POSTGRESQL_PORT: "5432"
   VITE_MONGODB_HOSTNAME: ocean-mongo.f4.htw-berlin.de
   VITE_MONGODB_PORT: "27017"
-  VITE_ADMINER_URL: ""
+  VITE_ADMINER_URL: https://ocean-pg.f4.htw-berlin.de/
   VITE_ISSUE_LINK: https://github.com/HTWHub/ocean/issues
