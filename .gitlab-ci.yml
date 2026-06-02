@@ -76,6 +76,7 @@ build:frontend:
 deploy:app:
   stage: deploy
   image: alpine:3.20
+  resource_group: production
   needs:
     - build:backend
     - build:frontend

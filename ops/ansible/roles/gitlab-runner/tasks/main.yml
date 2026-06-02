@@ -92,6 +92,25 @@
   environment: "{{ outbound_proxy_env | combine({'GITLAB_RUNNER_TOKEN': gitlab_runner_token}) }}"
   when: gitlab_runner_config.rc != 0
 
+- name: Configure GitLab Runner global concurrency
+  ansible.builtin.lineinfile:
+    path: /etc/gitlab-runner/config.toml
+    regexp: '^concurrent = '
+    line: "concurrent = {{ gitlab_runner_concurrent }}"
+    mode: "0600"
+  notify: Restart gitlab-runner
+
+- name: Configure GitLab Runner per-runner concurrency
+  ansible.builtin.blockinfile:
+    path: /etc/gitlab-runner/config.toml
+    insertafter: '^  executor = '
+    marker: "  # {mark} ANSIBLE MANAGED RUNNER CONCURRENCY"
+    block: |
+        limit = {{ gitlab_runner_limit }}
+        request_concurrency = {{ gitlab_runner_request_concurrency }}
+    mode: "0600"
+  notify: Restart gitlab-runner
+
 - name: Enable and start GitLab Runner
   ansible.builtin.systemd:
     name: gitlab-runner
