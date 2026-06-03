@@ -5,6 +5,8 @@ stages:
 variables:
   BACKEND_IMAGE: "$CI_REGISTRY_IMAGE/backend"
   FRONTEND_IMAGE: "$CI_REGISTRY_IMAGE/frontend"
+  DOCKER_BUILDKIT: "1"
+  ANSIBLE_COLLECTIONS_PATH: "$CI_PROJECT_DIR/.ansible/collections"
   VITE_API_URL: /v1
   VITE_POSTGRESQL_HOSTNAME: ocean-pg.f4.htw-berlin.de
   VITE_POSTGRESQL_PORT: "5432"
@@ -33,30 +35,42 @@ default:
   services:
     - name: docker:24-dind
       command: ["--tls=false"]
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 
 build:backend:
   extends: .build_image
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - .gitlab-ci.yml
+        - backend/**/*
   script:
+    - docker pull "$BACKEND_IMAGE:latest" || true
     - |
       docker build \
+        --cache-from "$BACKEND_IMAGE:latest" \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
         --build-arg HTTP_PROXY="$HTTP_PROXY" \
         --build-arg HTTPS_PROXY="$HTTPS_PROXY" \
         --build-arg NO_PROXY="$NO_PROXY" \
-        -t "$BACKEND_IMAGE:$CI_COMMIT_SHORT_SHA" \
         -t "$BACKEND_IMAGE:latest" \
         backend
-    - docker push "$BACKEND_IMAGE:$CI_COMMIT_SHORT_SHA"
     - docker push "$BACKEND_IMAGE:latest"
 
 build:frontend:
   extends: .build_image
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - .gitlab-ci.yml
+        - frontend/**/*
   script:
+    - docker pull "$FRONTEND_IMAGE:latest" || true
     - |
       docker build \
+        --cache-from "$FRONTEND_IMAGE:latest" \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
         --build-arg HTTP_PROXY="$HTTP_PROXY" \
         --build-arg HTTPS_PROXY="$HTTPS_PROXY" \
         --build-arg NO_PROXY="$NO_PROXY" \
@@ -67,25 +81,27 @@ build:frontend:
         --build-arg VITE_MONGODB_PORT="$VITE_MONGODB_PORT" \
         --build-arg VITE_ADMINER_URL="$VITE_ADMINER_URL" \
         --build-arg VITE_ISSUE_LINK="$VITE_ISSUE_LINK" \
-        -t "$FRONTEND_IMAGE:$CI_COMMIT_SHORT_SHA" \
         -t "$FRONTEND_IMAGE:latest" \
         frontend
-    - docker push "$FRONTEND_IMAGE:$CI_COMMIT_SHORT_SHA"
     - docker push "$FRONTEND_IMAGE:latest"
 
 deploy:app:
   stage: deploy
   image: alpine:3.20
   resource_group: production
-  needs:
-    - build:backend
-    - build:frontend
+  cache:
+    key:
+      files:
+        - ops/ansible/requirements.yml
+    paths:
+      - .ansible/collections/
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
   before_script:
-    - apk add --no-cache ansible bash curl openssh-client rsync
-    - ansible-galaxy collection install -r ops/ansible/requirements.yml
+    - apk add --no-cache ansible bash curl openssh-client
+    - install -m 700 -d "$ANSIBLE_COLLECTIONS_PATH"
+    - ansible-galaxy collection install -r ops/ansible/requirements.yml -p "$ANSIBLE_COLLECTIONS_PATH"
     - install -m 700 -d ~/.ssh
     - if [ -f "$ANSIBLE_SSH_PRIVATE_KEY" ]; then cp "$ANSIBLE_SSH_PRIVATE_KEY" ~/.ssh/id_ed25519; else printf '%s\n' "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519; fi
     - chmod 600 ~/.ssh/id_ed25519
@@ -106,5 +122,5 @@ deploy:app:
         -i inventory.yml \
         playbook.yml \
         --limit app \
-        -e "backend_image=$BACKEND_IMAGE:$CI_COMMIT_SHORT_SHA" \
-        -e "frontend_image=$FRONTEND_IMAGE:$CI_COMMIT_SHORT_SHA"
+        -e "backend_image=$BACKEND_IMAGE:latest" \
+        -e "frontend_image=$FRONTEND_IMAGE:latest"
