@@ -1,6 +1,4 @@
-# ops/
-
-Deployment and VM-operation files for Ocean.
+# Deployment and VM-operation files for Ocean.
 
 - `bootstrap/bootstrap-vm.sh` — one-shot script that creates the `ansible` user on a fresh VM.
 - `ansible/` — playbook + roles that provision the three VMs (`app`, `pg`, `mongo`).
@@ -75,20 +73,13 @@ The script writes `/etc/firewall.conf` and an `if-up.d` hook, so rules survive r
 
 ## TLS certificates
 
-```
+- ansible sets up provided tls certs for all VMs
 
-Each fullchain is leaf + GEANT TLS RSA 1 + HARICA TLS RSA Root CA 2021. The HARICA roots are already in both the VMs' OS trust store and the backend JVM's `cacerts`, so **no CA file is shipped** — pgjdbc (`sslfactory=DefaultJavaSSLFactory`) and the Mongo driver verify the DB certs against the JVM trust store. Confirm trust if certs change CA:
+- backend docker image bakes in LDAP CA
 
-```sh
-# JVM trust used by the backend (the one that matters):
-sudo docker run --rm --entrypoint keytool ocean-backend:latest -list -cacerts -storepass changeit 2>&1 | grep -ci harica
-```
-
-The ansible `tls` role copies cert+key to `/etc/ocean/tls/` on each VM (cert.pem 0644, key.pem 0600 owned by the right service UID, combined.pem on mongo). Filenames mapped per-host in `ansible/inventory.yml` (`tls_cert_file`, `tls_key_file`).
+The pg role also stages `backend/docker/dfn-community-root-ca-2022.pem` mounts it. This is separate from the backend JVM trust store; Postgres LDAP auth uses libldap/OpenSSL trust inside the Postgres container.
 
 > **Renewal:** HTW certs expire **2026-11-30**. Request reissue ~30 days before, drop the new files into `ops/certs/` with the same names, re-run `ansible-playbook -i inventory.yml playbook.yml --tags tls`.
-
-> **Rollout state:** TLS is **enforced** on both managed clusters — pg via `hostssl`-only lines in `ops/compose/pg/pg_hba.conf`, mongo via `--tlsMode=requireTLS`. The backend must therefore connect with TLS: set `PG_CLUSTER_SSLMODE=verify-full` and `MONGODB_CLUSTER_TLS=true` in `backend.env` (see `backend.env.example`). Plain connections are rejected, so deploy the DB tiers and the backend env together. The internal `postgres_orm` and LDAP on app-vm stay plain — they talk to the backend over the host-local docker bridge and never cross the network.
 
 > **Firewall:** open `:443` on app-vm before re-deploying. See "Open the firewall" above.
 

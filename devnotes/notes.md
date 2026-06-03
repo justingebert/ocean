@@ -14,7 +14,7 @@
 - env files for vms as gitlab secrets or secret files
 - make sure PR cant execute ansible code on vm
 - add precommit hooks with husky
-- 
+- staging env?
 
 ## Questions:
 - what about certificate renewal?

@@ -14,6 +14,14 @@
     group: "999"
     mode: "0640"
 
+- name: Stage LDAP CA for Postgres LDAP auth
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../backend/docker/dfn-community-root-ca-2022.pem"
+    dest: "{{ etc_ocean }}/dfn-community-root-ca-2022.pem"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
 - name: Stage Caddyfile
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../../ops/compose/pg/Caddyfile"

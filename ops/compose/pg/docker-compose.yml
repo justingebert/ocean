@@ -5,11 +5,14 @@ services:
     image: postgres:12.20
     restart: unless-stopped
     env_file: /etc/ocean/pg_cluster.env
+    environment:
+      LDAPTLS_CACERT: /etc/ssl/certs/dfn-community-root-ca-2022.pem
     ports:
       - "5432:5432"
     volumes:
       - /srv/ocean/pg_cluster/data:/var/lib/postgresql/data
       - /etc/ocean/tls:/etc/ssl/ocean:ro
+      - /etc/ocean/dfn-community-root-ca-2022.pem:/etc/ssl/certs/dfn-community-root-ca-2022.pem:ro
       - /etc/ocean/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
     command: >-
       postgres

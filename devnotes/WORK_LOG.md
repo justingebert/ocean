@@ -6,7 +6,12 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
+## 2026-06-03 ci and pg ldap debugging
+- add cache and optimze ci
+- debug why posgres ldap auth doesnt work
+
 ## 2026-06-02 plan CICD expansion
+- added it gitlab issues
 
 ## 2026-06-02 get adminer running, think about prod adminer setup, also managed postgrtes stuff
 - local needs adjusted hbd config and deployed needs proxy for tls

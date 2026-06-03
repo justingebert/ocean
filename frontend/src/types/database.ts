@@ -83,7 +83,7 @@ export class Database extends BaseModel {
    */
   public connectionString(psqlUsername?: string): string {
     if (this.props.engine === EngineType.PostgreSQL) {
-      return `psql "postgresql://${psqlUsername}@${this.hostname}:${this.port}/${this.props.name}?sslmode=verify-full"`;
+      return `psql "postgresql://${psqlUsername}@${this.hostname}:${this.port}/${this.props.name}?sslmode=verify-full&sslrootcert=system"`;
     } else if (this.props.engine === EngineType.MongoDB) {
       return `mongodb://${this.hostname}:${this.port.toString()}/?authSource=${
         this.props.name
