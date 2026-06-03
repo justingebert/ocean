@@ -24,7 +24,7 @@ services:
     command: ["php", "-S", "0.0.0.0:8080", "-t", "/var/www/html"] #bind to ipV4
     environment:
       ADMINER_DEFAULT_SERVER: pg_cluster:5432
-      PGSSLMODE: disable
+      PGSSLMODE: require
     depends_on:
       - pg_cluster
 
