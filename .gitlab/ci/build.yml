@@ -1,0 +1,57 @@
+.build_image:
+  stage: build
+  image: docker:24-cli
+  services:
+    - name: docker:24-dind
+      command: ["--tls=false"]
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+
+build:backend:
+  extends: .build_image
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*.yml
+        - backend/**/*
+  script:
+    - docker pull "$BACKEND_IMAGE:latest" || true
+    - |
+      docker build \
+        --cache-from "$BACKEND_IMAGE:latest" \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
+        --build-arg HTTP_PROXY="$HTTP_PROXY" \
+        --build-arg HTTPS_PROXY="$HTTPS_PROXY" \
+        --build-arg NO_PROXY="$NO_PROXY" \
+        -t "$BACKEND_IMAGE:latest" \
+        backend
+    - docker push "$BACKEND_IMAGE:latest"
+
+build:frontend:
+  extends: .build_image
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*.yml
+        - frontend/**/*
+  script:
+    - docker pull "$FRONTEND_IMAGE:latest" || true
+    - |
+      docker build \
+        --cache-from "$FRONTEND_IMAGE:latest" \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
+        --build-arg HTTP_PROXY="$HTTP_PROXY" \
+        --build-arg HTTPS_PROXY="$HTTPS_PROXY" \
+        --build-arg NO_PROXY="$NO_PROXY" \
+        --build-arg VITE_API_URL="$VITE_API_URL" \
+        --build-arg VITE_POSTGRESQL_HOSTNAME="$VITE_POSTGRESQL_HOSTNAME" \
+        --build-arg VITE_POSTGRESQL_PORT="$VITE_POSTGRESQL_PORT" \
+        --build-arg VITE_MONGODB_HOSTNAME="$VITE_MONGODB_HOSTNAME" \
+        --build-arg VITE_MONGODB_PORT="$VITE_MONGODB_PORT" \
+        --build-arg VITE_ADMINER_URL="$VITE_ADMINER_URL" \
+        --build-arg VITE_ISSUE_LINK="$VITE_ISSUE_LINK" \
+        -t "$FRONTEND_IMAGE:latest" \
+        frontend
+    - docker push "$FRONTEND_IMAGE:latest"

@@ -36,3 +36,4 @@
 
 ## TODOs
 - [ ] write down how to set up vm for ansible (ssh key setup)
+- [ ] gitlab badges to readme

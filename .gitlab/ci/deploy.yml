@@ -1,0 +1,104 @@
+# Shared Ansible deployment wrapper, i think this might be easier to understand when each deployment has its own script but lets see
+.deploy_ansible:
+  extends: .ansible_base
+  stage: deploy
+  resource_group: production
+  allow_failure: false
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+    - when: never
+  environment:
+    name: $DEPLOY_ENVIRONMENT_NAME
+    deployment_tier: production
+  script:
+    # Prepare SSH access for the selected host group.
+    - |
+      test -n "${ANSIBLE_SSH_PRIVATE_KEY:-}" || {
+        echo "ANSIBLE_SSH_PRIVATE_KEY is required."
+        exit 1
+      }
+
+      install -m 700 -d ~/.ssh
+      if [ -f "$ANSIBLE_SSH_PRIVATE_KEY" ]; then
+        cp "$ANSIBLE_SSH_PRIVATE_KEY" ~/.ssh/id_ed25519
+      else
+        printf '%s\n' "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+      fi
+      chmod 600 ~/.ssh/id_ed25519
+
+      for host in $ANSIBLE_KNOWN_HOSTS; do
+        ssh-keyscan "$host" >> ~/.ssh/known_hosts
+      done
+    # Fail early when a target-specific secret is missing.
+    - |
+      for required in $ANSIBLE_REQUIRED_ENV; do
+        value="$(printenv "$required" || true)"
+        if [ -z "$value" ]; then
+          echo "$required is required."
+          exit 1
+        fi
+      done
+    # Download TLS material only for hosts that terminate TLS.
+    - |
+      if [ "${ANSIBLE_FETCH_SECURE_FILES:-false}" = "true" ]; then
+        bash -eo pipefail -c 'curl -fsSL "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash'
+        export OCEAN_TLS_SRC="$CI_PROJECT_DIR/.secure_files"
+
+        for secure_file in $ANSIBLE_SECURE_FILE_NAMES; do
+          test -f "$OCEAN_TLS_SRC/$secure_file" || {
+            echo "$secure_file is missing from GitLab secure files."
+            exit 1
+          }
+        done
+      fi
+    - cd ops/ansible
+    # Run the one playbook against the requested inventory group.
+    - |
+      GITLAB_REGISTRY_USER="${CI_REGISTRY_USER:-}" \
+      GITLAB_REGISTRY_PASSWORD="${CI_REGISTRY_PASSWORD:-}" \
+      ansible-playbook \
+        -i inventory.yml \
+        playbook.yml \
+        --limit "$ANSIBLE_LIMIT" \
+        -e "backend_image=$BACKEND_IMAGE:latest" \
+        -e "frontend_image=$FRONTEND_IMAGE:latest"
+
+deploy:app:
+  extends: .deploy_ansible
+  variables:
+    ANSIBLE_LIMIT: app
+    ANSIBLE_KNOWN_HOSTS: ocean-jg.f4.htw-berlin.de
+    ANSIBLE_FETCH_SECURE_FILES: "true"
+    ANSIBLE_SECURE_FILE_NAMES: ocean-jg.pem ocean-jg.f4.htw-berlin.de.key
+    ANSIBLE_REQUIRED_ENV: OCEAN_APPLICATION_SECRET OCEAN_JWT_SECRET OCEAN_POSTGRES_ORM_PASSWORD OCEAN_PG_CLUSTER_PASSWORD OCEAN_MONGODB_CLUSTER_PASSWORD
+    DEPLOY_ENVIRONMENT_NAME: production/app
+
+deploy:pg:
+  extends: .deploy_ansible
+  variables:
+    ANSIBLE_LIMIT: pg
+    ANSIBLE_KNOWN_HOSTS: ocean-pg.f4.htw-berlin.de
+    ANSIBLE_FETCH_SECURE_FILES: "true"
+    ANSIBLE_SECURE_FILE_NAMES: ocean-pg.pem ocean-pg.f4.htw-berlin.de.key
+    ANSIBLE_REQUIRED_ENV: OCEAN_PG_CLUSTER_PASSWORD
+    DEPLOY_ENVIRONMENT_NAME: production/pg
+
+deploy:mongo:
+  extends: .deploy_ansible
+  variables:
+    ANSIBLE_LIMIT: mongo
+    ANSIBLE_KNOWN_HOSTS: ocean-mongo.f4.htw-berlin.de
+    ANSIBLE_FETCH_SECURE_FILES: "true"
+    ANSIBLE_SECURE_FILE_NAMES: ocean-mongo.pem ocean-mongo.f4.htw-berlin.de.key
+    ANSIBLE_REQUIRED_ENV: OCEAN_MONGODB_CLUSTER_PASSWORD
+    DEPLOY_ENVIRONMENT_NAME: production/mongo
+
+deploy:ops:
+  extends: .deploy_ansible
+  variables:
+    ANSIBLE_LIMIT: ops
+    ANSIBLE_KNOWN_HOSTS: ocean-ops.f4.htw-berlin.de
+    ANSIBLE_FETCH_SECURE_FILES: "false"
+    ANSIBLE_REQUIRED_ENV: ""
+    DEPLOY_ENVIRONMENT_NAME: production/ops

@@ -6,6 +6,14 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
+## 2026-06-05
+- split ci and add more ansible deployments for db server and ops
+
+## 2026-06-05 db deployments to CICD
+- think about end CICD strucutre and possible checks, e.g. anslbe syntax check, and dry runs
+- also precommit hooks? 
+- how can we make this proejct vm agnostic?
+
 ## 2026-06-05 ansible config audit
 - for prod deployments, consolidate and audit env setup
 
