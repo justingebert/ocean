@@ -6,6 +6,14 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
+## 2026-06-05 ansible config audit
+- for prod deployments, consolidate and audit env setup
+
+## 2026-06-03 deploy secret source cleanup
+- Stopped treating `.env.example` files as deploy inputs and removed redundant deploy env examples.
+- Ansible now renders VM env files from Jinja templates using local/GitLab `OCEAN_*` variables.
+- GitLab secure files now only carry file-shaped secrets like TLS certs/keys.
+
 ## 2026-06-03 ci and pg ldap debugging
 - add cache and optimze ci
 - debug why posgres ldap auth doesnt work

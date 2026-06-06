@@ -1,7 +1,11 @@
 ocean_user: ocean
 etc_ocean: /etc/ocean
 data_root: /srv/ocean
-env_src: "{{ playbook_dir }}/../../ops/compose/env"
+ocean_application_secret: "{{ lookup('ansible.builtin.env', 'OCEAN_APPLICATION_SECRET') | default('', true) | trim }}"
+ocean_jwt_secret: "{{ lookup('ansible.builtin.env', 'OCEAN_JWT_SECRET') | default('', true) | trim }}"
+ocean_postgres_orm_password: "{{ lookup('ansible.builtin.env', 'OCEAN_POSTGRES_ORM_PASSWORD') | default('', true) | trim }}"
+ocean_pg_cluster_password: "{{ lookup('ansible.builtin.env', 'OCEAN_PG_CLUSTER_PASSWORD') | default('', true) | trim }}"
+ocean_mongodb_cluster_password: "{{ lookup('ansible.builtin.env', 'OCEAN_MONGODB_CLUSTER_PASSWORD') | default('', true) | trim }}"
 outbound_no_proxy: localhost,127.0.0.1,docker
 outbound_proxy_env:
   HTTP_PROXY: "{{ outbound_proxy_url | default('') }}"

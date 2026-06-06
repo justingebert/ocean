@@ -1,4 +1,10 @@
 # Stage TLS material for the host on /etc/ocean/tls/.
+- name: Validate TLS source
+  ansible.builtin.assert:
+    that:
+      - tls_src | length > 0
+    fail_msg: "Set OCEAN_TLS_SRC to the directory containing TLS cert/key files."
+
 - name: Ensure TLS dir exists
   ansible.builtin.file:
     path: "{{ etc_ocean }}/tls"
@@ -22,6 +28,8 @@
     owner: "{{ tls_key_uid }}"
     group: "{{ tls_key_uid }}"
     mode: "0600"
+  no_log: true
+  diff: false
 
 - name: Assemble mongo combined.pem (key + cert)
   ansible.builtin.shell: |

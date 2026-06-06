@@ -6,14 +6,22 @@
     group: "{{ ocean_user }}"
     mode: "0640"
 
-- name: Stage mongodb_cluster.env
-  ansible.builtin.copy:
-    src: "{{ env_src }}/mongodb_cluster.env.example"
+- name: Validate mongo deploy secret
+  ansible.builtin.assert:
+    that:
+      - ocean_mongodb_cluster_password | length > 0
+      - "'change-me' not in ocean_mongodb_cluster_password"
+    fail_msg: "Set OCEAN_MONGODB_CLUSTER_PASSWORD before running the mongo role."
+
+- name: Render mongodb_cluster.env
+  ansible.builtin.template:
+    src: mongodb_cluster.env.j2
     dest: "{{ etc_ocean }}/mongodb_cluster.env"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0600"
-    force: false
+  no_log: true
+  diff: false
 
 - name: Create mongodb_cluster data dir
   ansible.builtin.file:

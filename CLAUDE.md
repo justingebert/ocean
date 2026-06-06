@@ -14,7 +14,7 @@ Three deployable parts plus docs:
 - `frontend/Dockerfile` — multi-stage Vite build → `caddy:2-alpine` serving `/usr/share/caddy`. `VITE_*` injected via `--build-arg` at build time. `frontend/Caddyfile` terminates TLS for `OCEAN_HOSTNAME` (cert mounted at `/etc/caddy/tls`) and does the SPA fallback; it is the only Caddyfile — no separate dev/prod split.
 - `backend/Dockerfile` — multi-stage `eclipse-temurin:17-jdk-jammy` + sbt → `sbt dist` → `eclipse-temurin:17-jre-jammy` runtime running `bin/backend` as the unprivileged `play` user. All runtime config (DB hosts, secrets, LDAP) flows in via env vars resolved by HOCON `${?VAR}` overrides.
 
-Deploy target is the three-VM HTW setup: `ops/compose/app/docker-compose.yml` (frontend + backend + internal Postgres + LDAP), `ops/compose/pg/docker-compose.yml` (managed Postgres), `ops/compose/mongo/docker-compose.yml` (managed MongoDB). Provisioned via `ops/ansible/` against `inventory.prod.yml`. Env templates in `ops/compose/env/`. No CI/CD pipeline yet.
+Deploy target is the three-VM HTW setup: `ops/compose/app/docker-compose.yml` (frontend + backend + internal Postgres), `ops/compose/pg/docker-compose.yml` (managed Postgres), `ops/compose/mongo/docker-compose.yml` (managed MongoDB). Provisioned via `ops/ansible/` against `inventory.yml`. VM env files are rendered from role templates; real deploy secrets come from local/GitLab `OCEAN_*` environment variables. TLS files come from `OCEAN_TLS_SRC` locally or GitLab secure files in CI.
 
 ## Running things locally
 

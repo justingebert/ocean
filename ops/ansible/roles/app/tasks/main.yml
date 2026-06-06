@@ -14,17 +14,33 @@
     group: "{{ ocean_user }}"
     mode: "0600"
 
-- name: Stage env files
-  ansible.builtin.copy:
-    src: "{{ env_src }}/{{ item }}.env.example"
-    dest: "{{ etc_ocean }}/{{ item }}.env"
+- name: Validate app deploy secrets
+  ansible.builtin.assert:
+    that:
+      - ocean_application_secret | length >= 32
+      - ocean_jwt_secret | length >= 32
+      - ocean_postgres_orm_password | length > 0
+      - ocean_pg_cluster_password | length > 0
+      - ocean_mongodb_cluster_password | length > 0
+      - "'change-me' not in ocean_application_secret"
+      - "'change-me' not in ocean_jwt_secret"
+      - "'change-me' not in ocean_postgres_orm_password"
+      - "'change-me' not in ocean_pg_cluster_password"
+      - "'change-me' not in ocean_mongodb_cluster_password"
+    fail_msg: "Set real OCEAN_* deploy secrets before running the app role."
+
+- name: Render app env files
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ etc_ocean }}/{{ item }}"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0600"
-    force: true
   loop:
-    - backend
-    - postgres_orm
+    - backend.env
+    - postgres_orm.env
+  no_log: true
+  diff: false
 
 - name: Create postgres_orm data dir
   ansible.builtin.file:
@@ -66,5 +82,4 @@
     build: never
     pull: policy
     remove_orphans: true
-  environment: "{{ build_proxy_args | default({}) }}"
   tags: compose

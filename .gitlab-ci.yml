@@ -107,13 +107,15 @@ deploy:app:
     - chmod 600 ~/.ssh/id_ed25519
     - ssh-keyscan ocean-jg.f4.htw-berlin.de >> ~/.ssh/known_hosts
   script:
-    - export SECURE_FILES_DOWNLOAD_PATH=.secure_files
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
-    - install -m 700 -d ops/certs ops/compose/env
-    - install -m 600 .secure_files/ocean-jg.pem ops/certs/ocean-jg.pem
-    - install -m 600 .secure_files/ocean-jg.f4.htw-berlin.de.key ops/certs/ocean-jg.f4.htw-berlin.de.key
-    - install -m 600 .secure_files/backend.env.example ops/compose/env/backend.env.example
-    - install -m 600 .secure_files/postgres_orm.env.example ops/compose/env/postgres_orm.env.example
+    - export OCEAN_TLS_SRC="$CI_PROJECT_DIR/.secure_files"
+    - test -f "$OCEAN_TLS_SRC/ocean-jg.pem"
+    - test -f "$OCEAN_TLS_SRC/ocean-jg.f4.htw-berlin.de.key"
+    - test -n "$OCEAN_APPLICATION_SECRET"
+    - test -n "$OCEAN_JWT_SECRET"
+    - test -n "$OCEAN_POSTGRES_ORM_PASSWORD"
+    - test -n "$OCEAN_PG_CLUSTER_PASSWORD"
+    - test -n "$OCEAN_MONGODB_CLUSTER_PASSWORD"
     - cd ops/ansible
     - |
       GITLAB_REGISTRY_USER="$CI_REGISTRY_USER" \

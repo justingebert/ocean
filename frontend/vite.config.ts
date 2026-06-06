@@ -2,13 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import istanbul from "vite-plugin-istanbul"
-import path from 'node:path'
 
 // https://vite.dev/config/
 export default defineConfig({
-    // Read .env from the repo root so it stays the single source of truth
-    // for compose, the backend container, and the SPA.
-    envDir: path.resolve(__dirname, '..'),
     server: {
         fs: {
             allow: ['.']

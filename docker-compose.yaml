@@ -23,6 +23,7 @@ services:
     volumes:
       - postgres_orm_data:/var/lib/postgresql/data
 
+#ldap login doesnt work atm needs hba.conf wired up
   pg_cluster:
     image: postgres:12.20
     depends_on:

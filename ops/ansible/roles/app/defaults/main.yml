@@ -1,21 +1,11 @@
-compose_src: "{{ playbook_dir }}/../../ops/compose/app/docker-compose.yml"
+compose_src: "{{ playbook_dir }}/../compose/app/docker-compose.yml"
 
 docker_registry_url: gl-ai.f4.htw-berlin.de:5005
 container_registry_image: "{{ docker_registry_url }}/s0583511/ocean"
 docker_registry_username: "{{ lookup('ansible.builtin.env', 'GITLAB_REGISTRY_USER') | default('', true) }}"
 docker_registry_password: "{{ lookup('ansible.builtin.env', 'GITLAB_REGISTRY_PASSWORD') | default('', true) }}"
-docker_registry_reauthorize: false
 
 backend_image: "{{ container_registry_image }}/backend:latest"
 frontend_image: "{{ container_registry_image }}/frontend:latest"
 app_image_pull_policy: "always"
 ocean_hostname: ocean-jg.f4.htw-berlin.de
-
-vite_build_args:
-  VITE_API_URL: /v1
-  VITE_POSTGRESQL_HOSTNAME: ocean-pg.f4.htw-berlin.de
-  VITE_POSTGRESQL_PORT: "5432"
-  VITE_MONGODB_HOSTNAME: ocean-mongo.f4.htw-berlin.de
-  VITE_MONGODB_PORT: "27017"
-  VITE_ADMINER_URL: https://ocean-pg.f4.htw-berlin.de/
-  VITE_ISSUE_LINK: https://github.com/HTWHub/ocean/issues

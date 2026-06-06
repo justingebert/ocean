@@ -95,14 +95,15 @@ fabric.properties
 
 plans
 
-# Local env files (committed: .env.example only)
-.env
+frontend/.env
 .env.local
 .env.*.local
+.secrets/
+.secure_files/
 
 **/.DS_Store
 
-ops/certs
+.secrets/certs
 
 .agents
 skills-lock.json

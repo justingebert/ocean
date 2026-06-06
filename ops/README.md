@@ -2,7 +2,7 @@
 
 - `bootstrap/bootstrap-vm.sh` — one-shot script that creates the `ansible` user on a fresh VM.
 - `ansible/` — playbook + roles that provision the three VMs (`app`, `pg`, `mongo`).
-- `compose/` — docker-compose files and `.env.example` templates staged onto each VM by the playbook.
+- `compose/` — docker-compose files used by the Ansible roles.
 
 > **HTW network note:** the VMs have no direct internet access. All outbound HTTP(S) goes through the HTW web proxy at `http://webproxy.rz.htw-berlin.de:3128`. 
 
@@ -79,19 +79,71 @@ The script writes `/etc/firewall.conf` and an `if-up.d` hook, so rules survive r
 
 The pg role also stages `backend/docker/dfn-community-root-ca-2022.pem` mounts it. This is separate from the backend JVM trust store; Postgres LDAP auth uses libldap/OpenSSL trust inside the Postgres container.
 
-> **Renewal:** HTW certs expire **2026-11-30**. Request reissue ~30 days before, drop the new files into `ops/certs/` with the same names, re-run `ansible-playbook -i inventory.yml playbook.yml --tags tls`.
+> **Renewal:** HTW certs expire **2026-11-30**. Request reissue ~30 days before, update the TLS secure files with the same names, re-run `ansible-playbook -i inventory.yml playbook.yml --tags tls`.
 
 > **Firewall:** open `:443` on app-vm before re-deploying. See "Open the firewall" above.
 
-## Deploy with Ansible
+## Deploy secrets
 
-From `ops/ansible/`:
+Ansible renders `/etc/ocean/*.env` from Jinja templates. Keep only scalar secret values in local env vars or GitLab CI/CD variables.
+
+Create local deploy secrets from the repo root:
 
 ```sh
-ansible-galaxy install -r requirements.yml          # first time only
-ansible -i inventory.yml all -m ping                # connectivity check
+umask 077
+mkdir -p .secrets/certs
+{
+  printf 'OCEAN_APPLICATION_SECRET=%s\n' "$(openssl rand -hex 32)"
+  printf 'OCEAN_JWT_SECRET=%s\n' "$(openssl rand -hex 32)"
+  printf 'OCEAN_POSTGRES_ORM_PASSWORD=%s\n' "$(openssl rand -hex 32)"
+  printf 'OCEAN_PG_CLUSTER_PASSWORD=%s\n' "$(openssl rand -hex 32)"
+  printf 'OCEAN_MONGODB_CLUSTER_PASSWORD=%s\n' "$(openssl rand -hex 32)"
+} > .secrets/prod.env
+```
+
+Put TLS cert/key files in `.secrets/certs/` locally, or as GitLab secure files in CI:
+
+```text
+ocean-jg.pem
+ocean-jg.f4.htw-berlin.de.key
+ocean-pg.pem
+ocean-pg.f4.htw-berlin.de.key
+ocean-mongo.pem
+ocean-mongo.f4.htw-berlin.de.key
+```
+
+In GitLab, add the five `OCEAN_*` secret values as CI/CD variables. Add only TLS cert/key files as secure files.
+
+Changing DB env files does not rotate passwords inside existing Postgres/Mongo data volumes. For an existing VM, rotate the DB passwords first or reset the data volume before switching to new DB credentials.
+
+## Deploy with Ansible
+
+From the repo root:
+
+```sh
+cd ops/ansible
+ansible-galaxy install -r requirements.yml
+ansible -i inventory.yml all -m ping
+```
+
+Deploy the ops runner VM from the repo root:
+
+```sh
+cd ops/ansible
+GITLAB_RUNNER_TOKEN='<token>' ansible-playbook -i inventory.yml playbook.yml --limit ops
+```
+
+Deploy app/db VMs from the repo root:
+
+```sh
+set -a
+. ./.secrets/prod.env
+set +a
+export OCEAN_TLS_SRC="$(pwd)/.secrets/certs"
+
+cd ops/ansible
 ansible-playbook -i inventory.yml playbook.yml      # full deploy
 
 # Target a single tier
-ansible-playbook -i inventory.yml playbook.yml --limit app
+ansible-playbook -i inventory.yml playbook.yml --limit app    #TODO this also needs gitlab registryh username and TOKEN
 ```
