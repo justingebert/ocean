@@ -1,10 +1,6 @@
 # Ocean
 
-[![Build Status Backend](https://github.com/HTWHub/ocean/actions/workflows/backend-deploy_production.yml/badge.svg)](https://github.com/HTWHub/ocean/actions)
-
-[![Build Status Frontend](https://github.com/HTWHub/ocean/actions/workflows/frontend-deploy_production.yml/badge.svg)](https://github.com/HTWHub/ocean/actions)
-
-[![codecov](https://codecov.io/gh/htwhub/ocean/branch/production/graph/badge.svg)](https://codecov.io/gh/htwhub/ocean)
+[![pipeline status](https://gl-ai.f4.htw-berlin.de/s0583511/ocean/badges/main/pipeline.svg)](https://gl-ai.f4.htw-berlin.de/s0583511/ocean/-/commits/main)
 
 Ocean is platform for fully managed database service that makes it easy to setup, manage and administer databases.
 
