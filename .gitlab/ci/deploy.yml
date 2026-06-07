@@ -3,10 +3,10 @@
   extends: .ansible_base
   stage: deploy
   resource_group: production
-  allow_failure: false
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
+      allow_failure: true
     - when: never
   environment:
     name: $DEPLOY_ENVIRONMENT_NAME
@@ -96,6 +96,11 @@ deploy:mongo:
 
 deploy:ops:
   extends: .deploy_ansible
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $DEPLOY_OPS == "true"'
+      when: manual
+      allow_failure: true
+    - when: never
   variables:
     ANSIBLE_LIMIT: ops
     ANSIBLE_KNOWN_HOSTS: ocean-ops.f4.htw-berlin.de

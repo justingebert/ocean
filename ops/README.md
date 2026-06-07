@@ -1,7 +1,7 @@
 # Deployment and VM-operation files for Ocean.
 
 - `bootstrap/bootstrap-vm.sh` — one-shot script that creates the `ansible` user on a fresh VM.
-- `ansible/` — playbook + roles that provision the three VMs (`app`, `pg`, `mongo`).
+- `ansible/` — playbook + roles that provision the VMs (`app`, `pg`, `mongo`, `ops`).
 - `compose/` — docker-compose files used by the Ansible roles.
 
 > **HTW network note:** the VMs have no direct internet access. All outbound HTTP(S) goes through the HTW web proxy at `http://webproxy.rz.htw-berlin.de:3128`. 
@@ -115,6 +115,42 @@ ocean-mongo.f4.htw-berlin.de.key
 In GitLab, add the five `OCEAN_*` secret values as CI/CD variables. Add only TLS cert/key files as secure files.
 
 Changing DB env files does not rotate passwords inside existing Postgres/Mongo data volumes. For an existing VM, rotate the DB passwords first or reset the data volume before switching to new DB credentials.
+
+## Deploy from GitLab CI
+
+GitLab CI validates the Ansible inventory and playbook automatically when ops files change:
+
+```text
+validate:ansible
+```
+
+Production deploy jobs are manual and optional, so the pipeline badge still reflects build/validation health when no deploy was triggered:
+
+```text
+deploy:app
+deploy:pg
+deploy:mongo
+```
+
+These jobs appear on `main` pipelines. They deploy the same playbook with a different `--limit` target and use separate GitLab environments:
+
+```text
+production/app
+production/pg
+production/mongo
+```
+
+Protect `production/*` in GitLab if only maintainers should deploy.
+
+The ops runner deploy is hidden from normal pipelines. To show it:
+
+1. Open GitLab's "Run pipeline" page.
+2. Select the `main` branch.
+3. Add pipeline variable `DEPLOY_OPS=true`.
+4. Start the pipeline.
+5. Run the manual `deploy:ops` job.
+
+`deploy:ops` uses the `production/ops` environment. If the runner VM is not registered yet, the Ansible role also needs `GITLAB_RUNNER_TOKEN` as a GitLab CI/CD variable. Existing registered runners can usually be updated without that token.
 
 ## Deploy with Ansible
 
