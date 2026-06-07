@@ -2,13 +2,13 @@ name: ocean-app
 
 services:
   postgres_orm:
-    image: postgres:12-alpine
+    image: postgres:18.4-alpine
     restart: unless-stopped
     env_file: /etc/ocean/postgres_orm.env
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
-      - /srv/ocean/postgres_orm/data:/var/lib/postgresql/data
+      - /srv/ocean/postgres_orm/data:/var/lib/postgresql
 
   backend:
     image: ${BACKEND_IMAGE:-ocean-backend:latest}

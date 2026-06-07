@@ -13,7 +13,7 @@ services:
       - "1636:1636"
 
   postgres_orm:
-    image: postgres:12-alpine
+    image: postgres:18.4-alpine
     environment:
       POSTGRES_DB: internal
       POSTGRES_USER: postgres
@@ -21,11 +21,11 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_orm_data:/var/lib/postgresql/data
+      - postgres_orm_data:/var/lib/postgresql
 
 #ldap login doesnt work atm needs hba.conf wired up
   pg_cluster:
-    image: postgres:12.20
+    image: postgres:18.4
     depends_on:
       - openldap
     environment:
@@ -35,7 +35,7 @@ services:
     ports:
       - "5555:5432"
     volumes:
-      - pg_cluster_data:/var/lib/postgresql/data
+      - pg_cluster_data:/var/lib/postgresql
 #      - ./ops/compose/pg/pg_hba.local.conf:/etc/postgresql/pg_hba.conf:ro
 #    command: >-
 #      postgres

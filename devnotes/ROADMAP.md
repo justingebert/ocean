@@ -72,7 +72,7 @@ deploy app stack to the three HTW VMs, test end-to-end in prod.
 
 DB servers off EOL + the driver/library bumps they force. Detailed runbook in `plans/upgrades.md`.
 
-- Targets: Postgres 12 → **17** (both instances); Mongo 5 → **7** (LTS); pgjdbc 42.2.21 → 42.7.x (CVE-2024-1597); mongo-scala-driver 2.9.0 → 5.x; jackson align with Play 3.0.
+- Targets: Postgres 12 → **18.4** (both instances); Mongo 5 → **7** (LTS); pgjdbc 42.2.21 → 42.7.11; mongo-scala-driver 2.9.0 → 5.x; jackson align with Play 3.0.
 - Two hard couplings: Mongo bump forces a `MongoDBEngine` rewrite (`Completed` type gone in driver 4.0); Postgres majors need dump/restore (PGDATA format change) — capture roles/globals, not just schema.
 - `openldap` is on the frozen `bitnamilegacy` image and sits in the prod auth path — decision needed (pin / migrate image / move to HTW LDAP).
 - Out of this phase: Scala 2.13 → 3 (deferred); frontend stays as-is (already fresh) bar an `npm audit` pass.

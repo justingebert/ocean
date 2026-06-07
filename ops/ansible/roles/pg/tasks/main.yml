@@ -8,7 +8,7 @@
 
 - name: Stage pg_hba.conf
   ansible.builtin.copy:
-    src: "{{ playbook_dir }}/../../ops/compose/pg/pg_hba.conf"
+    src: "{{ playbook_dir }}/../compose/pg/pg_hba.conf"
     dest: "{{ etc_ocean }}/pg_hba.conf"
     owner: "999"
     group: "999"
@@ -24,7 +24,7 @@
 
 - name: Stage Caddyfile
   ansible.builtin.copy:
-    src: "{{ playbook_dir }}/../../ops/compose/pg/Caddyfile"
+    src: "{{ playbook_dir }}/../compose/pg/Caddyfile"
     dest: "{{ etc_ocean }}/Caddyfile"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"

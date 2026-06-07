@@ -2,7 +2,7 @@ name: ocean-pg
 
 services:
   pg_cluster:
-    image: postgres:12.20
+    image: postgres:18.4
     restart: unless-stopped
     env_file: /etc/ocean/pg_cluster.env
     environment:
@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /srv/ocean/pg_cluster/data:/var/lib/postgresql/data
+      - /srv/ocean/pg_cluster/data:/var/lib/postgresql
       - /etc/ocean/tls:/etc/ssl/ocean:ro
       - /etc/ocean/dfn-community-root-ca-2022.pem:/etc/ssl/certs/dfn-community-root-ca-2022.pem:ro
       - /etc/ocean/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro

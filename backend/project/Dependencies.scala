@@ -7,7 +7,7 @@ object Dependencies {
     // compile
     val directory = "2.0.2"
     val h2 = "1.4.200"
-    val postgresql = "42.2.21"
+    val postgresql = "42.7.11"
     val mongodb = "2.9.0"
     val slick = "6.1.0"
     val slickEvolution = "6.1.0"
