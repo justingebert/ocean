@@ -15,8 +15,9 @@
     "vitest:ui": "vitest --ui",
     "vitest:coverage": "vitest --coverage",
     "generate-coverage-report": "npx nyc report --reporter=text --reporter=html --report-dir=coverage/total",
-    "cypress:component": "npx cypress run --component",
+    "cypress:component": "VITE_COVERAGE=true npx cypress run --component",
     "test:e2e": "npx cypress run",
+    "typecheck:cypress": "tsc --noEmit -p cypress/tsconfig.json",
     "test": "npm run vitest && npm run cypress:component",
     "docs": "typedoc --out docs/typedoc src/ --entryPointStrategy expand"
   },
@@ -55,7 +56,6 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@types/react-router-dom": "^5.1.7",
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/coverage-istanbul": "^3.0.4",
     "@vitest/ui": "^3.0.4",

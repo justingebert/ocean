@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "composite": true,
-    "tsBuildInfoFile": "../node_modules/.tmp/tsconfig.cypress.tsbuildinfo",
     "rootDir": "..",
     "target": "ES2020",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
@@ -21,14 +19,7 @@
     "e2e/**/*.tsx",
     "support/**/*.ts",
     "support/**/*.tsx",
-    "../src/**/*.ts",
-    "../src/**/*.tsx"
-  ],
-  "exclude": [
-    "../src/**/*.test.ts",
-    "../src/**/*.test.tsx",
-    "../src/**/*.stories.ts",
-    "../src/**/*.stories.tsx",
-    "../src/**/*.stories.mdx"
+    "../src/**/*.cy.ts",
+    "../src/**/*.cy.tsx"
   ]
 }

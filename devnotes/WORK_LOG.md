@@ -6,6 +6,13 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
+## 2026-06-08 — frontend tooling drift (audit step 2)
+- removed stale deps
+- pinned local Node to 22 (`frontend/.nvmrc`) to match the Dockerfile (`node:22-alpine`)
+- split the Cypress TS project out of the app build: `cypress/tsconfig.json` is now standalone and owns only cypress files instead of re-typechecking the whole `src` tree under looser options; added a `typecheck:cypress` script
+- gated `vite-plugin-istanbul` behind `VITE_COVERAGE=true` (set by `cypress:component`) and dropped `forceBuildInstrument`, so prod build / normal dev are no longer instrumented
+- still open: step-1 frontend CI validate job missing (lint/vitest/tsc/typecheck run nowhere in CI); istanbul `include` glob is `src/*` (misses nested files); `tsconfig.vitest.json` keeps the same whole-`src` overlap
+
 ## 2026-06-08 — frontend audit cleanup
 - restored green lint, typecheck, unit + component tests, and build after they had degraded
 - type-hygiene pass (dropped `any`), fixed a few latent bugs, modernized tsconfig to project references, and brought test files under typecheck
