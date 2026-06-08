@@ -1,7 +1,7 @@
 import React from "react";
 
 import AppLayout from "../layouts/AppLayout";
-import { OverviewNavigation } from "../constants/menu.";
+import { OverviewNavigation } from "../constants/menu.ts";
 import { startingPoints } from "../constants/starting";
 import Headline from "../components/Headline";
 import StartingPoints from "../components/StartingPoints";

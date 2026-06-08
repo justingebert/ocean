@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { UpstreamDatabaseProperties } from "../../types/database";
 import { DatabaseClient } from "../../api/databaseClient";
-import { DatabasesNavigation } from "../../constants/menu.";
+import { DatabasesNavigation } from "../../constants/menu.ts";
 import AppLayout from "../../layouts/AppLayout";
 import CreateDatabaseForm from "../../components/forms/CreateDatabaseForm";
 

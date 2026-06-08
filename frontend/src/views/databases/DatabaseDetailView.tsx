@@ -7,7 +7,7 @@ import { Database } from "../../types/database";
 import { User, UserProperties } from "../../types/user";
 import { UpstreamCreateRoleProperties } from "../../types/role";
 import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";
-import { DatabasesNavigation } from "../../constants/menu.";
+import { DatabasesNavigation } from "../../constants/menu.ts";
 import { deleteModalContent } from "../../constants/modals";
 import { getDetailViewTabsFor } from "../../constants/tabs";
 import { InvitationClient } from "../../api/invitationClient";

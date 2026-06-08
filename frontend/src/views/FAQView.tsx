@@ -1,7 +1,7 @@
 import React from 'react';
 
 import AppLayout from '../layouts/AppLayout';
-import { FAQNavigation } from '../constants/menu.';
+import { FAQNavigation } from '../constants/menu.ts';
 import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/react';
 import {ChevronDownIcon} from "@heroicons/react/20/solid";
 /**

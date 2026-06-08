@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { OverviewNavigation } from "../constants/menu.";
+import { OverviewNavigation } from "../constants/menu.ts";
 import { CredentialProperties } from "../types/models";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import { loginStart } from "../redux/slices/session/sessionSlice";

@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import { DatabasesNavigation } from "../../constants/menu.";
+import { DatabasesNavigation } from "../../constants/menu.ts";
 import { emptyDatabaseState } from "../../constants/empty";
 import { DatabaseClient } from "../../api/databaseClient";
 import AppLayout from "../../layouts/AppLayout";

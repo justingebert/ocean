@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { UserProperties } from "../types/user";
 import { useAppDispatch } from "../redux/hooks";
 import { logout } from "../redux/slices/session/sessionSlice";
-import { Navigation, navigation, SettingsNavigation } from "../constants/menu.";
+import { Navigation, navigation, SettingsNavigation } from "../constants/menu.ts";
 import { UserClient } from "../api/userClient";
 import CreateDropdown from "../components/CreateDropdown";
 

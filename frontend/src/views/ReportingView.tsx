@@ -2,7 +2,7 @@ import React from "react";
 
 import AppLayout from "../layouts/AppLayout";
 import Headline from "../components/Headline";
-import { ReportingNavigation } from "../constants/menu.";
+import { ReportingNavigation } from "../constants/menu.ts";
 import {Database, DatabaseProperties} from "../types/database";
 import { useMetricsQuery } from "../hooks/useMetricsQuery";
 import {
