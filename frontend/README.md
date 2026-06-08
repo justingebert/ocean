@@ -37,12 +37,6 @@ npm run preview
 ```
 Serves the built project for preview.
 
-### Storybook
-```sh
-npm run storybook
-```
-Starts Storybook for component development.
-
 ### Generate Documentation
 ```sh
 npm run docs
@@ -122,5 +116,4 @@ Ensure that the **RENOVATE_TOKEN** is set up with the required GitHub or GitLab 
 - **Vite 6**, **TypeScript**
 - **Vitest**, **@testing-library/react**, **Jest DOM**
 - **Cypress** (E2E & component testing)
-- **Storybook** (UI component development)
 - **ESLint**, **TypeScript ESLint**

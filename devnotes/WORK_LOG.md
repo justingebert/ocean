@@ -6,6 +6,9 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
+## 2026-06-08 strip storybook
+- used claude to get it running but its needs a lot of porting and doesnt cover much of the app so strip it for now
+
 ## 2026-06-08 — frontend tooling drift (audit step 2)
 - removed stale deps
 - pinned local Node to 22 (`frontend/.nvmrc`) to match the Dockerfile (`node:22-alpine`)

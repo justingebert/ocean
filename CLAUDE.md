@@ -47,7 +47,6 @@ npm run vitest           # unit/component tests (single run)
 npm run vitest -- path/to/file.test.ts   # single file
 npm run cypress:component    # Cypress component tests — dev server must NOT be running
 npm run test:e2e             # Cypress E2E — dev server MUST be running
-npm run storybook
 ```
 
 ## Backend architecture

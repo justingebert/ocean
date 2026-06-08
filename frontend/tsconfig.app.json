@@ -31,9 +31,6 @@
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
     "src/**/*.cy.ts",
-    "src/**/*.cy.tsx",
-    "src/**/*.stories.ts",
-    "src/**/*.stories.tsx",
-    "src/**/*.stories.mdx"
+    "src/**/*.cy.tsx"
   ]
 }
