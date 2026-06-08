@@ -6,7 +6,13 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
-## 2026-06-08 strip storybook
+## 2026-06-08 — add Prettier formatter (frontend)
+- added Prettier + `eslint-config-prettier` (last in the flat config so ESLint stops owning style); `format` / `format:check` scripts mirror the backend's scalafmt gate
+- config matches the prevailing `src/` style (double-quote, semicolons) so churn is formatting-only; applied it across the tree in an isolated commit recorded in `.git-blame-ignore-revs`
+- bumped eslint `ecmaVersion` 2020 → 2022; codebase was already lint-clean (0 `any`)
+- deferred type-aware lint (`recommendedTypeChecked`) — documented as a next step in `devnotes/plans/frontendaudit.md`
+
+## 2026-06-08 strip storybook + add formatter and audit packages
 - used claude to get it running but its needs a lot of porting and doesnt cover much of the app so strip it for now
 
 ## 2026-06-08 — frontend tooling drift (audit step 2)
