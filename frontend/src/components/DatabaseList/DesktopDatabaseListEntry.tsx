@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { DatabasesNavigation } from '../../constants/menu.';
-import { getDatabaseCreatedAt, getDatabaseEngineTitle } from './DatabaseList';
+import { getDatabaseCreatedAt, getDatabaseEngineTitle } from './databaseListFormat';
 import { DatabaseProperties } from '../../types/database';
 import {CircleStackIcon} from "@heroicons/react/24/outline";
 

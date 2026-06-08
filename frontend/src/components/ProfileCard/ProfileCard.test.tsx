@@ -1,9 +1,7 @@
-import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import ProfileCard from "./ProfileCard";
 
-// Tests for ProfileCard component to verify correct rendering behavior under different states
 describe("ProfileCard Component", () => {
     // Mock user data used for testing profile card rendering
     const mockUser = {

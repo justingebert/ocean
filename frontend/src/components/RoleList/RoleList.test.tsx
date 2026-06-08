@@ -1,11 +1,11 @@
-import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import RoleList, { RoleListProps } from "./RoleList";
+import { RoleProperties } from "../../types/role";
 
 // Mock RoleListEntry to control rendering and behavior in tests
 vi.mock("./RoleListEntry", () => ({
-    default: ({ role, onDelete }: { role: any; onDelete: () => void }) => (
+    default: ({ role, onDelete }: { role: RoleProperties; onDelete: () => void }) => (
         <tr>
             <td>{role.name}</td>
             <td>{role.password}</td>

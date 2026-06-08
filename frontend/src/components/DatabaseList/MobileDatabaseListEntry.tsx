@@ -1,7 +1,7 @@
 import React from 'react';
 import { CircleStackIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
-import { getDatabaseCreatedAt, getDatabaseEngineTitle } from './DatabaseList';
+import { getDatabaseCreatedAt, getDatabaseEngineTitle } from './databaseListFormat';
 import { DatabaseProperties } from '../../types/database';
 
 /**

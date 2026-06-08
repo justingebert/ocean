@@ -6,7 +6,6 @@ describe("DatabasesView Test", () => {
     // Mock API responses for user authentication and database retrieval
     beforeEach(() => {
         // Simulate login process by intercepting authentication request
-        // @ts-ignore
         cy.intercept("POST", loginApiUrl, {
             statusCode: 200,
             body: {
@@ -16,7 +15,6 @@ describe("DatabasesView Test", () => {
         }).as("signinRequest");
 
         // Intercept user API call
-        // @ts-ignore
         cy.intercept("GET", userApiUrl, {
             statusCode: 200,
             body: {
@@ -30,7 +28,6 @@ describe("DatabasesView Test", () => {
         }).as("getUser");
 
         // Mock API response to return a list of test databases
-        // @ts-ignore
         cy.intercept("GET", databasesApiUrl, {
             statusCode: 200,
             body: [
@@ -52,7 +49,6 @@ describe("DatabasesView Test", () => {
         cy.get('a[href="/databases/"]').click();
 
         // Simulate scenario where no databases exist, expecting an empty state UI
-        // @ts-ignore
         cy.intercept("GET", databasesApiUrl, {
             statusCode: 200,
             body: [],

@@ -4,7 +4,6 @@ describe("Login and OverviewView Test", () => {
 
     beforeEach(() => {
         // Intercept login API call
-        // @ts-ignore
         cy.intercept("POST", loginApiUrl, (req) => {
             if (req.body.username === "testuser" && req.body.password === "password123") {
                 req.reply({

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import {axiosInstance, decodeJwt, setBearerToken} from './client';
-import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 
 // Mock localStorage methods for testing without affecting the real browser environment
 Object.defineProperty(global, 'localStorage', {
@@ -21,15 +21,18 @@ describe('Axios Client (Real Axios)', () => {
         expect(axiosInstance.defaults.headers['Access-Control-Allow-Origin']).toBe('*');
     });
 
-    // Test axios GET request using a public mock API to validate response handling
+    // Test axios GET request using a local mock adapter to validate response handling
     it('should make a successful GET request to a mock server', async () => {
-        // Mock server response using an actual endpoint (like jsonplaceholder.typicode.com or a local mock server)
-        const mockBaseURL = 'https://jsonplaceholder.typicode.com';
-        const testAxiosInstance = axios.create({ baseURL: mockBaseURL });
+        const mockAxios = new MockAdapter(axiosInstance);
+        mockAxios.onGet('/todos/1').reply(200, { id: 1 });
 
-        const response = await testAxiosInstance.get('/todos/1');
-        expect(response.status).toBe(200);
-        expect(response.data).toHaveProperty('id', 1);
+        try {
+            const response = await axiosInstance.get('/todos/1');
+            expect(response.status).toBe(200);
+            expect(response.data).toHaveProperty('id', 1);
+        } finally {
+            mockAxios.restore();
+        }
     });
 
     // Verify JWT decoding function correctly extracts payload from a valid token

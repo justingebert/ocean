@@ -10,6 +10,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "vitest": "vitest --run",
     "vitest:ui": "vitest --ui",
     "vitest:coverage": "vitest --coverage",

@@ -1,4 +1,3 @@
-import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom"; // Ensure this is imported
 import { describe, it, expect } from "vitest";

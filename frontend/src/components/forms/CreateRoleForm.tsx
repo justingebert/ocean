@@ -30,8 +30,8 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
             .required("Name is required")
             .min(4, "Name should be of minimum 4 characters length")
             .matches(/^[a-z][a-z0-9_]*$/, "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.")
-            .test("unique_test", "Name is already registered", (value, ctx) =>
-                validateDatabaseValues(value, ctx)
+            .test("unique_test", "Name is already registered", (value) =>
+                validateDatabaseValues(value)
             )
     });
     /**
@@ -43,8 +43,7 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
      * @returns `true` if the role name is available, otherwise `false`.
      */
     const validateDatabaseValues = async (
-        roleName: string | undefined,
-        context: yup.TestContext<Record<string, any>>
+        roleName: string | undefined
     ): Promise<boolean> => {
         if (roleName !== undefined && database !== undefined) {
             const payload: UpstreamCreateRoleProperties = {
@@ -59,7 +58,7 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
                 if (availability) {
                     return true;
                 }
-            } catch (parseError) {
+            } catch {
                 // TODO: user should know what happend
                 return false;
             }
@@ -75,14 +74,12 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
                 }}
                 validationSchema={schema}
                 onSubmit={values => {
-                    // same shape as initial values
-                    console.log(values);
                     if (database) {
                         onSubmit({ roleName: `${database.name}_${values.roleName}`, instanceId: database.id })
                     }
                 }}
             >
-                {({ errors, touched }) => (
+                {({ errors }) => (
                     <Form className="space-y-6">
                         <label htmlFor="company-website" className="block text-sm font-medium text-gray-700">
                             Username

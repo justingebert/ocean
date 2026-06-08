@@ -6,6 +6,10 @@ import {
 } from "../types/database";
 import { axiosInstance } from "./client";
 
+interface AvailabilityResponse {
+  availability: boolean;
+}
+
 export class DatabaseClient {
   /**
    * Fetches all databases from all users.
@@ -65,7 +69,7 @@ export class DatabaseClient {
    * @returns A promise that resolves with the availability status.
    */
   public static availabilityDatabase = (database: UpstreamDatabaseProperties) =>
-    axiosInstance.post<any>("/databases/_availability_", database);
+    axiosInstance.post<AvailabilityResponse>("/databases/_availability_", database);
 
   /**
    * Deletes a database by its unique ID.
@@ -73,7 +77,7 @@ export class DatabaseClient {
    * @returns A promise that resolves to the deletion response.
    */
   public static deleteDatabase = async (id: number) => {
-    const { data } = await axiosInstance.delete<any>(
+    const { data } = await axiosInstance.delete<unknown>(
       `/databases/${id.toString()}`
     );
     return data;
@@ -86,7 +90,7 @@ export class DatabaseClient {
    * @returns A promise that resolves to the deletion response.
    */
   public static deleteDatabaseWithPermission = async (id: number) => {
-    const { data } = await axiosInstance.delete<any>(
+    const { data } = await axiosInstance.delete<unknown>(
       `/databases/${id.toString()}/_permission_`
     );
     return data;

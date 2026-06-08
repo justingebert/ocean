@@ -3,6 +3,10 @@ import * as yup from "yup";
 import { RoleProperties, UpstreamCreateRoleProperties } from "../types/role";
 import { axiosInstance } from "./client";
 
+interface AvailabilityResponse {
+  availability: boolean;
+}
+
 export class RoleClient {
   /**
    * Fetches all roles associated with a specific database.
@@ -37,7 +41,7 @@ export class RoleClient {
    */
   public static availabilityRoleForDatabase = (
     role: UpstreamCreateRoleProperties
-  ) => axiosInstance.post<any>("/roles/_availability_", role);
+  ) => axiosInstance.post<AvailabilityResponse>("/roles/_availability_", role);
 
   /**
    * Deletes a role by its unique ID.
@@ -45,7 +49,7 @@ export class RoleClient {
    * @returns A promise that resolves to a deletion response.
    */
   public static deleteRoleForDatabase = async (id: number) => {
-    const { data } = await axiosInstance.delete<any>(`/roles/${id.toString()}`);
+    const { data } = await axiosInstance.delete<unknown>(`/roles/${id.toString()}`);
     return data;
   };
 }

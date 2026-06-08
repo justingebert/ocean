@@ -6,6 +6,10 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
+## 2026-06-08 — frontend audit cleanup
+- restored green lint, typecheck, unit + component tests, and build after they had degraded
+- type-hygiene pass (dropped `any`), fixed a few latent bugs, modernized tsconfig to project references, and brought test files under typecheck
+
 ## 2026-06-07
 - upgrade postgres from 12 to 18
 - make deploy jobs not required and hide deploy ops behind manual run

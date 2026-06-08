@@ -28,7 +28,7 @@ export class InvitationClient {
    * @returns A promise that resolves to a deletion response.
    */
   public static deleteInvitationForDatabase = async (id: number) => {
-    const { data } = await axiosInstance.delete<any>(`/invitations/${id.toString()}`);
+    const { data } = await axiosInstance.delete<unknown>(`/invitations/${id.toString()}`);
     return data;
   }
 }

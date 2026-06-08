@@ -1,18 +1,17 @@
-import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, it, beforeEach, vi, expect } from "vitest";
-import userEvent from "@testing-library/user-event";
 import CreateRoleModal, { CreateRoleModalProps } from "./CreateRoleModal";
+import { CreateRoleFormProps } from "../forms/CreateRoleForm";
 
 // Mock the CreateRoleForm component to control its rendering and behavior in tests
 vi.mock("../forms/CreateRoleForm", () => {
     return {
-        default: vi.fn(({ onSubmit, onClose }: any) => (
+        default: vi.fn(({ onSubmit, onClose }: CreateRoleFormProps) => (
             // Mock structure of the CreateRoleForm component to expose onSubmit and onClose handlers
             <div data-testid="create-role-form">
                 {/* The mock doesn't render buttons; instead, expose onSubmit and onClose */}
                 <button
-                    onClick={() => onSubmit({ roleName: "Admin" })}
+                    onClick={() => onSubmit({ roleName: "Admin", instanceId: 1 })}
                     data-testid="submit-button"
                 >
                     Submit

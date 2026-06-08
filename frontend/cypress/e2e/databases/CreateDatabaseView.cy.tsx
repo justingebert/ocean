@@ -4,12 +4,10 @@ describe("Login and Create a Database", () => {
     const createDatabaseApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/databases"; // Create database endpoint
     const checkAvailabilityApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/databases/_availability_"; // Check availability endpoint
     const getDatabasesUrl = "http://databases.f4.htw-berlin.de:9000/v1/databases"
-    let wasPostRequestBodyRight = false; // Global boolean flag
 
     // Set up API intercepts to mock backend responses and control test scenarios
     beforeEach(() => {
         // Mock login API to simulate authentication responses
-        // @ts-ignore
         cy.intercept("POST", loginApiUrl, (req) => {
             if (req.body.username === "testuser" && req.body.password === "password123") {
                 req.reply({
@@ -28,7 +26,6 @@ describe("Login and Create a Database", () => {
         }).as("signinRequest");
 
         // Mock user data retrieval after successful login
-        // @ts-ignore
         cy.intercept("GET", userApiUrl, {
             statusCode: 200,
             body: {
@@ -42,18 +39,15 @@ describe("Login and Create a Database", () => {
         }).as("getUser");
 
         // Mock API response when creating a new database
-        // @ts-ignore
         cy.intercept("POST", createDatabaseApiUrl, (req) => {
             console.log("POST Request Body:", req.body);
             if (req.body.name === "testdatabase") {
-                wasPostRequestBodyRight = true;
                 req.reply({
                     statusCode: 201,
                     body: { name: "testdatabase",
                             engine: "postgresql"},
                 });
             } else {
-                wasPostRequestBodyRight = false;
                 req.reply({
                     statusCode: 400,
                     body: { message: "Invalid database name" },
@@ -62,7 +56,6 @@ describe("Login and Create a Database", () => {
         }).as("createDatabase");
 
         // Intercept availability check API call
-        // @ts-ignore
         cy.intercept("POST", checkAvailabilityApiUrl, (req) => {
             req.reply({
                 statusCode: 200,
@@ -70,7 +63,6 @@ describe("Login and Create a Database", () => {
             });
         }).as("checkAvailability");
 
-        // @ts-ignore
         cy.intercept("GET", getDatabasesUrl, {
             statusCode: 200
         });

@@ -58,7 +58,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
    */
   const validateDatabaseValues = async (
     name: string | undefined,
-    context: yup.TestContext<Record<string, any>>
+    context: yup.TestContext<Record<string, unknown>>
   ): Promise<boolean> => {
     const engine = context.parent.engine as string | undefined;
     if (name !== undefined && engine !== undefined) {
@@ -77,7 +77,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
         if (availability) {
           return true;
         }
-      } catch (parseError) {
+      } catch {
         // TODO: user should know what happend
         return false;
       }
@@ -98,10 +98,12 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
     valid: boolean
   ): JSX.Element => {
     if (loading) {
-      <ArrowPathIcon
-        className="animate-spin h-5 w-5 text-blue-400"
-        aria-hidden="true"
-      />;
+      return (
+        <ArrowPathIcon
+          className="animate-spin h-5 w-5 text-blue-400"
+          aria-hidden="true"
+        />
+      );
     } else if (touched && valid) {
       return (
         <CheckCircleIcon

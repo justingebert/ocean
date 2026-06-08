@@ -13,7 +13,6 @@ describe("DatabaseDetailView Test", () => {
     // Intercept API calls to simulate backend behavior for database details
     beforeEach(() => {
         // Intercept login API call
-        // @ts-ignore
         cy.intercept("POST", loginApiUrl, {
             statusCode: 200,
             body: {
@@ -23,7 +22,6 @@ describe("DatabaseDetailView Test", () => {
         }).as("signinRequest");
 
         // Mock user API response to ensure correct user details
-        // @ts-ignore
         cy.intercept("GET", userApiUrl, {
             statusCode: 200,
             body: {
@@ -37,7 +35,6 @@ describe("DatabaseDetailView Test", () => {
         }).as("getUser");
 
         // Mock API response for fetching the list of databases
-        // @ts-ignore
         cy.intercept("GET", databasesApiUrl, {
             statusCode: 200,
             body: [
@@ -47,7 +44,6 @@ describe("DatabaseDetailView Test", () => {
         }).as("getDatabases");
 
         // Mock get database number 1
-        // @ts-ignore
         cy.intercept("GET", database1ApiUrl, {
             statusCode: 200,
             body: {
@@ -60,7 +56,6 @@ describe("DatabaseDetailView Test", () => {
         }).as("getDatabase1");
 
         // Mock get roles
-        // @ts-ignore
         cy.intercept("GET", databasesRolesApiUrl, {
             statusCode: 200,
             body: [
@@ -74,7 +69,6 @@ describe("DatabaseDetailView Test", () => {
         }).as("getRoles");
 
         // Mock get database invitations
-        // @ts-ignore
         cy.intercept("GET", databaseInvitationsApiUrl, {
             statusCode: 200,
             body: [{
@@ -93,7 +87,6 @@ describe("DatabaseDetailView Test", () => {
         }).as("getDatabaseInvitations");
 
         // Mock get users
-        // @ts-ignore
         cy.intercept("GET", usersApiUrl, {
             statusCode: 200,
             body: [
@@ -124,14 +117,12 @@ describe("DatabaseDetailView Test", () => {
             ],
         }).as("getUsers");
 
-        // @ts-ignore
         // Mock successful deletion of a database
         cy.intercept("DELETE", database1ApiUrl, {
             statusCode: 200,
         }).as("deleteDatabase1");
 
         // Intercept availability check API call
-        // @ts-ignore
         cy.intercept("POST", checkRolesAvailabilityApiUrl, (req) => {
             req.reply({
                 statusCode: 200,
@@ -140,7 +131,6 @@ describe("DatabaseDetailView Test", () => {
         }).as("checkAvailability");
 
         // Intercept create a new Role API call
-        // @ts-ignore
         cy.intercept("POST", rolesApiUrl, (req) => {
             req.reply({
                 statusCode: 200,
@@ -154,7 +144,6 @@ describe("DatabaseDetailView Test", () => {
         }).as("createRole");
 
         // Intercept create a new Invitation API call
-        // @ts-ignore
         cy.intercept("POST", invitationsApiUrl, (req) => {
             req.reply({
                 statusCode: 200,
@@ -168,7 +157,6 @@ describe("DatabaseDetailView Test", () => {
 
     it("Fails to create a new invitation", () => {
         // Simulate a failed invitation creation request
-        // @ts-ignore
         cy.intercept("POST", invitationsApiUrl, {
             statusCode: 400, // Simulate good request
             body: { message: "Failed to create invitation" },
@@ -205,7 +193,6 @@ describe("DatabaseDetailView Test", () => {
     });
 
     it("Successfully delete an invitation", () => {
-        // @ts-ignore
         cy.intercept("DELETE", `${invitationsApiUrl}/2`, {
             statusCode: 200, // Simulate good request
             body: { message: "" },
@@ -242,7 +229,6 @@ describe("DatabaseDetailView Test", () => {
     });
 
     it("Fails to delete an invitation", () => {
-        // @ts-ignore
         cy.intercept("DELETE", `${invitationsApiUrl}/2`, {
             statusCode: 400, // Simulate bad request
             body: { message: "" },
@@ -281,7 +267,6 @@ describe("DatabaseDetailView Test", () => {
     });
 
     it("Successfully delete a user", () => {
-        // @ts-ignore
         cy.intercept("DELETE", `${rolesApiUrl}/4`, {
             statusCode: 200, // Simulate good request
             body: { message: "" },
@@ -318,7 +303,6 @@ describe("DatabaseDetailView Test", () => {
     });
 
     it("Fails to delete a user", () => {
-        // @ts-ignore
         cy.intercept("DELETE", `${rolesApiUrl}/4`, {
             statusCode: 400, // Simulate good request
             body: { message: "Failed to create role" },
@@ -357,7 +341,6 @@ describe("DatabaseDetailView Test", () => {
     });
 
     it("Fails to create new user", () => {
-        // @ts-ignore
         cy.intercept("POST", rolesApiUrl, {
             statusCode: 400, // Simulate bad request
             body: { message: "Failed to create role" },

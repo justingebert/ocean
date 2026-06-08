@@ -9,16 +9,11 @@ import AppLayout from "../../layouts/AppLayout";
 import CreateDatabaseForm from "../../components/forms/CreateDatabaseForm";
 
 /**
- * Props for the `CreateDatabaseView` component.
- * Currently, this component does not accept any props.
- */
-interface CreateDatabaseViewProps { }
-/**
  * View component for creating a new database.
  * - Uses `react-query` to manage the mutation for database creation.
  * - Navigates to the database list upon successful creation.
  */
-const CreateDatabaseView: React.FC<CreateDatabaseViewProps> = () => {
+const CreateDatabaseView: React.FC = () => {
   const navigate = useNavigate();
   // Queries
   const queryClient = useQueryClient()

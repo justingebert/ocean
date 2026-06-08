@@ -14,7 +14,7 @@ import { InvitationClient } from "../../api/invitationClient";
 import { RoleClient } from "../../api/roleClient";
 import { UserClient } from "../../api/userClient";
 import { DatabaseClient } from "../../api/databaseClient";
-import { getDatabaseEngineTitle } from "../../components/DatabaseList/DatabaseList";
+import { getDatabaseEngineTitle } from "../../components/DatabaseList/databaseListFormat";
 import AppLayout from "../../layouts/AppLayout";
 import ActionDropdown from "../../components/ActionDropdown";
 import CreateRoleModal from "../../components/modals/CreateRoleModal";
@@ -28,17 +28,12 @@ import UserSelector from "../../components/UserSelector/UserSelector";
 import { Tabs } from "../../components/Navigation/Tabs/Tabs";
 
 /**
- * Props for the `DatabaseDetailView` component.
- * Currently, this component does not accept any props.
- */
-interface DatabaseDetailViewProps { }
-/**
  * View component for displaying the details of a database.
  * - Fetches database information, roles, invitations, and users.
  * - Supports role creation, invitation management, and database deletion.
  */
-const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
-  let { id } = useParams<{ id: string }>();
+const DatabaseDetailView: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const parsedId = id ? Number.parseInt(id) : undefined;
   const navigate = useNavigate();
   // Tabs
@@ -104,7 +99,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       setOpenCreateRoleModal(false);
       setShowUserAddSuccessNotification(true);
     },
-    onError: (_value) => {
+    onError: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       setOpenCreateRoleModal(false);
       setShowUserAddFailedNotification(true);
@@ -119,7 +114,7 @@ const DatabaseDetailView: React.FC<DatabaseDetailViewProps> = () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       setShowUserDeleteSuccessNotification(true);
     },
-    onError: (_value) => {
+    onError: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       setShowUserDeleteFailedNotification(true);
     }

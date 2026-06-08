@@ -11,17 +11,12 @@ import EmptyState from "../../components/EmptyState";
 import Headline from "../../components/Headline";
 
 /**
- * Props for the `DatabasesView` component.
- * Currently, this component does not accept any props.
- */
-interface DatabasesViewProps {}
-/**
  * View component for displaying the list of user-specific databases.
  * - Fetches databases using `react-query`.
  * - Shows an empty state if no databases are available.
  * - Navigates to a new database creation page or details page when clicked.
  */
-const DatabasesView: React.FC<DatabasesViewProps> = () => {
+const DatabasesView: React.FC = () => {
   const navigate = useNavigate();
     /**
      * Fetches the databases associated with the current user.

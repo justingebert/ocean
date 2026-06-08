@@ -4,7 +4,6 @@ describe("SignInView E2E Test", () => {
 
   beforeEach(() => {
     // Intercept the fetch request to the signin endpoint
-    // @ts-ignore
     cy.intercept("POST", signinApiUrl, (req) => {
       // Mock response based on the body of the request
       if (req.body.username === "testuser" && req.body.password === "password123") {

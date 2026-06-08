@@ -10,17 +10,12 @@ import UserLayout from "../layouts/UserLayout";
 import SignInForm from "../components/SignInForm";
 
 /**
- * Props for the `SignInView` component.
- * Currently, this component does not accept any props.
- */
-interface SignInViewProps { }
-/**
  * The sign-in page where users can log into their HTW account.
  * - Uses `react-redux` for authentication state management.
  * - Redirects users to the overview page if they are already logged in.
  * - Handles authentication by dispatching login credentials to Redux.
  */
-const SignInView: React.FC<SignInViewProps> = () => {
+const SignInView: React.FC = () => {
   const navigate = useNavigate();
   const { loading, error, isLoggedIn } = useAppSelector(
     (state) => state.session.session

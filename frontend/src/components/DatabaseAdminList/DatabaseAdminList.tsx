@@ -5,11 +5,8 @@ import { Database } from "../../types/database";
 import {
   getDatabaseCreatedAt,
   getDatabaseEngineTitle,
-} from "../DatabaseList/DatabaseList";
+} from "../DatabaseList/databaseListFormat";
 
-/**
- * Props for the `DatabaseAdminList` component.
- */
 export interface DatabaseAdminListProps {
   databases: ReadonlyArray<Database>;
   onDelete?: (database: Database) => void;

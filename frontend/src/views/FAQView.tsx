@@ -5,11 +5,6 @@ import { FAQNavigation } from '../constants/menu.';
 import {Disclosure, DisclosureButton, DisclosurePanel} from '@headlessui/react';
 import {ChevronDownIcon} from "@heroicons/react/20/solid";
 /**
- * Props for the `FAQView` component.
- * Currently, this component does not accept any props.
- */
-interface FAQViewProps {}
-/**
  * List of frequently asked questions (FAQs) and their corresponding answers.
  */
 const faqs = [
@@ -39,7 +34,7 @@ const faqs = [
  * - Uses `headlessui` for collapsible FAQ sections.
  * - Wrapped in `AppLayout` for consistent navigation.
  */
-const FAQView: React.FC<FAQViewProps> = () => {
+const FAQView: React.FC = () => {
   return (
     <AppLayout selectedNavigation={FAQNavigation.name}>
         <div className="max-w-7xl mx-auto py-12 px-4 sm:py-16 sm:px-6 lg:px-8">

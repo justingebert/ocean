@@ -1,16 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-/**
- * Props for the `PageNotFoundView` component.
- * Currently, this component does not accept any props.
- */
-interface PageNotFoundViewProps { }
-/**
- * A 404 page component that displays a "Page not found" message.
- * - Shows a large "404" error code.
- * - Provides options to navigate back home or contact support.
- */
-const PageNotFoundView: React.FC<PageNotFoundViewProps> = () => {
+
+const PageNotFoundView: React.FC = () => {
     return (
         <div className="bg-white min-h-screen px-4 py-16 sm:px-6 sm:py-24 md:grid md:place-items-center lg:px-8">
             <div className="max-w-max mx-auto">

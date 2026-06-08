@@ -1,5 +1,5 @@
 import React from 'react';
-import { compareDesc, formatDistance } from 'date-fns';
+import { compareDesc } from 'date-fns';
 
 import MobileDatabaseListEntry from './MobileDatabaseListEntry';
 import DesktopDatabaseListEntry from './DesktopDatabaseListEntry';
@@ -68,29 +68,4 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
         </>
     );
 }
-/**
- * Returns the database engine title based on its identifier.
- *
- * @param value - The engine identifier (`'P'` for PostgreSQL, `'M'` for MongoDB).
- * @returns The full name of the database engine.
- */
-export const getDatabaseEngineTitle = (value: string): string => {
-    if (value === 'P') {
-        return 'PostgreSQL';
-    } else if (value === 'M') {
-        return 'MongoDB';
-    } else {
-        return 'Unknown';
-    }
-}
-/**
- * Formats the database creation date into a human-readable format.
- *
- * @param value - The date the database was created.
- * @returns A formatted string representing the relative time (e.g., "3 days ago").
- */
-export const getDatabaseCreatedAt = (value: Date): string => {
-    return formatDistance(value, new Date(), { addSuffix: true })
-}
-
 export default DatabaseList;

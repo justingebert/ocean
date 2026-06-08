@@ -1,10 +1,10 @@
-import { SignJWT, jwtVerify, decodeJwt } from "jose";
+import { SignJWT } from "jose";
 
 const SECRET_KEY = new TextEncoder().encode("your_test_secret_key"); // Use the same key as your backend
 const EXPIRED_SECRET_KEY = new TextEncoder().encode("expired_test_secret_key");
 
 // Function to generate a valid JWT
-const generateValidJWT = async (userId) => {
+const generateValidJWT = async (userId: number) => {
     return await new SignJWT({ userId })
         .setProtectedHeader({ alg: "HS256" })
         .setExpirationTime("1h") // Expires in 1 hour
@@ -13,7 +13,7 @@ const generateValidJWT = async (userId) => {
 };
 
 // Function to generate an expired JWT
-const generateExpiredJWT = async (userId) => {
+const generateExpiredJWT = async (userId: number) => {
     return await new SignJWT({ userId })
         .setProtectedHeader({ alg: "HS256" })
         .setExpirationTime(Math.floor(Date.now() / 1000) - 60) // Expired 1 min ago
@@ -156,8 +156,8 @@ describe("Access token management tests", () => {
 
                     // Verify tokens were cleared
                     cy.window().then((win) => {
-                        expect(win.localStorage.getItem("accessToken")).to.be.null;
-                        expect(win.localStorage.getItem("refreshToken")).to.be.null;
+                        expect(win.localStorage.getItem("accessToken")).to.equal(null);
+                        expect(win.localStorage.getItem("refreshToken")).to.equal(null);
                     });
 
                     // Verify redirection to login
@@ -185,5 +185,3 @@ describe("Access token management tests", () => {
         cy.contains("Network Error").should("exist");
     });
 });
-
-

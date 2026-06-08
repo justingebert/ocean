@@ -4,7 +4,6 @@ describe("Login and Navigate to Settings", () => {
 
     beforeEach(() => {
         // Intercept login API call
-        // @ts-ignore
         cy.intercept("POST", loginApiUrl, (req) => {
             if (req.body.username === "testuser" && req.body.password === "password123") {
                 req.reply({
@@ -23,7 +22,6 @@ describe("Login and Navigate to Settings", () => {
         }).as("signinRequest");
 
         // Intercept user API call for settings
-        // @ts-ignore
         cy.intercept("GET", userApiUrl, {
             statusCode: 200,
             body: {

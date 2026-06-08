@@ -1,4 +1,3 @@
-import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import CreateDatabaseForm, { CreateDatabaseFormProps } from "./CreateDatabaseForm";
@@ -88,9 +87,7 @@ describe("CreateDatabaseForm", () => {
         const spyApi = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(mockResponse);
         // Spy on DatabaseValidation schema validation to confirm it processes data correctly
         const spyValidation = vi.spyOn(DatabaseValidation.availabilityDatabaseSchema, "validateSync").mockImplementation(
-            (data) => {
-                return { availability: true } as any;
-            }
+            () => ({ availability: true })
         );
 
         render(<CreateDatabaseForm {...defaultProps} />);

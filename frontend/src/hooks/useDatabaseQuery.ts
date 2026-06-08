@@ -36,12 +36,11 @@ export const useDatabasesQuery = (
  * @returns A `useMutation` result to handle the deletion process.
  */
 export const useDeleteDatabaseWithPermissionMutation = (
-    options?: Omit<UseMutationOptions<any, Error, number>, "mutationFn">
+    options?: Omit<UseMutationOptions<unknown, Error, number>, "mutationFn">
 ) => {
     return useMutation({
         mutationFn: async (variables: number) => {
-            const { data } = await DatabaseClient.deleteDatabaseWithPermission(variables);
-            return data;
+            return DatabaseClient.deleteDatabaseWithPermission(variables);
         },
         ...options,
     });

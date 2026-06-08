@@ -15,17 +15,12 @@ import { useUsersQuery } from "../hooks/useUserQuery";
 import { UserAdminList } from "../components/UserAdminList/UserAdminList";
 
 /**
- * Props for the `ReportingView` component.
- * Currently, this component does not accept any props.
- */
-interface ReportingViewProps {}
-/**
  * The reporting page displaying metrics, database statistics, and user data.
  * - Fetches and displays system-wide metrics.
  * - Lists all databases and provides deletion functionality.
  * - Lists all users in the system.
  */
-const ReportingView: React.FC<ReportingViewProps> = () => {
+const ReportingView: React.FC = () => {
   const metricsQuery = useMetricsQuery();
   /**
    * Interface for metrics data retrieved from the API.

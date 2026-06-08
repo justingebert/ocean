@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "../node_modules/.tmp/tsconfig.cypress.tsbuildinfo",
+    "rootDir": "..",
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "types": ["cypress", "node", "vite/client"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true
+  },
+  "include": [
+    "e2e/**/*.ts",
+    "e2e/**/*.tsx",
+    "support/**/*.ts",
+    "support/**/*.tsx",
+    "../src/**/*.ts",
+    "../src/**/*.tsx"
+  ],
+  "exclude": [
+    "../src/**/*.test.ts",
+    "../src/**/*.test.tsx",
+    "../src/**/*.stories.ts",
+    "../src/**/*.stories.tsx",
+    "../src/**/*.stories.mdx"
+  ]
+}

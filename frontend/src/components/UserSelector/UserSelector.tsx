@@ -83,7 +83,7 @@ const UserSelector: React.FC<UserSelectorProps> = ({ users, selectedUserIds, onS
                                 }
                                 value={user}
                             >
-                                {({ selected, focus }) => (
+                                {({ focus }) => (
                                     <>
                                         <div className="flex">
                                             <span className={classNames(selectedUserIds.find(id => id === user.id) ? 'font-semibold' : 'font-normal', 'truncate')}>

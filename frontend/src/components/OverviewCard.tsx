@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Database } from '../types/database';
 import { UserProperties } from '../types/user';
-import { getDatabaseEngineTitle } from './DatabaseList/DatabaseList';
+import { getDatabaseEngineTitle } from './DatabaseList/databaseListFormat';
 import {EngineType} from "../types/engine";
 
 /**
