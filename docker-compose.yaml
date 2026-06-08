@@ -42,7 +42,7 @@ services:
 #      -c hba_file=/etc/postgresql/pg_hba.conf
 
   mongodb_cluster:
-    image: mongo:5
+    image: mongo:8.0
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: toor

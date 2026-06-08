@@ -2,7 +2,7 @@ name: ocean-mongo
 
 services:
   mongodb_cluster:
-    image: mongo:5
+    image: mongo:8.0
     restart: unless-stopped
     env_file: /etc/ocean/mongodb_cluster.env
     ports:

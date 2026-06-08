@@ -6,6 +6,10 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
+## 2026-06-07
+- upgrade postgres from 12 to 18
+- make deploy jobs not required and hide deploy ops behind manual run
+
 ## 2026-06-05
 - split ci and add more ansible deployments for db server and ops
 

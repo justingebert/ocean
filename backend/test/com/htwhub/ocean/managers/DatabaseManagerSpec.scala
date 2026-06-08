@@ -25,7 +25,6 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.when
-import org.mongodb.scala.Completed
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import org.scalatestplus.mockito.MockitoSugar
@@ -111,7 +110,7 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
         when(postgreSQLEngine.grantAccessToPublicSchema(any[String])).thenReturn(Future(Vector(1)))
 
         val mongoDBEngine = mock[MongoDBEngine]
-        when(mongoDBEngine.createDatabase(any[String])).thenReturn(Future(Completed()))
+        when(mongoDBEngine.createDatabase(any[String])).thenReturn(Future(()))
 
         val databaseManager =
           createDatabaseManager(
@@ -140,7 +139,7 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
         when(instanceService.addInstance(any[Instance], UserId(anyLong()))).thenReturn(Future(instance))
 
         val mongoDBEngine = mock[MongoDBEngine]
-        when(mongoDBEngine.createDatabase(any[String])).thenReturn(Future(Completed()))
+        when(mongoDBEngine.createDatabase(any[String])).thenReturn(Future(()))
 
         val postgreSQLEngine = mock[PostgreSQLEngine]
         when(postgreSQLEngine.createDatabase(any[String])).thenReturn(Future(Vector(1)))
@@ -208,7 +207,7 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
           .thenReturn(Future(List(Vector(1))))
 
         val mongoDBEngine = mock[MongoDBEngine]
-        when(mongoDBEngine.deleteDatabase(any[String])).thenReturn(Future(Completed()))
+        when(mongoDBEngine.deleteDatabase(any[String])).thenReturn(Future(()))
 
         val databaseManager =
           createDatabaseManager(

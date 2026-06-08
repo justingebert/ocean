@@ -7,7 +7,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import org.mongodb.scala.bson._
 import org.mongodb.scala.bson.collection.mutable.Document
-import org.mongodb.scala.Completed
 import org.mongodb.scala.MongoClient
 import play.api.Configuration
 import scala.concurrent.ExecutionContext
@@ -34,8 +33,7 @@ class MongoDBEngine @Inject() (config: Configuration)(implicit ec: ExecutionCont
     val credential = createCredential(conf.username, conf.databaseName, conf.password.toCharArray)
     MongoClientSettings
       .builder()
-      // Todo: check for port
-      .applyToClusterSettings(block => block.hosts(List(new ServerAddress(conf.serverName, 27017)).asJava))
+      .applyToClusterSettings(block => block.hosts(List(new ServerAddress(conf.serverName, conf.portNumber)).asJava))
       .applyToSslSettings(block => block.enabled(conf.tls))
       .credential(credential)
       .build()
@@ -51,7 +49,7 @@ class MongoDBEngine @Inject() (config: Configuration)(implicit ec: ExecutionCont
     MongoDBConfiguration(serverName, databaseName, portNumber, username, password, tls)
   }
 
-  def createDatabase(databaseName: String): Future[Completed] = {
+  def createDatabase(databaseName: String): Future[Unit] = {
     val database = mongoClient.getDatabase(databaseName)
     database.createCollection(initialCollection).toFuture()
   }
@@ -69,7 +67,7 @@ class MongoDBEngine @Inject() (config: Configuration)(implicit ec: ExecutionCont
     processCommand(databaseName, createUserDoc)
   }
 
-  def deleteDatabase(databaseName: String): Future[Completed] = {
+  def deleteDatabase(databaseName: String): Future[Unit] = {
     val database = mongoClient.getDatabase(databaseName)
     database.drop().toFuture()
   }

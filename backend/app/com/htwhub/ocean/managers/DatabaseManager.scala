@@ -19,7 +19,6 @@ import com.htwhub.ocean.service.UserService
 import java.sql.Timestamp
 import java.time.Instant
 import javax.inject.Inject
-import org.mongodb.scala.Completed
 import play.api.Logger
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -93,7 +92,7 @@ class DatabaseManager @Inject() (
 
     } yield job1.toList ++ job2.toList ++ job3.toList ++ job4.toList
 
-  def addDatabaseForMongoDB(instance: Instance): Future[Completed] =
+  def addDatabaseForMongoDB(instance: Instance): Future[Unit] =
     for {
       job1 <- mongoDBEngine
         .createDatabase(instance.name)
