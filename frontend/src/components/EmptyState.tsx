@@ -5,14 +5,14 @@ import { PlusIcon, CircleStackIcon } from "@heroicons/react/20/solid";
  * Props for the `EmptyState` component.
  */
 export interface EmptyStateProps {
-    /** The title displayed in the empty state. */
-    title: string;
-    /** A brief description explaining the empty state. */
-    description: string;
-    /** The text displayed on the action button. */
-    buttonText: string;
-    /** Callback function triggered when the button is clicked. */
-    onClick: () => void;
+  /** The title displayed in the empty state. */
+  title: string;
+  /** A brief description explaining the empty state. */
+  description: string;
+  /** The text displayed on the action button. */
+  buttonText: string;
+  /** Callback function triggered when the button is clicked. */
+  onClick: () => void;
 }
 /**
  * Displays an empty state message with an action button.
@@ -24,18 +24,10 @@ export interface EmptyStateProps {
  * @param buttonText - The text on the action button.
  * @param onClick - Callback function triggered when the button is clicked.
  */
-const EmptyState: React.FC<EmptyStateProps> = ({
-  title,
-  description,
-  buttonText,
-  onClick,
-}) => {
+const EmptyState: React.FC<EmptyStateProps> = ({ title, description, buttonText, onClick }) => {
   return (
     <div className="text-center">
-      <CircleStackIcon
-        className="mx-auto h-12 w-12 text-gray-400"
-        aria-hidden="true"
-      />
+      <CircleStackIcon className="mx-auto h-12 w-12 text-gray-400" aria-hidden="true" />
       <h3 className="mt-2 text-sm font-medium text-gray-900">{title}</h3>
       <p className="mt-1 text-sm text-gray-500">{description}</p>
       <div className="mt-6">

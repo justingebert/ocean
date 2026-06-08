@@ -16,7 +16,7 @@ import CreateDatabaseForm from "../../components/forms/CreateDatabaseForm";
 const CreateDatabaseView: React.FC = () => {
   const navigate = useNavigate();
   // Queries
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   /**
    * Mutation hook to create a new database.
    * - Calls `DatabaseClient.createDatabase()`.

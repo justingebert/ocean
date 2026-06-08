@@ -33,11 +33,11 @@ describe("SignInView E2E Test", () => {
 
     // Wait for the signin request to complete
     cy.wait("@signinRequest") // Use the alias to wait for the request
-        .its("request.body") // Assert the body of the request
-        .should("deep.equal", {
-          username: "testuser",
-          password: "password123",
-        });
+      .its("request.body") // Assert the body of the request
+      .should("deep.equal", {
+        username: "testuser",
+        password: "password123",
+      });
 
     // Assert redirection to the overview page
     cy.url().should("include", overviewPage);
@@ -53,8 +53,8 @@ describe("SignInView E2E Test", () => {
 
     // Wait for the signin request and assert the response
     cy.wait("@signinRequest") // Wait for the aliased request
-        .its("response.statusCode") // Assert the response status code
-        .should("eq", 401);
+      .its("response.statusCode") // Assert the response status code
+      .should("eq", 401);
 
     // Assert error message is displayed
     cy.contains("Error").should("exist");

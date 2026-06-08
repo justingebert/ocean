@@ -1,6 +1,6 @@
-import {mount} from "cypress/react";
+import { mount } from "cypress/react";
 import CreateRoleForm from "./CreateRoleForm";
-import {EngineType} from "../../types/engine";
+import { EngineType } from "../../types/engine";
 
 describe("CreateRoleForm Component", () => {
   // Mock database object to simulate a real database instance for testing
@@ -32,13 +32,7 @@ describe("CreateRoleForm Component", () => {
     }).as("checkRoleAvailability");
 
     // Mount the CreateRoleForm component with the mock database and stub functions
-    mount(
-        <CreateRoleForm
-            database={mockDatabase}
-            onSubmit={mockOnSubmit}
-            onClose={mockOnClose}
-        />
-    );
+    mount(<CreateRoleForm database={mockDatabase} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
   });
   // Ensure validation errors are displayed for empty, short, or incorrectly formatted role names
   it("displays validation errors for invalid input", () => {
@@ -79,4 +73,3 @@ describe("CreateRoleForm Component", () => {
     cy.get("@onClose").should("have.been.called");
   });
 });
-

@@ -27,11 +27,7 @@ export interface SignInFormProps {
  * @param errorMessage - The error message to display if authentication fails.
  * @param onSubmit - Callback function triggered when the user submits their credentials.
  */
-const SignInForm: React.FC<SignInFormProps> = ({
-  loading,
-  errorMessage,
-  onSubmit,
-}) => {
+const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit }) => {
   /**
    * Returns dynamic class names based on the validation state of an input field.
    *
@@ -62,7 +58,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
           validationSchema={UserValidation.loginSchema}
           onSubmit={(
             values: CredentialProperties,
-            { setSubmitting }: FormikHelpers<CredentialProperties>
+            { setSubmitting }: FormikHelpers<CredentialProperties>,
           ) => {
             if (onSubmit) {
               onSubmit(values);
@@ -73,10 +69,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
           {({ errors, touched }) => (
             <Form className="space-y-6">
               <div>
-                <label
-                  htmlFor="username"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                   Username*
                 </label>
                 <div className="mt-1">
@@ -85,15 +78,11 @@ const SignInForm: React.FC<SignInFormProps> = ({
                     name="username"
                     placeholder=""
                     className={getFieldClassNames(
-                      errors.username !== undefined &&
-                      touched.username !== undefined
+                      errors.username !== undefined && touched.username !== undefined,
                     )}
                   />
                   {errors.username && touched.username && (
-                    <span
-                      className="mt-2 text-sm text-red-600"
-                      id="usernameHelp"
-                    >
+                    <span className="mt-2 text-sm text-red-600" id="usernameHelp">
                       {errors.username}
                     </span>
                   )}
@@ -101,10 +90,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
               </div>
 
               <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password*
                 </label>
                 <div className="mt-1">
@@ -114,15 +100,11 @@ const SignInForm: React.FC<SignInFormProps> = ({
                     type="password"
                     placeholder=""
                     className={getFieldClassNames(
-                      errors.password !== undefined &&
-                      touched.password !== undefined
+                      errors.password !== undefined && touched.password !== undefined,
                     )}
                   />
                   {errors.password && touched.password && (
-                    <span
-                      className="mt-2 text-sm text-red-600"
-                      id="passwordHelp"
-                    >
+                    <span className="mt-2 text-sm text-red-600" id="passwordHelp">
                       {errors.password}
                     </span>
                   )}

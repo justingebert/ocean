@@ -1,23 +1,23 @@
-import React from 'react'
+import React from "react";
 
-import { EngineOption, IEngineOption } from './EngineOption';
+import { EngineOption, IEngineOption } from "./EngineOption";
 
 /**
  * Props for the `EngineGroup` component.
  */
 export interface EngineSelectorProps {
-    /**
-     * List of engines options.
-     */
-    engineOptions: ReadonlyArray<IEngineOption>;
-    /**
-     * The selected engine options.
-     */
-    selectedValue: string;
-    /**
-     * The function called when the engine option state changes.
-     */
-    onSelect?: (value: string) => void;
+  /**
+   * List of engines options.
+   */
+  engineOptions: ReadonlyArray<IEngineOption>;
+  /**
+   * The selected engine options.
+   */
+  selectedValue: string;
+  /**
+   * The function called when the engine option state changes.
+   */
+  onSelect?: (value: string) => void;
 }
 /**
  * Renders a group of selectable engine options.
@@ -28,17 +28,23 @@ export interface EngineSelectorProps {
  * @param selectedValue - The currently selected engine option.
  * @param onSelect - Callback function triggered when an option is selected.
  */
-export const EngineGroup: React.FC<EngineSelectorProps> = ({ engineOptions, selectedValue, onSelect }) => {
-    return (
-        <div className="flex flex-col space-y-3">
-            <div className="flex flex-row space-x-4">
-                {engineOptions.map((engineOption, index) => (
-                    <EngineOption key={index.toString()}
-                        engineOption={engineOption}
-                        selected={engineOption.value === selectedValue}
-                        onSelect={onSelect} />
-                ))}
-            </div>
-        </div>
-    )
-}
+export const EngineGroup: React.FC<EngineSelectorProps> = ({
+  engineOptions,
+  selectedValue,
+  onSelect,
+}) => {
+  return (
+    <div className="flex flex-col space-y-3">
+      <div className="flex flex-row space-x-4">
+        {engineOptions.map((engineOption, index) => (
+          <EngineOption
+            key={index.toString()}
+            engineOption={engineOption}
+            selected={engineOption.value === selectedValue}
+            onSelect={onSelect}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};

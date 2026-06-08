@@ -25,11 +25,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "vitest.setup.ts"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vitest.setup.ts"],
   "exclude": [
     "src/**/*.cy.ts",
     "src/**/*.cy.tsx",

@@ -17,9 +17,7 @@ import SignInForm from "../components/SignInForm";
  */
 const SignInView: React.FC = () => {
   const navigate = useNavigate();
-  const { loading, error, isLoggedIn } = useAppSelector(
-    (state) => state.session.session
-  );
+  const { loading, error, isLoggedIn } = useAppSelector((state) => state.session.session);
   const dispatch = useAppDispatch();
   /**
    * Redirects the user to the overview page if already logged in.
@@ -49,11 +47,7 @@ const SignInView: React.FC = () => {
             Sign in to your HTW account
           </h2>
         </div>
-        <SignInForm
-          loading={loading}
-          errorMessage={error}
-          onSubmit={onSubmit}
-        />
+        <SignInForm loading={loading} errorMessage={error} onSubmit={onSubmit} />
       </div>
     </UserLayout>
   );

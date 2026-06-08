@@ -1,10 +1,5 @@
 import React, { Suspense } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Navigate,
-  Routes, Outlet,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Navigate, Routes, Outlet } from "react-router-dom";
 import { useAppSelector } from "../redux/hooks";
 
 import SignInView from "./SignInView";
@@ -12,12 +7,8 @@ import LoadingView from "./LoadingView";
 // Lazy-loaded views for optimized performance
 const OverviewView = React.lazy(() => import("./OverviewView"));
 const DatabasesView = React.lazy(() => import("./databases/DatabasesView"));
-const CreateDatabaseView = React.lazy(
-  () => import("./databases/CreateDatabaseView")
-);
-const DatabaseDetailView = React.lazy(
-  () => import("./databases/DatabaseDetailView")
-);
+const CreateDatabaseView = React.lazy(() => import("./databases/CreateDatabaseView"));
+const DatabaseDetailView = React.lazy(() => import("./databases/DatabaseDetailView"));
 const ReportingView = React.lazy(() => import("./ReportingView"));
 const SettingsView = React.lazy(() => import("./SettingsView"));
 const FAQView = React.lazy(() => import("./FAQView"));

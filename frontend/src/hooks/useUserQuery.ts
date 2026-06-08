@@ -10,15 +10,13 @@ import { UserProperties } from "../types/user";
  * @param options - Optional query configuration (e.g., refetch intervals, stale time, caching behavior).
  * @returns A `useQuery` result containing an array of user properties.
  */
-export const useUsersQuery = (
-    options?: UseQueryOptions<ReadonlyArray<UserProperties>>
-) => {
-    return useQuery({
-        queryKey: ["users"],
-        queryFn: async () => {
-            const data = await UserClient.getUsers();
-            return data;
-        },
-        ...options,
-    });
+export const useUsersQuery = (options?: UseQueryOptions<ReadonlyArray<UserProperties>>) => {
+  return useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const data = await UserClient.getUsers();
+      return data;
+    },
+    ...options,
+  });
 };

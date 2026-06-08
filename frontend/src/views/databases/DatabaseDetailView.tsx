@@ -42,22 +42,30 @@ const DatabaseDetailView: React.FC = () => {
   const [openDeleteDatabaseModal, setDeleteDatabaseOpenModal] = useState<boolean>(false);
   const [openCreateRoleModal, setOpenCreateRoleModal] = useState<boolean>(false);
   // Notifications
-  const [showUserAddSuccessNotification, setShowUserAddSuccessNotification] = useState<boolean>(false);
-  const [showUserAddFailedNotification, setShowUserAddFailedNotification] = useState<boolean>(false);
-  const [showUserDeleteSuccessNotification, setShowUserDeleteSuccessNotification] = useState<boolean>(false);
-  const [showUserDeleteFailedNotification, setShowUserDeleteFailedNotification] = useState<boolean>(false);
-  const [showInvitationAddSuccessNotification, setShowInvitationAddSuccessNotification] = useState<boolean>(false);
-  const [showInvitationAddFailedNotification, setShowInvitationAddFailedNotification] = useState<boolean>(false);
-  const [showInvitationDeleteSuccessNotification, setShowInvitationDeleteSuccessNotification] = useState<boolean>(false);
-  const [showInvitationDeleteFailedNotification, setShowInvitationDeleteFailedNotification] = useState<boolean>(false);
+  const [showUserAddSuccessNotification, setShowUserAddSuccessNotification] =
+    useState<boolean>(false);
+  const [showUserAddFailedNotification, setShowUserAddFailedNotification] =
+    useState<boolean>(false);
+  const [showUserDeleteSuccessNotification, setShowUserDeleteSuccessNotification] =
+    useState<boolean>(false);
+  const [showUserDeleteFailedNotification, setShowUserDeleteFailedNotification] =
+    useState<boolean>(false);
+  const [showInvitationAddSuccessNotification, setShowInvitationAddSuccessNotification] =
+    useState<boolean>(false);
+  const [showInvitationAddFailedNotification, setShowInvitationAddFailedNotification] =
+    useState<boolean>(false);
+  const [showInvitationDeleteSuccessNotification, setShowInvitationDeleteSuccessNotification] =
+    useState<boolean>(false);
+  const [showInvitationDeleteFailedNotification, setShowInvitationDeleteFailedNotification] =
+    useState<boolean>(false);
   // Queries
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   /**
    * Fetches the database details by ID.
    */
   const { data: database } = useQuery({
     queryKey: ["database", parsedId],
-    queryFn: () => parsedId ? DatabaseClient.getDatabase(parsedId) : Promise.resolve(null),
+    queryFn: () => (parsedId ? DatabaseClient.getDatabase(parsedId) : Promise.resolve(null)),
     enabled: !!parsedId, // Ensures query only runs when parsedId is valid
   });
   /**
@@ -65,7 +73,7 @@ const DatabaseDetailView: React.FC = () => {
    */
   const { data: roles } = useQuery({
     queryKey: ["roles", parsedId],
-    queryFn: () => parsedId ? RoleClient.getRolesForDatabase(parsedId) : Promise.resolve([]),
+    queryFn: () => (parsedId ? RoleClient.getRolesForDatabase(parsedId) : Promise.resolve([])),
     enabled: !!parsedId,
   });
   /**
@@ -73,7 +81,8 @@ const DatabaseDetailView: React.FC = () => {
    */
   const { data: invitations } = useQuery({
     queryKey: ["invitations", parsedId],
-    queryFn: () => parsedId ? InvitationClient.getInvitationsForDatabase(parsedId) : Promise.resolve([]),
+    queryFn: () =>
+      parsedId ? InvitationClient.getInvitationsForDatabase(parsedId) : Promise.resolve([]),
     enabled: !!parsedId,
   });
   /**
@@ -103,7 +112,7 @@ const DatabaseDetailView: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       setOpenCreateRoleModal(false);
       setShowUserAddFailedNotification(true);
-    }
+    },
   });
   /**
    * Mutation for deleting a role from the database.
@@ -117,14 +126,14 @@ const DatabaseDetailView: React.FC = () => {
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
       setShowUserDeleteFailedNotification(true);
-    }
+    },
   });
   /**
    * Mutation for creating an invitation for a user.
    */
   const createInvitationMutation = useMutation({
     mutationFn: (invitation: UpstreamCreateInvitationProperties) =>
-        InvitationClient.createInvitationForDatabase(invitation),
+      InvitationClient.createInvitationForDatabase(invitation),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invitations"] });
       setShowInvitationAddSuccessNotification(true);
@@ -132,7 +141,7 @@ const DatabaseDetailView: React.FC = () => {
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ["invitations"] });
       setShowInvitationAddFailedNotification(true);
-    }
+    },
   });
   /**
    * Mutation for deleting an invitation.
@@ -146,7 +155,7 @@ const DatabaseDetailView: React.FC = () => {
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ["invitations"] });
       setShowInvitationDeleteFailedNotification(true);
-    }
+    },
   });
   /**
    * Mutation for deleting the entire database.
@@ -157,10 +166,10 @@ const DatabaseDetailView: React.FC = () => {
       setDeleteDatabaseOpenModal(false);
       queryClient.invalidateQueries({ queryKey: ["databases"] });
       navigate("/databases"); // Keeping history.push as requested
-    }
+    },
   });
   // Other users except our user
-  const otherUsers = (users || []).filter(_ => _.id !== user?.id)
+  const otherUsers = (users || []).filter((_) => _.id !== user?.id);
   /**
    * Handles the deletion of an invitation for a user.
    * - Finds the invitation matching the user ID.
@@ -170,12 +179,12 @@ const DatabaseDetailView: React.FC = () => {
    */
   const onDeleteInvitation = (value: UserProperties) => {
     if (invitations) {
-      const invitation = invitations.find(invitation => invitation.userId === value.id);
+      const invitation = invitations.find((invitation) => invitation.userId === value.id);
       if (invitation) {
         deleteInvitationMutation.mutate(invitation.id);
       }
     }
-  }
+  };
   /**
    * Renders the content for the selected tab.
    * - Overview tab: Displays database details.
@@ -186,21 +195,14 @@ const DatabaseDetailView: React.FC = () => {
    */
   const renderTabContent = (): React.ReactNode => {
     if (activeId === 1) {
-      return (
-        <OverviewCard
-          database={database ? new Database(database) : undefined}
-          user={user}
-        />
-      );
+      return <OverviewCard database={database ? new Database(database) : undefined} user={user} />;
     } else if (activeId === 2) {
       return (
         <div className="mt-6">
           <div className="flex items-center justify-between flex-wrap sm:flex-nowrap pb-8">
             <div>
               <Headline title="Users" size="medium" />
-              <p className="mt-1 text-sm text-gray-500">
-                Only for this database
-              </p>
+              <p className="mt-1 text-sm text-gray-500">Only for this database</p>
             </div>
             <div className="flex-shrink-0">
               <button
@@ -217,26 +219,29 @@ const DatabaseDetailView: React.FC = () => {
         </div>
       );
     } else if (activeId === 3) {
-      return <div className="z-50">
-        <UserSelector
-          users={otherUsers}
-          selectedUserIds={Invitation.getUserIds(invitations)}
-          onSelect={(value) => {
-            const parsedId = id ? Number.parseInt(id) : undefined;
-            if (parsedId !== undefined) {
-              createInvitationMutation.mutate({ instanceId: parsedId, userId: value.id });
-            }
-          }}
-          onDeselect={onDeleteInvitation}
-        />
-        <div className="my-5">
-          <Headline title="Invitations" size="medium" />
-          <p className="mt-1 text-sm text-gray-500">
-            Invite other people
-          </p>
+      return (
+        <div className="z-50">
+          <UserSelector
+            users={otherUsers}
+            selectedUserIds={Invitation.getUserIds(invitations)}
+            onSelect={(value) => {
+              const parsedId = id ? Number.parseInt(id) : undefined;
+              if (parsedId !== undefined) {
+                createInvitationMutation.mutate({ instanceId: parsedId, userId: value.id });
+              }
+            }}
+            onDeselect={onDeleteInvitation}
+          />
+          <div className="my-5">
+            <Headline title="Invitations" size="medium" />
+            <p className="mt-1 text-sm text-gray-500">Invite other people</p>
+          </div>
+          <InvitationList
+            invitedUsers={User.getInvitedUsers(otherUsers, invitations || [])}
+            onDelete={(user) => onDeleteInvitation({ ...user, employeeType: "", mail: "" })}
+          />
         </div>
-        <InvitationList invitedUsers={User.getInvitedUsers(otherUsers, invitations || [])} onDelete={(user) => onDeleteInvitation({ ...user, employeeType: "", mail: "" })} />
-      </div>
+      );
     }
   };
   /**
@@ -259,15 +264,14 @@ const DatabaseDetailView: React.FC = () => {
           onClose={() => setDeleteDatabaseOpenModal(false)}
         />
         <CreateRoleModal
-          database={database ?? undefined}  // Ensures 'null' is converted to 'undefined'
+          database={database ?? undefined} // Ensures 'null' is converted to 'undefined'
           open={openCreateRoleModal}
           onSubmit={(value) => createRoleMutation.mutate(value)}
           onClose={() => setOpenCreateRoleModal(false)}
         />
-
       </div>
-    )
-  }
+    );
+  };
   /**
    * Renders notification messages for success and failure events.
    *
@@ -329,8 +333,8 @@ const DatabaseDetailView: React.FC = () => {
           onClose={() => setShowInvitationDeleteFailedNotification(false)}
         />
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <AppLayout selectedNavigation={DatabasesNavigation.name}>
@@ -347,9 +351,7 @@ const DatabaseDetailView: React.FC = () => {
             <div className="animate-pulse mt-1 h-6 w-36 bg-gray-200" />
           )}
           {database ? (
-            <div className="text-sm text-gray-500">
-              {getDatabaseEngineTitle(database.engine)}
-            </div>
+            <div className="text-sm text-gray-500">{getDatabaseEngineTitle(database.engine)}</div>
           ) : (
             <div className="animate-pulse mt-1 h-4 w-24 bg-gray-200" />
           )}

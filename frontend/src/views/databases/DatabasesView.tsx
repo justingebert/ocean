@@ -18,15 +18,15 @@ import Headline from "../../components/Headline";
  */
 const DatabasesView: React.FC = () => {
   const navigate = useNavigate();
-    /**
-     * Fetches the databases associated with the current user.
-     */
-    const { data: databases } = useQuery({
-        queryKey: ["databases"],
-        queryFn: () => DatabaseClient.getUserDatabases()
-    });
+  /**
+   * Fetches the databases associated with the current user.
+   */
+  const { data: databases } = useQuery({
+    queryKey: ["databases"],
+    queryFn: () => DatabaseClient.getUserDatabases(),
+  });
 
-    return (
+  return (
     <AppLayout selectedNavigation={DatabasesNavigation.name}>
       <div className="max-w-6xl mx-auto mt-8 mb-6 px-4  sm:px-6 lg:px-8">
         <Headline title="Databases" size="large" />
@@ -36,19 +36,13 @@ const DatabasesView: React.FC = () => {
          * Displays an empty state when there are no databases.
          * Provides a button to navigate to the new database creation page.
          */
-        <EmptyState
-          {...emptyDatabaseState}
-          onClick={() => navigate("/databases/new")}
-        />
+        <EmptyState {...emptyDatabaseState} onClick={() => navigate("/databases/new")} />
       ) : (
         /**
          * Displays the list of databases if available.
          * Clicking on a database navigates to its details page.
          */
-        <DatabaseList
-          databases={databases || []}
-          onClick={(id) => navigate(`/databases/${id}`)}
-        />
+        <DatabaseList databases={databases || []} onClick={(id) => navigate(`/databases/${id}`)} />
       )}
     </AppLayout>
   );

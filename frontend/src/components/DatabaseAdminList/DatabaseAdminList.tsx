@@ -2,10 +2,7 @@ import React from "react";
 import { compareDesc } from "date-fns";
 
 import { Database } from "../../types/database";
-import {
-  getDatabaseCreatedAt,
-  getDatabaseEngineTitle,
-} from "../DatabaseList/databaseListFormat";
+import { getDatabaseCreatedAt, getDatabaseEngineTitle } from "../DatabaseList/databaseListFormat";
 
 export interface DatabaseAdminListProps {
   databases: ReadonlyArray<Database>;
@@ -16,10 +13,7 @@ export interface DatabaseAdminListProps {
  * - Allows sorting databases by creation date.
  * - Provides an optional delete action for each database.
  */
-export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
-  databases,
-  onDelete,
-}) => {
+export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({ databases, onDelete }) => {
   /** Sorted list of databases, ordered by creation date (newest first). */
   const sortedDatabases = databases
     .slice(0)
@@ -101,9 +95,7 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
             <td className="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">
               {database.name}
             </td>
-            <td className="whitespace-nowrap px-2 py-2 text-sm text-gray-900">
-              {database.userId}
-            </td>
+            <td className="whitespace-nowrap px-2 py-2 text-sm text-gray-900">{database.userId}</td>
             <td className="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
               <span
                 className={

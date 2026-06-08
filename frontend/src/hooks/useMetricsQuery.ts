@@ -10,15 +10,13 @@ import { MetricProperties } from "../types/metrics";
  * @param options - Optional query configuration (e.g., refetch intervals, caching behavior).
  * @returns A `useQuery` result containing system metrics.
  */
-export const useMetricsQuery = (
-    options?: UseQueryOptions<MetricProperties>
-) => {
-    return useQuery({
-        queryKey: ["metrics"], // Unique query key for caching
-        queryFn: async () => {
-            const data = await MetricClient.getMetrics();
-            return data;
-        },
-        ...options,
-    });
+export const useMetricsQuery = (options?: UseQueryOptions<MetricProperties>) => {
+  return useQuery({
+    queryKey: ["metrics"], // Unique query key for caching
+    queryFn: async () => {
+      const data = await MetricClient.getMetrics();
+      return data;
+    },
+    ...options,
+  });
 };

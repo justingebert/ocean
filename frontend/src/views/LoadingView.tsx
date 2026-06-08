@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-import AppLayout from '../layouts/AppLayout';
+import AppLayout from "../layouts/AppLayout";
 
 /**
  * A simple loading screen that renders inside the application layout.
@@ -8,9 +8,7 @@ import AppLayout from '../layouts/AppLayout';
  * - Uses `AppLayout` to maintain a consistent UI structure.
  */
 const LoadingView: React.FC = () => {
-  return (
-    <AppLayout selectedNavigation="">LoadingView</AppLayout>
-  );
-}
+  return <AppLayout selectedNavigation="">LoadingView</AppLayout>;
+};
 
 export default LoadingView;

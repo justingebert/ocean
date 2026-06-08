@@ -1,9 +1,9 @@
 /* This example requires Tailwind CSS v2.0+ */
-import React, { Fragment } from 'react'
-import { Link } from 'react-router-dom'
+import React, { Fragment } from "react";
+import { Link } from "react-router-dom";
 
-import {Menu, MenuButton, MenuItem, MenuItems, Transition} from '@headlessui/react'
-import { ChevronDownIcon, CircleStackIcon} from '@heroicons/react/20/solid'
+import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react";
+import { ChevronDownIcon, CircleStackIcon } from "@heroicons/react/20/solid";
 
 /**
  * Utility function to join class names dynamically.
@@ -12,7 +12,7 @@ import { ChevronDownIcon, CircleStackIcon} from '@heroicons/react/20/solid'
  * @returns A string containing the filtered class names.
  */
 function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 /**
  * Renders a dropdown menu for creating new entities.
@@ -49,9 +49,17 @@ const CreateDropdown: React.FC = () => {
                 <MenuItem>
                   {({ focus }) => (
                     <p>
-                      <Link to="/databases/new" className={classNames(focus ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm')}
+                      <Link
+                        to="/databases/new"
+                        className={classNames(
+                          focus ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                          "group flex items-center px-4 py-2 text-sm",
+                        )}
                       >
-                        <CircleStackIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" aria-hidden="true" />
+                        <CircleStackIcon
+                          className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                          aria-hidden="true"
+                        />
                         Databases
                       </Link>
                     </p>
@@ -63,7 +71,7 @@ const CreateDropdown: React.FC = () => {
         </>
       )}
     </Menu>
-  )
-}
+  );
+};
 
 export default CreateDropdown;

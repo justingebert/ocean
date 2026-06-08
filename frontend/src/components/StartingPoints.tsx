@@ -7,14 +7,14 @@ import { StartingPoint } from "../constants/starting";
  * Props for the `StartingPoints` component.
  */
 export interface StartingPointsProps {
-    /** The title displayed at the top of the section. */
-    title: string;
-    /** A brief description explaining the purpose of the starting points. */
-    description: string;
-    /** List of starting points containing navigation options. */
-    startingPoints: StartingPoint[];
-    /** The URL for additional help or information. */
-    moreHref: string;
+  /** The title displayed at the top of the section. */
+  title: string;
+  /** A brief description explaining the purpose of the starting points. */
+  description: string;
+  /** List of starting points containing navigation options. */
+  startingPoints: StartingPoint[];
+  /** The URL for additional help or information. */
+  moreHref: string;
 }
 /**
  * Renders a section with starting points for navigating key actions.
@@ -53,7 +53,7 @@ const StartingPoints: React.FC<StartingPointsProps> = ({
               <div
                 className={classNames(
                   item.background,
-                  "flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-lg"
+                  "flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-lg",
                 )}
               >
                 <item.icon className="h-6 w-6 text-white" aria-hidden="true" />

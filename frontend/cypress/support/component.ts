@@ -14,11 +14,10 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import "./commands";
 
-import { mount } from 'cypress/react'
+import { mount } from "cypress/react";
 import "@cypress/code-coverage/support";
-
 
 // Augment the Cypress namespace to include type definitions for
 // your custom command.
@@ -28,7 +27,7 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
-      mount: typeof mount
+      mount: typeof mount;
     }
   }
 }

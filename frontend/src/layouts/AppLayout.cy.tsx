@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "../redux/store";
-import {navigation, SettingsNavigation} from "../constants/menu";
+import { navigation, SettingsNavigation } from "../constants/menu";
 
 // Initialize a new QueryClient instance for React Query
 const queryClient = new QueryClient();
@@ -24,14 +24,14 @@ describe("AppLayout Tests", () => {
     cy.intercept("GET", "/v1/user", { body: mockUser }).as("getUser");
 
     mount(
-        // Wrap the component with necessary providers: Redux store, QueryClient, and Router
-        <Provider store={store}>
-          <QueryClientProvider client={queryClient}>
-            <Router>
-              <AppLayout {...defaultProps} />
-            </Router>
-          </QueryClientProvider>
-        </Provider>
+      // Wrap the component with necessary providers: Redux store, QueryClient, and Router
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <Router>
+            <AppLayout {...defaultProps} />
+          </Router>
+        </QueryClientProvider>
+      </Provider>,
     );
   });
   // Verify that navigation items appear based on user permissions
@@ -39,7 +39,10 @@ describe("AppLayout Tests", () => {
     cy.wait("@getUser");
     // Loop through navigation items and check visibility based on permissions
     navigation.forEach((item) => {
-      if (item.requiredPermission === undefined || item.requiredPermission === mockUser.employeeType) {
+      if (
+        item.requiredPermission === undefined ||
+        item.requiredPermission === mockUser.employeeType
+      ) {
         cy.contains(item.name).should("exist");
       } else {
         cy.contains(item.name).should("not.exist");
@@ -64,8 +67,8 @@ describe("AppLayout Tests", () => {
 
     // Verify the Settings link
     cy.contains("Settings")
-        .should("exist") // Confirm the link is present
-        .and("have.attr", "href", SettingsNavigation.to); // Verify the correct path
+      .should("exist") // Confirm the link is present
+      .and("have.attr", "href", SettingsNavigation.to); // Verify the correct path
 
     // Click the Settings link and ensure navigation
     cy.contains("Settings").click({ force: true });
@@ -74,7 +77,7 @@ describe("AppLayout Tests", () => {
 
     // Verify the Logout button
     cy.contains("Logout")
-        .should("exist") // Confirm the button is present
-        .click(); // Trigger the logout action
+      .should("exist") // Confirm the button is present
+      .click(); // Trigger the logout action
   });
 });
