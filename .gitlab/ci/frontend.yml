@@ -1,0 +1,22 @@
+validate:frontend:
+  stage: validate
+  image: node:22-alpine
+  cache:
+    key:
+      files:
+        - frontend/package-lock.json
+    paths:
+      - frontend/.npm/
+  rules:
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*.yml
+        - frontend/**/*
+  before_script:
+    - cd frontend
+    - npm ci --cache .npm --prefer-offline --no-audit --no-fund
+  script:
+    - npm run lint
+    - npm run format:check
+    - npm run build
+    - npm run vitest

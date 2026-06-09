@@ -33,5 +33,6 @@ default:
 
 include:
   - local: .gitlab/ci/ansible.yml
+  - local: .gitlab/ci/frontend.yml
   - local: .gitlab/ci/build.yml
   - local: .gitlab/ci/deploy.yml
