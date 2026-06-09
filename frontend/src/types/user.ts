@@ -19,8 +19,7 @@ export type InvitedUserProperties = Pick<
   UserProperties,
   "id" | "username" | "firstName" | "lastName"
 > &
-  Pick<InvitationProperties, "createdAt">
-  & {
+  Pick<InvitationProperties, "createdAt"> & {
     invitationId: number;
   };
 /**
@@ -48,7 +47,7 @@ export class User {
    */
   public static getInvitedUsers = (
     users: UserProperties[],
-    invitations: InvitationProperties[]
+    invitations: InvitationProperties[],
   ): InvitedUserProperties[] => {
     const result: InvitedUserProperties[] = [];
     for (const invitation of invitations) {
@@ -62,7 +61,7 @@ export class User {
           createdAt: invitation.createdAt,
           invitationId: invitation.id,
         };
-        result.push(invitedUser)
+        result.push(invitedUser);
       }
     }
     return result;

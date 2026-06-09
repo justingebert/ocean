@@ -60,7 +60,6 @@ export const setupRequestInterceptors = (dispatch: AppDispatch) => {
   const responseHandle = axiosInstance.interceptors.response.use(
     (response) => response, // Pass through successful responses
     async (error: AxiosError) => {
-
       const originalRequest = error.config;
 
       if (!originalRequest) {
@@ -93,7 +92,7 @@ export const setupRequestInterceptors = (dispatch: AppDispatch) => {
         }
       }
       return Promise.reject(error);
-    }
+    },
   );
   // Function to remove the interceptor when no longer needed
   return () => {

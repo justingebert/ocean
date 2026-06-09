@@ -1,13 +1,22 @@
 import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
-import { Dialog, Menu, Transition, DialogPanel, MenuButton, MenuItems, MenuItem, TransitionChild} from "@headlessui/react";
-import {Bars3CenterLeftIcon, ChevronDownIcon, XMarkIcon} from "@heroicons/react/20/solid";
+import {
+  Dialog,
+  Menu,
+  Transition,
+  DialogPanel,
+  MenuButton,
+  MenuItems,
+  MenuItem,
+  TransitionChild,
+} from "@headlessui/react";
+import { Bars3CenterLeftIcon, ChevronDownIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { useQuery } from "@tanstack/react-query";
 
 import { UserProperties } from "../types/user";
 import { useAppDispatch } from "../redux/hooks";
 import { logout } from "../redux/slices/session/sessionSlice";
-import { Navigation, navigation, SettingsNavigation } from "../constants/menu.";
+import { Navigation, navigation, SettingsNavigation } from "../constants/menu.ts";
 import { UserClient } from "../api/userClient";
 import CreateDropdown from "../components/CreateDropdown";
 
@@ -35,10 +44,7 @@ export interface AppLayoutProps {
  * @param children - The main content of the page.
  * @param selectedNavigation - The currently selected navigation item.
  */
-const AppLayout: React.FC<AppLayoutProps> = ({
-  children,
-  selectedNavigation,
-}) => {
+const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) => {
   const userQuery = useQuery({
     queryKey: ["user"],
     queryFn: () => UserClient.getUser(),
@@ -94,48 +100,48 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       {/* Mobile Sidebar */}
       <Transition show={sidebarOpen} as={Fragment}>
         <Dialog
-            as="div"
-            static
-            className="fixed inset-0 flex z-40 lg:hidden"
-            open={sidebarOpen}
-            onClose={setSidebarOpen}
+          as="div"
+          static
+          className="fixed inset-0 flex z-40 lg:hidden"
+          open={sidebarOpen}
+          onClose={setSidebarOpen}
         >
           {/* Sidebar Panel */}
           <TransitionChild
-              as={Fragment}
-              enter="transition-opacity ease-linear duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="transition-opacity ease-linear duration-300"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
+            as={Fragment}
+            enter="transition-opacity ease-linear duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition-opacity ease-linear duration-300"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
             <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
           </TransitionChild>
 
           <TransitionChild
-              as={Fragment}
-              enter="transition ease-in-out duration-300 transform"
-              enterFrom="-translate-x-full"
-              enterTo="translate-x-0"
-              leave="transition ease-in-out duration-300 transform"
-              leaveFrom="translate-x-0"
-              leaveTo="-translate-x-full"
+            as={Fragment}
+            enter="transition ease-in-out duration-300 transform"
+            enterFrom="-translate-x-full"
+            enterTo="translate-x-0"
+            leave="transition ease-in-out duration-300 transform"
+            leaveFrom="translate-x-0"
+            leaveTo="-translate-x-full"
           >
             <DialogPanel className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-cyan-700">
               <TransitionChild
-                  as={Fragment}
-                  enter="ease-in-out duration-300"
-                  enterFrom="opacity-0"
-                  enterTo="opacity-100"
-                  leave="ease-in-out duration-300"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
+                as={Fragment}
+                enter="ease-in-out duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="ease-in-out duration-300"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
               >
                 <div className="absolute top-0 right-0 -mr-12 pt-2">
                   <button
-                      className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                      onClick={() => setSidebarOpen(false)}
+                    className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                    onClick={() => setSidebarOpen(false)}
                   >
                     <span className="sr-only">Close sidebar</span>
                     <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
@@ -145,63 +151,60 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
               <div className="flex-shrink-0 flex items-center px-4">
                 <img
-                    className="h-8 w-auto"
-                    src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Logo_HTW_Berlin.svg"
-                    alt="HTW logo"
+                  className="h-8 w-auto"
+                  src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Logo_HTW_Berlin.svg"
+                  alt="HTW logo"
                 />
               </div>
               {/* Sidebar Navigation */}
               <nav
-                  className="mt-5 flex-shrink-0 h-full divide-y divide-cyan-800 overflow-y-auto"
-                  aria-label="Sidebar"
+                className="mt-5 flex-shrink-0 h-full divide-y divide-cyan-800 overflow-y-auto"
+                aria-label="Sidebar"
               >
                 <div className="px-2 space-y-1">
                   {navigationWithPermission
-                      .filter((item) => item.section === "primary")
-                      .map((item) => (
-                          <Link
-                              key={item.name}
-                              to={item.to}
-                              className={classNames(
-                                  item.name === selectedNavigation
-                                      ? "bg-cyan-800 text-white"
-                                      : "text-cyan-100 hover:text-white hover:bg-cyan-600",
-                                  "group flex items-center px-2 py-2 text-base font-medium rounded-md"
-                              )}
-                              aria-current={item.name === selectedNavigation ? "page" : undefined}
-                          >
-                            <item.icon
-                                className="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"
-                                aria-hidden="true"
-                            />
-                            {item.name}
-                          </Link>
-                      ))}
+                    .filter((item) => item.section === "primary")
+                    .map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.to}
+                        className={classNames(
+                          item.name === selectedNavigation
+                            ? "bg-cyan-800 text-white"
+                            : "text-cyan-100 hover:text-white hover:bg-cyan-600",
+                          "group flex items-center px-2 py-2 text-base font-medium rounded-md",
+                        )}
+                        aria-current={item.name === selectedNavigation ? "page" : undefined}
+                      >
+                        <item.icon
+                          className="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"
+                          aria-hidden="true"
+                        />
+                        {item.name}
+                      </Link>
+                    ))}
                 </div>
 
                 <div className="mt-6 pt-6">
                   <div className="px-2 space-y-1">
                     {navigationWithPermission
-                        .filter((item) => item.section === "secondary")
-                        .map((item) => (
-                            <Link
-                                key={item.name}
-                                to={item.to}
-                                className={classNames(
-                                    item.name === selectedNavigation
-                                        ? "bg-cyan-800 text-white"
-                                        : "text-cyan-100 hover:text-white hover:bg-cyan-600",
-                                    "group flex items-center px-2 py-2 text-base font-medium rounded-md"
-                                )}
-                                aria-current={item.name === selectedNavigation ? "page" : undefined}
-                            >
-                              <item.icon
-                                  className="mr-4 h-6 w-6 text-cyan-200"
-                                  aria-hidden="true"
-                              />
-                              {item.name}
-                            </Link>
-                        ))}
+                      .filter((item) => item.section === "secondary")
+                      .map((item) => (
+                        <Link
+                          key={item.name}
+                          to={item.to}
+                          className={classNames(
+                            item.name === selectedNavigation
+                              ? "bg-cyan-800 text-white"
+                              : "text-cyan-100 hover:text-white hover:bg-cyan-600",
+                            "group flex items-center px-2 py-2 text-base font-medium rounded-md",
+                          )}
+                          aria-current={item.name === selectedNavigation ? "page" : undefined}
+                        >
+                          <item.icon className="mr-4 h-6 w-6 text-cyan-200" aria-hidden="true" />
+                          {item.name}
+                        </Link>
+                      ))}
                   </div>
                 </div>
               </nav>
@@ -212,7 +215,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             {/* Dummy element to force sidebar to shrink to fit close icon */}
           </div>
         </Dialog>
-
       </Transition>
 
       {/* Static sidebar for desktop */}
@@ -242,11 +244,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                         item.name === selectedNavigation
                           ? "bg-cyan-800 text-white"
                           : "text-cyan-100 hover:text-white hover:bg-cyan-600",
-                        "group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md"
+                        "group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md",
                       )}
-                      aria-current={
-                        item.name === selectedNavigation ? "page" : undefined
-                      }
+                      aria-current={item.name === selectedNavigation ? "page" : undefined}
                     >
                       <item.icon
                         className="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200"
@@ -268,16 +268,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           item.name === selectedNavigation
                             ? "bg-cyan-800 text-white"
                             : "text-cyan-100 hover:text-white hover:bg-cyan-600",
-                          "group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md"
+                          "group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md",
                         )}
-                        aria-current={
-                          item.name === selectedNavigation ? "page" : undefined
-                        }
+                        aria-current={item.name === selectedNavigation ? "page" : undefined}
                       >
-                        <item.icon
-                          className="mr-4 h-6 w-6 text-cyan-200"
-                          aria-hidden="true"
-                        />
+                        <item.icon className="mr-4 h-6 w-6 text-cyan-200" aria-hidden="true" />
                         {item.name}
                       </Link>
                     ))}
@@ -314,20 +309,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           <div className="animate-pulse rounded-full h-8 w-8 bg-gray-200" />
                         ) : (
                           <svg className="rounded-full" height="36" width="36">
-                            <rect
-                              fill="#a0d36a"
-                              x="0"
-                              y="0"
-                              height="36"
-                              width="36"
-                            ></rect>
-                            <text
-                              fill="#ffffff"
-                              fontSize="15"
-                              textAnchor="middle"
-                              x="17"
-                              y="23"
-                            >
+                            <rect fill="#a0d36a" x="0" y="0" height="36" width="36"></rect>
+                            <text fill="#ffffff" fontSize="15" textAnchor="middle" x="17" y="23">
                               {getAbbreviationFor(userQuery.data)}
                             </text>
                           </svg>
@@ -368,7 +351,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                               to={SettingsNavigation.to}
                               className={classNames(
                                 focus ? "bg-gray-100" : "",
-                                "block px-4 py-2 text-sm text-gray-700"
+                                "block px-4 py-2 text-sm text-gray-700",
                               )}
                             >
                               Settings
@@ -381,7 +364,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                               onClick={onLogout}
                               className={classNames(
                                 focus ? "bg-gray-100" : "",
-                                "block px-4 py-2 text-sm text-gray-700"
+                                "block px-4 py-2 text-sm text-gray-700",
                               )}
                             >
                               Logout

@@ -2,8 +2,8 @@ import React from "react";
 
 import AppLayout from "../layouts/AppLayout";
 import Headline from "../components/Headline";
-import { ReportingNavigation } from "../constants/menu.";
-import {Database, DatabaseProperties} from "../types/database";
+import { ReportingNavigation } from "../constants/menu.ts";
+import { Database, DatabaseProperties } from "../types/database";
 import { useMetricsQuery } from "../hooks/useMetricsQuery";
 import {
   useDatabasesQuery,
@@ -15,52 +15,46 @@ import { useUsersQuery } from "../hooks/useUserQuery";
 import { UserAdminList } from "../components/UserAdminList/UserAdminList";
 
 /**
- * Props for the `ReportingView` component.
- * Currently, this component does not accept any props.
- */
-interface ReportingViewProps {}
-/**
  * The reporting page displaying metrics, database statistics, and user data.
  * - Fetches and displays system-wide metrics.
  * - Lists all databases and provides deletion functionality.
  * - Lists all users in the system.
  */
-const ReportingView: React.FC<ReportingViewProps> = () => {
+const ReportingView: React.FC = () => {
   const metricsQuery = useMetricsQuery();
   /**
    * Interface for metrics data retrieved from the API.
    */
   interface MetricsData {
-      totalInstances: number;
-      totalUsers: number;
+    totalInstances: number;
+    totalUsers: number;
   }
   const metrics = metricsQuery.data as MetricsData | undefined;
   const databasesQuery = useDatabasesQuery();
   const databases = Array.isArray(databasesQuery.data)
-      ? (databasesQuery.data as DatabaseProperties[]).map((db) => new Database(db))
-      : [];
+    ? (databasesQuery.data as DatabaseProperties[]).map((db) => new Database(db))
+    : [];
   /**
    * Mutation hook for deleting a database with required permissions.
    * - On successful deletion, refreshes database and metrics queries.
    */
-  const deleteDatabaseWithPermissionMutation =
-    useDeleteDatabaseWithPermissionMutation({
-      onSettled: () => {
-        databasesQuery.refetch();
-        metricsQuery.refetch();
-      },
-    });
+  const deleteDatabaseWithPermissionMutation = useDeleteDatabaseWithPermissionMutation({
+    onSettled: () => {
+      databasesQuery.refetch();
+      metricsQuery.refetch();
+    },
+  });
   const usersQuery = useUsersQuery();
   /**
    * Interface for user properties.
    */
   interface UserProperties {
-      id: number;
-      username: string;
-      firstName: string;
-      lastName: string;
-      mail: string;
-      employeeType: string;
+    id: number;
+    username: string;
+    firstName: string;
+    lastName: string;
+    mail: string;
+    employeeType: string;
   }
   const users = (usersQuery.data as UserProperties[]) || [];
   /**
@@ -108,9 +102,7 @@ const ReportingView: React.FC<ReportingViewProps> = () => {
   const renderMetrics = (): React.ReactElement => {
     return (
       <div>
-        <h2 className="mt-5 text-2xl leading-6 font-medium text-gray-900">
-          Metrics: Total
-        </h2>
+        <h2 className="mt-5 text-2xl leading-6 font-medium text-gray-900">Metrics: Total</h2>
         <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {getStats().map((item, index) => (
             <Stats key={index} name={item.name} value={item.value} />
@@ -128,14 +120,10 @@ const ReportingView: React.FC<ReportingViewProps> = () => {
   const renderDatabases = (): React.ReactElement => {
     return (
       <div>
-        <h2 className="mt-10 text-2xl leading-6 font-medium text-gray-900">
-          All Databases
-        </h2>
+        <h2 className="mt-10 text-2xl leading-6 font-medium text-gray-900">All Databases</h2>
         <DatabaseAdminList
           databases={databases}
-          onDelete={(database) =>
-            deleteDatabaseWithPermissionMutation.mutate(database.id)
-          }
+          onDelete={(database) => deleteDatabaseWithPermissionMutation.mutate(database.id)}
         />
       </div>
     );
@@ -148,9 +136,7 @@ const ReportingView: React.FC<ReportingViewProps> = () => {
   const renderUsers = (): React.ReactElement => {
     return (
       <div>
-        <h2 className="mt-10 text-2xl leading-6 font-medium text-gray-900">
-          All Users
-        </h2>
+        <h2 className="mt-10 text-2xl leading-6 font-medium text-gray-900">All Users</h2>
         <UserAdminList users={users} />
       </div>
     );

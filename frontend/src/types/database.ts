@@ -1,5 +1,5 @@
 import { BaseModel } from "./models";
-import {EngineType, EngineTypeValues} from "./engine";
+import { EngineType, EngineTypeValues } from "./engine";
 
 const {
   VITE_POSTGRESQL_HOSTNAME,
@@ -21,10 +21,7 @@ export interface DatabaseProperties {
 /**
  * Defines the required properties for creating a new database.
  */
-export type UpstreamDatabaseProperties = Pick<
-  DatabaseProperties,
-  "name" | "engine"
->;
+export type UpstreamDatabaseProperties = Pick<DatabaseProperties, "name" | "engine">;
 /**
  * Represents a Database model with extended functionalities.
  */

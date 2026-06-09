@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { OverviewNavigation } from "../constants/menu.";
+import { OverviewNavigation } from "../constants/menu.ts";
 import { CredentialProperties } from "../types/models";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import { loginStart } from "../redux/slices/session/sessionSlice";
@@ -10,21 +10,14 @@ import UserLayout from "../layouts/UserLayout";
 import SignInForm from "../components/SignInForm";
 
 /**
- * Props for the `SignInView` component.
- * Currently, this component does not accept any props.
- */
-interface SignInViewProps { }
-/**
  * The sign-in page where users can log into their HTW account.
  * - Uses `react-redux` for authentication state management.
  * - Redirects users to the overview page if they are already logged in.
  * - Handles authentication by dispatching login credentials to Redux.
  */
-const SignInView: React.FC<SignInViewProps> = () => {
+const SignInView: React.FC = () => {
   const navigate = useNavigate();
-  const { loading, error, isLoggedIn } = useAppSelector(
-    (state) => state.session.session
-  );
+  const { loading, error, isLoggedIn } = useAppSelector((state) => state.session.session);
   const dispatch = useAppDispatch();
   /**
    * Redirects the user to the overview page if already logged in.
@@ -54,11 +47,7 @@ const SignInView: React.FC<SignInViewProps> = () => {
             Sign in to your HTW account
           </h2>
         </div>
-        <SignInForm
-          loading={loading}
-          errorMessage={error}
-          onSubmit={onSubmit}
-        />
+        <SignInForm loading={loading} errorMessage={error} onSubmit={onSubmit} />
       </div>
     </UserLayout>
   );

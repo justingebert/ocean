@@ -1,11 +1,7 @@
-import React, {JSX} from "react";
+import React, { JSX } from "react";
 import * as yup from "yup";
 import { Field, Form, Formik, FormikHelpers } from "formik";
-import {
-  CheckCircleIcon,
-  ArrowPathIcon,
-  NoSymbolIcon,
-} from "@heroicons/react/24/outline";
+import { CheckCircleIcon, ArrowPathIcon, NoSymbolIcon } from "@heroicons/react/24/outline";
 
 import { engineOptions } from "../../constants/engines";
 import { UpstreamDatabaseProperties } from "../../types/database";
@@ -42,9 +38,12 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
       .string()
       .required("Name is required")
       .min(4, "Name should be of minimum 4 characters length")
-      .matches(/^[a-z][a-z0-9_]*$/, "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.")
+      .matches(
+        /^[a-z][a-z0-9_]*$/,
+        "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.",
+      )
       .test("unique_test", "Name is already registered", (value, ctx) =>
-        validateDatabaseValues(value, ctx)
+        validateDatabaseValues(value, ctx),
       ),
     engine: yup.string().required("Engine is required"),
   });
@@ -58,7 +57,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
    */
   const validateDatabaseValues = async (
     name: string | undefined,
-    context: yup.TestContext<Record<string, any>>
+    context: yup.TestContext<Record<string, unknown>>,
   ): Promise<boolean> => {
     const engine = context.parent.engine as string | undefined;
     if (name !== undefined && engine !== undefined) {
@@ -72,12 +71,12 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
       const response = await DatabaseClient.availabilityDatabase(payload);
       try {
         const { availability } = DatabaseValidation.availabilityDatabaseSchema.validateSync(
-          response.data
+          response.data,
         );
         if (availability) {
           return true;
         }
-      } catch (parseError) {
+      } catch {
         // TODO: user should know what happend
         return false;
       }
@@ -92,23 +91,11 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
    * @param valid - Indicates if the input is valid.
    * @returns A JSX element representing the input status icon.
    */
-  const renderNameInput = (
-    touched: boolean,
-    loading: boolean,
-    valid: boolean
-  ): JSX.Element => {
+  const renderNameInput = (touched: boolean, loading: boolean, valid: boolean): JSX.Element => {
     if (loading) {
-      <ArrowPathIcon
-        className="animate-spin h-5 w-5 text-blue-400"
-        aria-hidden="true"
-      />;
+      return <ArrowPathIcon className="animate-spin h-5 w-5 text-blue-400" aria-hidden="true" />;
     } else if (touched && valid) {
-      return (
-        <CheckCircleIcon
-          className="h-5 w-5 text-green-400"
-          aria-hidden="true"
-        />
-      );
+      return <CheckCircleIcon className="h-5 w-5 text-green-400" aria-hidden="true" />;
     } else if (!valid && touched) {
       return <NoSymbolIcon className="h-5 w-5 text-red-400" aria-hidden="true" />;
     }
@@ -124,8 +111,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
         <Headline title="Choose a database engine" size="medium" />
       </div>
       <div className="text-sm font-light mb-3">
-        A database runs a single database engine that powers one or more
-        individual databases.
+        A database runs a single database engine that powers one or more individual databases.
       </div>
       <Formik
         initialValues={{
@@ -135,35 +121,29 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
         validationSchema={createDatabaseSchema}
         onSubmit={(
           values: UpstreamDatabaseProperties,
-          { setSubmitting }: FormikHelpers<UpstreamDatabaseProperties>
+          { setSubmitting }: FormikHelpers<UpstreamDatabaseProperties>,
         ) => {
           onSubmit(values);
           setSubmitting(true);
         }}
       >
-        {({
-          errors,
-          touched,
-          values,
-          setFieldValue,
-          isValidating,
-          isValid,
-        }) => (
+        {({ errors, touched, values, setFieldValue, isValidating, isValid }) => (
           <Form className="space-y-6">
             <>
-              <EngineGroup engineOptions={engineOptions} selectedValue={values.engine} onSelect={(value) => setFieldValue("engine", value)} />
+              <EngineGroup
+                engineOptions={engineOptions}
+                selectedValue={values.engine}
+                onSelect={(value) => setFieldValue("engine", value)}
+              />
               <div className="text-xl text-gray-600 sm:text-2xl mt-6 mb-3">
                 Choose a unique database name
               </div>
               <div className="text-sm font-light">
-                Names must be lowercase and start with a letter. They can be
-                between 4 and 32 characters long and may contain underscores.
+                Names must be lowercase and start with a letter. They can be between 4 and 32
+                characters long and may contain underscores.
               </div>
               <div className="mt-3">
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                   Database Name
                 </label>
                 {errors.name && touched.name && (

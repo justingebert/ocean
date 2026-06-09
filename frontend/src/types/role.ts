@@ -10,7 +10,6 @@ export interface RoleProperties {
 /**
  * Defines the required properties for creating a new role.
  */
-export type UpstreamCreateRoleProperties = Pick<
-  RoleProperties,
-  "instanceId"
-> & { roleName: string };
+export type UpstreamCreateRoleProperties = Pick<RoleProperties, "instanceId"> & {
+  roleName: string;
+};

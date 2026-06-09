@@ -1,9 +1,4 @@
-import {
-  useMutation,
-  UseMutationOptions,
-  useQuery,
-  UseQueryOptions,
-} from "@tanstack/react-query";
+import { useMutation, UseMutationOptions, useQuery, UseQueryOptions } from "@tanstack/react-query";
 
 import { DatabaseClient } from "../api/databaseClient";
 import { Database } from "../types/database";
@@ -15,17 +10,15 @@ import { Database } from "../types/database";
  * @param options - Optional query configuration.
  * @returns A `useQuery` result containing the databases.
  */
-export const useDatabasesQuery = (
-    options?: UseQueryOptions<ReadonlyArray<Database>>
-) => {
-    return useQuery({
-        queryKey: ["databases", "_all_"], //
-        queryFn: async () => {
-            const data = await DatabaseClient.getAllDatabases();
-            return data.map((database) => new Database(database));
-        },
-        ...options, //
-    });
+export const useDatabasesQuery = (options?: UseQueryOptions<ReadonlyArray<Database>>) => {
+  return useQuery({
+    queryKey: ["databases", "_all_"], //
+    queryFn: async () => {
+      const data = await DatabaseClient.getAllDatabases();
+      return data.map((database) => new Database(database));
+    },
+    ...options, //
+  });
 };
 
 /**
@@ -36,13 +29,12 @@ export const useDatabasesQuery = (
  * @returns A `useMutation` result to handle the deletion process.
  */
 export const useDeleteDatabaseWithPermissionMutation = (
-    options?: Omit<UseMutationOptions<any, Error, number>, "mutationFn">
+  options?: Omit<UseMutationOptions<unknown, Error, number>, "mutationFn">,
 ) => {
-    return useMutation({
-        mutationFn: async (variables: number) => {
-            const { data } = await DatabaseClient.deleteDatabaseWithPermission(variables);
-            return data;
-        },
-        ...options,
-    });
+  return useMutation({
+    mutationFn: async (variables: number) => {
+      return DatabaseClient.deleteDatabaseWithPermission(variables);
+    },
+    ...options,
+  });
 };

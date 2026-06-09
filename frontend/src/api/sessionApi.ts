@@ -25,9 +25,7 @@ export class SessionApi {
    * @param credentials - The user's login credentials (e.g., email and password).
    * @returns A promise that resolves to the authentication tokens.
    */
-  public static async login(
-    credentials: CredentialProperties
-  ): Promise<TokensReturn> {
+  public static async login(credentials: CredentialProperties): Promise<TokensReturn> {
     const { data } = await axiosInstance.post("/auth/signin", credentials);
     return data;
   }
@@ -38,9 +36,7 @@ export class SessionApi {
    * @returns A promise that resolves to the new authentication tokens.
    * @throws An error if the response does not match the expected token structure.
    */
-  public static async refreshToken(params: {
-    refreshToken: string;
-  }): Promise<TokensReturn> {
+  public static async refreshToken(params: { refreshToken: string }): Promise<TokensReturn> {
     const { data } = await axiosInstance.post("/auth/refresh-token", params);
     // Validate and return the response
     return this.tokensSchema.validateSync(data);

@@ -57,7 +57,7 @@ export function* restoreSessionAsync() {
   try {
     yield call(UserClient.getUser);
     yield put(loginSuccess());
-  } catch (error) {
+  } catch {
     yield put(logout());
   }
 }
@@ -68,10 +68,9 @@ export function* restoreSessionAsync() {
  * - Dispatches logout action.
  */
 export function* logoutAsync() {
-  setBearerToken("");
+  yield call(setBearerToken, "");
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
-  yield call;
 }
 /**
  * Authentication saga that listens for login, logout, and session restoration actions.

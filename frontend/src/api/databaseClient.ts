@@ -1,10 +1,11 @@
 import * as yup from "yup";
 
-import {
-  DatabaseProperties,
-  UpstreamDatabaseProperties,
-} from "../types/database";
+import { DatabaseProperties, UpstreamDatabaseProperties } from "../types/database";
 import { axiosInstance } from "./client";
+
+interface AvailabilityResponse {
+  availability: boolean;
+}
 
 export class DatabaseClient {
   /**
@@ -13,9 +14,7 @@ export class DatabaseClient {
    * @returns A promise that resolves to an array of all database properties.
    */
   public static getAllDatabases = async (): Promise<DatabaseProperties[]> => {
-    const { data } = await axiosInstance.get<DatabaseProperties[]>(
-      "/databases/_all_"
-    );
+    const { data } = await axiosInstance.get<DatabaseProperties[]>("/databases/_all_");
     return data;
   };
 
@@ -24,9 +23,7 @@ export class DatabaseClient {
    * @returns A promise that resolves to an array of database properties.
    */
   public static getUserDatabases = async (): Promise<DatabaseProperties[]> => {
-    const { data } = await axiosInstance.get<DatabaseProperties[]>(
-      "/databases"
-    );
+    const { data } = await axiosInstance.get<DatabaseProperties[]>("/databases");
     return data;
   };
 
@@ -35,12 +32,8 @@ export class DatabaseClient {
    * @param id - The unique identifier of the database.
    * @returns A promise that resolves to the database properties.
    */
-  public static getDatabase = async (
-    id: number
-  ): Promise<DatabaseProperties> => {
-    const { data } = await axiosInstance.get<DatabaseProperties>(
-      `/databases/${id.toString()}`
-    );
+  public static getDatabase = async (id: number): Promise<DatabaseProperties> => {
+    const { data } = await axiosInstance.get<DatabaseProperties>(`/databases/${id.toString()}`);
     return data;
   };
 
@@ -50,12 +43,9 @@ export class DatabaseClient {
    * @returns A promise that resolves to the created database properties.
    */
   public static createDatabase = async (
-    database: UpstreamDatabaseProperties
+    database: UpstreamDatabaseProperties,
   ): Promise<DatabaseProperties> => {
-    const { data } = await axiosInstance.post<DatabaseProperties>(
-      "/databases",
-      database
-    );
+    const { data } = await axiosInstance.post<DatabaseProperties>("/databases", database);
     return data;
   };
 
@@ -65,7 +55,7 @@ export class DatabaseClient {
    * @returns A promise that resolves with the availability status.
    */
   public static availabilityDatabase = (database: UpstreamDatabaseProperties) =>
-    axiosInstance.post<any>("/databases/_availability_", database);
+    axiosInstance.post<AvailabilityResponse>("/databases/_availability_", database);
 
   /**
    * Deletes a database by its unique ID.
@@ -73,9 +63,7 @@ export class DatabaseClient {
    * @returns A promise that resolves to the deletion response.
    */
   public static deleteDatabase = async (id: number) => {
-    const { data } = await axiosInstance.delete<any>(
-      `/databases/${id.toString()}`
-    );
+    const { data } = await axiosInstance.delete<unknown>(`/databases/${id.toString()}`);
     return data;
   };
 
@@ -86,8 +74,8 @@ export class DatabaseClient {
    * @returns A promise that resolves to the deletion response.
    */
   public static deleteDatabaseWithPermission = async (id: number) => {
-    const { data } = await axiosInstance.delete<any>(
-      `/databases/${id.toString()}/_permission_`
+    const { data } = await axiosInstance.delete<unknown>(
+      `/databases/${id.toString()}/_permission_`,
     );
     return data;
   };

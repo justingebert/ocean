@@ -5,7 +5,7 @@ import { CredentialProperties } from "../../../types/models";
 /**
  * Defines the shape of the user authentication state.
  */
-interface UserState {
+export interface UserState {
   /** Indicates whether the user is logged in (`true`), logged out (`false`), or session status is unknown (`undefined`). */
   isLoggedIn: boolean | undefined;
   /** Indicates if an authentication request is currently loading. */

@@ -4,24 +4,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { UpstreamDatabaseProperties } from "../../types/database";
 import { DatabaseClient } from "../../api/databaseClient";
-import { DatabasesNavigation } from "../../constants/menu.";
+import { DatabasesNavigation } from "../../constants/menu.ts";
 import AppLayout from "../../layouts/AppLayout";
 import CreateDatabaseForm from "../../components/forms/CreateDatabaseForm";
 
-/**
- * Props for the `CreateDatabaseView` component.
- * Currently, this component does not accept any props.
- */
-interface CreateDatabaseViewProps { }
 /**
  * View component for creating a new database.
  * - Uses `react-query` to manage the mutation for database creation.
  * - Navigates to the database list upon successful creation.
  */
-const CreateDatabaseView: React.FC<CreateDatabaseViewProps> = () => {
+const CreateDatabaseView: React.FC = () => {
   const navigate = useNavigate();
   // Queries
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   /**
    * Mutation hook to create a new database.
    * - Calls `DatabaseClient.createDatabase()`.

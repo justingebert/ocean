@@ -18,9 +18,9 @@ describe("Layout Component", () => {
 
     // Mount the Layout component with child content
     mount(
-        <Layout>
-          <div>{childContent}</div>
-        </Layout>
+      <Layout>
+        <div>{childContent}</div>
+      </Layout>,
     );
 
     // Verify that the child content is rendered correctly

@@ -33,6 +33,7 @@
 - Ansible overview 
 - htw vms outgoign traffic gets routed thortugh a forward webproxy
 - monogdb cert needs to be combined
+- js starfunctions
 
 ## TODOs
 - [ ] write down how to set up vm for ansible (ssh key setup)

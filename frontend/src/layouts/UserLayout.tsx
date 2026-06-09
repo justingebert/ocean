@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 /**
  * Props for the `Layout` component.
@@ -14,11 +14,7 @@ export interface LayoutProps {
  * @param children - The content to be wrapped inside the layout.
  */
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  return (
-    <div className="">
-      {children}
-    </div>
-  )
-}
+  return <div className="">{children}</div>;
+};
 
 export default Layout;
