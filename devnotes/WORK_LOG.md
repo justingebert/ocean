@@ -6,8 +6,22 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
 
-## 2026-06-09 — frontend CI gate 
-- add vlaidate job for frontend to qa commits for frontend
+
+## 2026-06-09 prefill Adminer links, and local dev ldap auth wiring
+- frontend Adminer links now preselect the viewed db
+- covered URL generation with focused unit tests; Cypress component check is blocked locally until the Cypress binary is installed
+- wired the local `pg_cluster` service to mount the inline config, this way ldap auth works locally with testusers
+
+
+## 2026-06-09 — backend code audit
+- code audit with agent => good base compared to frontend, some minor stuff found
+- will do maual check aswell
+
+## 2026-06-09 — frontend & backend CI gate 
+- add validate job for frontend & backend to qa commits 
+- backend CI + Dockerfile build stage now share one prebuilt sbt image (sbtscala); Dockerfile dropped its manual sbt install and switched `dist`+unzip → `sbt stage`
+- bump sbt and scala
+
 ## 2026-06-08 — add Prettier formatter (frontend)
 - added Prettier + `eslint-config-prettier` (last in the flat config so ESLint stops owning style); `format` / `format:check` scripts mirror the backend's scalafmt gate
 - config matches the prevailing `src/` style (double-quote, semicolons) so churn is formatting-only; applied it across the tree in an isolated commit recorded in `.git-blame-ignore-revs`

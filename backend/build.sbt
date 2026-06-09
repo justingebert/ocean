@@ -13,7 +13,7 @@ lazy val `backend` = (project in file("."))
 
 resolvers += "Akka Snapshot Repository".at("https://repo.akka.io/snapshots/")
 
-scalaVersion := "2.13.16"
+scalaVersion := "2.13.18"
 
 lazy val testSettings = Seq(
   coverageEnabled := true

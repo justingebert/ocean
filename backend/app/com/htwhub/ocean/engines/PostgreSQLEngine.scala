@@ -160,7 +160,7 @@ class PostgreSQLEngine @Inject() (config: Configuration)(implicit ec: ExecutionC
       dbCon.close
       res
     }
-    /*
+  /*
     val serverName = Future {
       config.getOptional[String]("pg_cluster.properties.serverName")
     } flatMap {

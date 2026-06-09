@@ -14,7 +14,8 @@
 - env files for vms as gitlab secrets or secret files
 - make sure PR cant execute ansible code on vm
 - add precommit hooks with husky
-- staging env?
+- staging env? nah to complex and not nesseary right?
+- monitoring of cpu, storage, memory network
 
 ## Questions:
 - what about certificate renewal?

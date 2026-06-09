@@ -1,0 +1,21 @@
+validate:backend:
+  stage: validate
+  image: sbtscala/scala-sbt:eclipse-temurin-17.0.15_6_1.12.11_2.13.18
+  variables:
+    COURSIER_CACHE: "$CI_PROJECT_DIR/backend/.coursier"
+  cache:
+    key:
+      files:
+        - backend/build.sbt
+        - backend/project/Dependencies.scala
+    paths:
+      - backend/.coursier/
+  rules:
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/**/*.yml
+        - backend/**/*
+  before_script:
+    - cd backend
+  script:
+    - sbt -batch formatCheck test

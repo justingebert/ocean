@@ -1,31 +1,17 @@
-FROM eclipse-temurin:17-jdk-jammy AS build
-
-ARG SBT_VERSION=1.10.4
-
-# install sbt
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        curl ca-certificates unzip \
- && curl -fsSL "https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${SBT_VERSION}.tgz" \
-    | tar -xz -C /opt \
- && ln -s /opt/sbt/bin/sbt /usr/local/bin/sbt \
- && rm -rf /var/lib/apt/lists/* # cleanup apt cache
+FROM sbtscala/scala-sbt:eclipse-temurin-17.0.15_6_1.12.11_2.13.18 AS build
 
 WORKDIR /src
 
-# Warm dependency cache before pulling app sources. This layer is reused unless build wiring changes.
+# Warm dependency cache
 COPY build.sbt ./
 COPY project/ project/
 RUN sbt -batch update
 
-# app sources and configs
 COPY app/ app/
 COPY conf/ conf/
 
-RUN sbt -batch dist \
- && unzip -q target/universal/backend-*.zip -d /opt/ \
- && mv /opt/backend-* /opt/backend
+RUN sbt -batch stage
 
-# --- runtime stage ---
 FROM eclipse-temurin:17-jre-jammy AS runtime
 
 # add dfn root ca to nvm truststore
@@ -41,7 +27,7 @@ RUN keytool -importcert -noprompt -trustcacerts \
 RUN useradd --system --uid 1000 --no-create-home --home-dir /opt/backend play
 
 WORKDIR /opt/backend
-COPY --from=build --chown=play:play /opt/backend/ ./
+COPY --from=build --chown=play:play /src/target/universal/stage/ ./
 
 USER play
 EXPOSE 9000
