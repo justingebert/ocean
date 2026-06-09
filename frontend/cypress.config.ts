@@ -8,6 +8,7 @@ export default defineConfig({
     VITE_MONGODB_HOSTNAME: "localhost",
     VITE_MONGODB_PORT: "27017",
     VITE_ADMINER_URL: "http://localhost:8080",
+    VITE_ADMINER_POSTGRESQL_SERVER: "pg_cluster:5432",
   },
   component: {
     devServer: {

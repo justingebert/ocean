@@ -100,10 +100,10 @@ describe("OverviewCard Component", () => {
     // Mock the connectionString method dynamically
     mockPostgresDatabase.connectionString = (username?: string) =>
       `mocked-psql-connection-string-${username}`;
+    const expectedAdminerUrl = mockPostgresDatabase.adminerUrl;
 
     mount(<OverviewCard database={mockPostgresDatabase} user={mockUser} />);
-    // Verify that the "Adminer" link is present in the component
-    cy.get("a").contains("Adminer");
+    cy.get("a").contains("Adminer").should("have.attr", "href", expectedAdminerUrl);
   });
   // Ensure the component handles cases where no database is provided
   it("handles the undefined database case correctly", () => {

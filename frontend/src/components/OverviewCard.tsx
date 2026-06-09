@@ -1,13 +1,9 @@
 import React from "react";
-
 import { Database } from "../types/database";
 import { UserProperties } from "../types/user";
 import { getDatabaseEngineTitle } from "./DatabaseList/databaseListFormat";
 import { EngineType } from "../types/engine";
 
-/**
- * Props for the `OverviewCard` component.
- */
 export interface OverviewCardProps {
   /** The database object containing its details (optional). */
   database?: Database;

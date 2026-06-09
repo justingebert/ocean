@@ -23,7 +23,6 @@ services:
     volumes:
       - postgres_orm_data:/var/lib/postgresql
 
-#ldap login doesnt work atm needs hba.conf wired up
   pg_cluster:
     image: postgres:18.4
     depends_on:
@@ -36,10 +35,12 @@ services:
       - "5555:5432"
     volumes:
       - pg_cluster_data:/var/lib/postgresql
-#      - ./ops/compose/pg/pg_hba.local.conf:/etc/postgresql/pg_hba.conf:ro
-#    command: >-
-#      postgres
-#      -c hba_file=/etc/postgresql/pg_hba.conf
+    configs:
+      - source: pg_hba_local
+        target: /etc/postgresql/pg_hba.conf
+    command: >-
+      postgres
+      -c hba_file=/etc/postgresql/pg_hba.conf
 
   mongodb_cluster:
     image: mongo:8.0
@@ -65,3 +66,28 @@ volumes:
   postgres_orm_data:
   pg_cluster_data:
   mongodb_cluster_data:
+
+# decided against creating a file since this could and would cause confusuion is this just a hba conf
+configs:
+  pg_hba_local:
+    content: |
+      # PostgreSQL Client Authentication Configuration for local docker-compose.
+      # Production uses ops/compose/pg/pg_hba.conf against HTW LDAPS; this dev
+
+      # TYPE     DATABASE  USER            ADDRESS       METHOD
+      local      all       all                           trust
+      host       all       all             127.0.0.1/32  trust
+      host       all       all             ::1/128       trust
+
+      # Local docker-network clients.
+      host       all       +ldap_role      samenet       ldap ldapserver=openldap ldapprefix="cn=" ldapsuffix=",ou=users,dc=example,dc=org" ldapport=1389
+      host       all       +generic_role   samenet       scram-sha-256
+      host       all       postgres        samenet       scram-sha-256
+      host       all       all             samenet       reject
+
+      # Host-published port clients. Docker Desktop traffic can arrive from a
+      # gateway address outside Postgres' `samenet`.
+      host       all       +ldap_role      all           ldap ldapserver=openldap ldapprefix="cn=" ldapsuffix=",ou=users,dc=example,dc=org" ldapport=1389
+      host       all       +generic_role   all           scram-sha-256
+      host       all       postgres        all           scram-sha-256
+      host       all       all             all           reject

@@ -7,10 +7,9 @@ const {
   VITE_MONGODB_HOSTNAME,
   VITE_MONGODB_PORT,
   VITE_ADMINER_URL,
+  VITE_ADMINER_POSTGRESQL_SERVER,
 } = import.meta.env;
-/**
- * Defines the properties of a database.
- */
+
 export interface DatabaseProperties {
   id: number;
   name: string;
@@ -90,11 +89,40 @@ export class Database extends BaseModel {
       return assertNever(this.props.engine);
     }
   }
+  private buildAdminerUrl(searchParams: URLSearchParams): string {
+    const baseUrl = VITE_ADMINER_URL;
+
+    if (!baseUrl) {
+      return "";
+    }
+
+    try {
+      const url = new URL(baseUrl);
+      searchParams.forEach((value, key) => url.searchParams.set(key, value));
+      return url.toString();
+    } catch {
+      const separator = baseUrl.includes("?") ? "&" : "?";
+      return `${baseUrl}${separator}${searchParams.toString()}`;
+    }
+  }
   /**
    * Retrieves the Adminer URL for database management.
    * @returns The Adminer URL as a string.
    */
   public get adminerUrl(): string {
-    return VITE_ADMINER_URL || "";
+    if (this.props.engine === EngineType.PostgreSQL) {
+      const adminerServer = VITE_ADMINER_POSTGRESQL_SERVER || `${this.hostname}:${this.port}`;
+      const searchParams = new URLSearchParams({
+        pgsql: adminerServer,
+        db: this.props.name,
+      });
+
+      return this.buildAdminerUrl(searchParams);
+    } else if (this.props.engine === EngineType.MongoDB) {
+      return VITE_ADMINER_URL || "";
+    } else {
+      const assertNever = (_: never): string => "";
+      return assertNever(this.props.engine);
+    }
   }
 }
