@@ -10,6 +10,7 @@ One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then 
 ## 2026-06-09 prefill Adminer links, and local dev ldap auth wiring
 - frontend Adminer links now preselect the viewed db
 - covered URL generation with focused unit tests; Cypress component check is blocked locally until the Cypress binary is installed
+- kept Vite env reads as module-level constants and made tests dynamically import the model after stubbing env
 - wired the local `pg_cluster` service to mount the inline config, this way ldap auth works locally with testusers
 
 

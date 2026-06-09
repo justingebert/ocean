@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { Database } from "./database";
+import type { DatabaseProperties } from "./database";
 import { EngineType } from "./engine";
 
 describe("Database", () => {
@@ -15,30 +15,33 @@ describe("Database", () => {
 
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.resetModules();
   });
 
-  it("prefills Adminer with PostgreSQL server and database values", () => {
-    const database = new Database({
+  const createPostgresDatabase = async (name = "customer_db") => {
+    vi.resetModules();
+    const { Database } = await import("./database");
+    const props: DatabaseProperties = {
       id: 1,
-      name: "customer_db",
+      name,
       engine: EngineType.PostgreSQL,
       createdAt: new Date(),
       userId: 1,
-    });
+    };
+
+    return new Database(props);
+  };
+
+  it("prefills Adminer with PostgreSQL server and database values", async () => {
+    const database = await createPostgresDatabase();
 
     expect(database.adminerUrl).toBe(
       "http://localhost:8080/?pgsql=pg_cluster%3A5432&db=customer_db",
     );
   });
 
-  it("does not include credentials in the Adminer URL", () => {
-    const database = new Database({
-      id: 1,
-      name: "customer_db",
-      engine: EngineType.PostgreSQL,
-      createdAt: new Date(),
-      userId: 1,
-    });
+  it("does not include credentials in the Adminer URL", async () => {
+    const database = await createPostgresDatabase();
 
     const adminerUrl = new URL(database.adminerUrl);
 
@@ -46,16 +49,10 @@ describe("Database", () => {
     expect(adminerUrl.searchParams.has("password")).toBe(false);
   });
 
-  it("falls back to the database host and port when no Adminer server override is set", () => {
+  it("falls back to the database host and port when no Adminer server override is set", async () => {
     vi.stubEnv("VITE_ADMINER_POSTGRESQL_SERVER", "");
 
-    const database = new Database({
-      id: 1,
-      name: "customer_db",
-      engine: EngineType.PostgreSQL,
-      createdAt: new Date(),
-      userId: 1,
-    });
+    const database = await createPostgresDatabase();
 
     expect(database.adminerUrl).toBe(
       "http://localhost:8080/?pgsql=localhost%3A5555&db=customer_db",

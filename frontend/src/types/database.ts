@@ -90,7 +90,7 @@ export class Database extends BaseModel {
     }
   }
   private buildAdminerUrl(searchParams: URLSearchParams): string {
-    const baseUrl = VITE_ADMINER_URL;
+    const baseUrl = VITE_ADMINER_URL || "";
 
     if (!baseUrl) {
       return "";
