@@ -4,15 +4,19 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 ## Format
 
-One section per discrete unit of work. Heading: `## YYYY-MM-DD — topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. If it'd take more than a minute to scan, it's too long.
+One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-06-10
+
+## 2026-06-10 — local dev LDAP off bitnami → osixia + rich seed
+- swapped the frozen legacy openldap for newer maintaned one
+- apply config to this ldap so seed dev users and similar behavoir to real ldap
 
 ## 2026-06-09 prefill Adminer links, and local dev ldap auth wiring
 - frontend Adminer links now preselect the viewed db
 - covered URL generation with focused unit tests; Cypress component check is blocked locally until the Cypress binary is installed
 - kept Vite env reads as module-level constants and made tests dynamically import the model after stubbing env
 - wired the local `pg_cluster` service to mount the inline config, this way ldap auth works locally with testusers
-
 
 ## 2026-06-09 — backend code audit
 - code audit with agent => good base compared to frontend, some minor stuff found
