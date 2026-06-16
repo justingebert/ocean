@@ -34,7 +34,6 @@ const defaultProps: StartingPointsProps = {
   title: "Getting Started",
   description: "Explore the starting points to get familiar with the application.",
   startingPoints: mockStartingPoints,
-  moreHref: "https://example.com",
 };
 // Helper function to render the StartingPoints component within a BrowserRouter
 const renderComponent = (props = defaultProps) => {
@@ -75,14 +74,5 @@ describe("StartingPoints Component", () => {
       // Verify that the anchor element's href attribute matches the expected URL
       expect(linkElement).toHaveAttribute("href", point.to);
     });
-  });
-  // Ensure that the "Or ask a question" link is rendered with the correct URL and attributes
-  it("renders the 'more' link correctly", () => {
-    renderComponent();
-    const moreLink = screen.getByText(/Or ask a question/i);
-    // Verify that the "more" link points to the expected URL
-    expect(moreLink).toHaveAttribute("href", defaultProps.moreHref);
-    // Ensure that the "more" link opens in a new tab
-    expect(moreLink).toHaveAttribute("target", "_blank");
   });
 });

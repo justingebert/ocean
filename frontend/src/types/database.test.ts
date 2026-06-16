@@ -49,13 +49,13 @@ describe("Database", () => {
     expect(adminerUrl.searchParams.has("password")).toBe(false);
   });
 
-  it("falls back to the database host and port when no Adminer server override is set", async () => {
+  it("uses the default internal Adminer PostgreSQL server when no override is set", async () => {
     vi.stubEnv("VITE_ADMINER_POSTGRESQL_SERVER", "");
 
     const database = await createPostgresDatabase();
 
     expect(database.adminerUrl).toBe(
-      "http://localhost:8080/?pgsql=localhost%3A5555&db=customer_db",
+      "http://localhost:8080/?pgsql=pg_cluster%3A5432&db=customer_db",
     );
   });
 });

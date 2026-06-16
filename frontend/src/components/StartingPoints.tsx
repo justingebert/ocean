@@ -13,24 +13,19 @@ export interface StartingPointsProps {
   description: string;
   /** List of starting points containing navigation options. */
   startingPoints: StartingPoint[];
-  /** The URL for additional help or information. */
-  moreHref: string;
 }
 /**
  * Renders a section with starting points for navigating key actions.
  * - Displays a list of available starting points with icons and descriptions.
- * - Includes a link to an external help resource.
  *
  * @param title - The section title.
  * @param description - A short explanation of the starting points.
  * @param startingPoints - The list of navigation options.
- * @param moreHref - A link to external help or questions.
  */
 const StartingPoints: React.FC<StartingPointsProps> = ({
   title,
   description,
   startingPoints,
-  moreHref,
 }) => {
   /**
    * Utility function to join class names dynamically.
@@ -71,16 +66,6 @@ const StartingPoints: React.FC<StartingPointsProps> = ({
             </div>
           </div>
         ))}
-      </div>
-      <div className="mt-4 flex">
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href={moreHref}
-          className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
-        >
-          Or ask a question<span aria-hidden="true"> &rarr;</span>
-        </a>
       </div>
     </div>
   );

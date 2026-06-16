@@ -45,13 +45,6 @@ build:frontend:
         --build-arg HTTP_PROXY="$HTTP_PROXY" \
         --build-arg HTTPS_PROXY="$HTTPS_PROXY" \
         --build-arg NO_PROXY="$NO_PROXY" \
-        --build-arg VITE_API_URL="$VITE_API_URL" \
-        --build-arg VITE_POSTGRESQL_HOSTNAME="$VITE_POSTGRESQL_HOSTNAME" \
-        --build-arg VITE_POSTGRESQL_PORT="$VITE_POSTGRESQL_PORT" \
-        --build-arg VITE_MONGODB_HOSTNAME="$VITE_MONGODB_HOSTNAME" \
-        --build-arg VITE_MONGODB_PORT="$VITE_MONGODB_PORT" \
-        --build-arg VITE_ADMINER_URL="$VITE_ADMINER_URL" \
-        --build-arg VITE_ISSUE_LINK="$VITE_ISSUE_LINK" \
         -t "$FRONTEND_IMAGE:latest" \
         frontend
     - docker push "$FRONTEND_IMAGE:latest"

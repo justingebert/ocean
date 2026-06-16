@@ -6,8 +6,6 @@ import { startingPoints } from "../constants/starting";
 import Headline from "../components/Headline";
 import StartingPoints from "../components/StartingPoints";
 
-/** The issue tracking link, fetched from environment variables. */
-const { VITE_ISSUE_LINK } = import.meta.env;
 /**
  * The overview page that serves as the main landing page after login.
  * - Displays an introduction headline.
@@ -21,7 +19,6 @@ const OverviewView: React.FC = () => {
         title="Getting started"
         description="Get started by selecting a template."
         startingPoints={startingPoints}
-        moreHref={VITE_ISSUE_LINK || "#"}
       />
     </AppLayout>
   );

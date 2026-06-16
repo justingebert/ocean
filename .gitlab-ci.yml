@@ -9,17 +9,10 @@ variables:
   DOCKER_BUILDKIT: "1"
   ANSIBLE_COLLECTIONS_PATH: "$CI_PROJECT_DIR/.ansible/collections"
   ANSIBLE_LOCAL_TEMP: "$CI_PROJECT_DIR/.ansible/tmp"
-  VITE_API_URL: /v1
-  VITE_POSTGRESQL_HOSTNAME: ocean-pg.f4.htw-berlin.de
-  VITE_POSTGRESQL_PORT: "5432"
-  VITE_MONGODB_HOSTNAME: ocean-mongo.f4.htw-berlin.de
-  VITE_MONGODB_PORT: "27017"
-  VITE_ADMINER_URL: https://ocean-pg.f4.htw-berlin.de/
-  VITE_ISSUE_LINK: https://github.com/HTWHub/ocean/issues
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
   OUTBOUND_PROXY_URL: &outbound_proxy_url "http://webproxy.rz.htw-berlin.de:3128"
-  OUTBOUND_NO_PROXY: &outbound_no_proxy "localhost,127.0.0.1,docker,docker:2375,docker:2376,ocean-jg.f4.htw-berlin.de,ocean-pg.f4.htw-berlin.de,ocean-mongo.f4.htw-berlin.de"
+  OUTBOUND_NO_PROXY: &outbound_no_proxy "localhost,127.0.0.1,docker,docker:2375,docker:2376"
   HTTP_PROXY: *outbound_proxy_url
   HTTPS_PROXY: *outbound_proxy_url
   NO_PROXY: *outbound_no_proxy

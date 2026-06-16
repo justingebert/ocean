@@ -18,8 +18,7 @@
     "cypress:component": "VITE_COVERAGE=true npx cypress run --component",
     "test:e2e": "npx cypress run",
     "typecheck:cypress": "tsc --noEmit -p cypress/tsconfig.json",
-    "test": "npm run vitest && npm run cypress:component",
-    "docs": "typedoc --out docs/typedoc src/ --entryPointStrategy expand"
+    "test": "npm run vitest && npm run cypress:component"
   },
   "dependencies": {
     "@headlessui/react": "^2.0.0",

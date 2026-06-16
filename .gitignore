@@ -107,3 +107,4 @@ frontend/.env
 
 .agents
 skills-lock.json
+.claude

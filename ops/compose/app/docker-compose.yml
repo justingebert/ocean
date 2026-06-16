@@ -26,6 +26,7 @@ services:
       OCEAN_HOSTNAME: ${OCEAN_HOSTNAME}
     volumes:
       - /etc/ocean/tls:/etc/caddy/tls:ro
+      - /etc/ocean/frontend-config.js:/usr/share/caddy/config.js:ro
     depends_on:
       - backend
     ports:

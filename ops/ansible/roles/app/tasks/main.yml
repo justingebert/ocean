@@ -42,6 +42,14 @@
   no_log: true
   diff: false
 
+- name: Render frontend runtime config
+  ansible.builtin.template:
+    src: frontend-config.js.j2
+    dest: "{{ etc_ocean }}/frontend-config.js"
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0644"
+
 - name: Create postgres_orm data dir
   ansible.builtin.file:
     path: "{{ data_root }}/postgres_orm/data"

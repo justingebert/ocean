@@ -3,12 +3,9 @@ import { decodeJwt as joseDecodeJwt, type JWTPayload } from "jose";
 
 import { loginFailed } from "../redux/slices/session/sessionSlice";
 import { AppDispatch } from "../redux/store";
+import { config } from "../config";
 import { SessionApi } from "./sessionApi";
 
-/** Base API URL configured from environment variables */
-const { VITE_API_URL } = import.meta.env;
-
-const baseURL = VITE_API_URL || "";
 /** Default headers for axios requests */
 const headers = {
   "Content-Type": "application/json",
@@ -19,7 +16,7 @@ const headers = {
  * This instance should be used for all API requests.
  */
 export const axiosInstance = axios.create({
-  baseURL: baseURL,
+  baseURL: config.apiUrl,
   timeout: 20000,
   headers: headers,
 });

@@ -1,11 +1,10 @@
 compose_src: "{{ playbook_dir }}/../compose/app/docker-compose.yml"
 
-docker_registry_url: gl-ai.f4.htw-berlin.de:5005
-container_registry_image: "{{ docker_registry_url }}/s0583511/ocean"
 docker_registry_username: "{{ lookup('ansible.builtin.env', 'GITLAB_REGISTRY_USER') | default('', true) }}"
 docker_registry_password: "{{ lookup('ansible.builtin.env', 'GITLAB_REGISTRY_PASSWORD') | default('', true) }}"
 
 backend_image: "{{ container_registry_image }}/backend:latest"
 frontend_image: "{{ container_registry_image }}/frontend:latest"
 app_image_pull_policy: "always"
-ocean_hostname: ocean-jg.f4.htw-berlin.de
+
+ocean_hostname: "{{ ansible_host }}"

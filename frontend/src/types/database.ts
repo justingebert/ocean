@@ -1,14 +1,6 @@
 import { BaseModel } from "./models";
 import { EngineType, EngineTypeValues } from "./engine";
-
-const {
-  VITE_POSTGRESQL_HOSTNAME,
-  VITE_POSTGRESQL_PORT,
-  VITE_MONGODB_HOSTNAME,
-  VITE_MONGODB_PORT,
-  VITE_ADMINER_URL,
-  VITE_ADMINER_POSTGRESQL_SERVER,
-} = import.meta.env;
+import { config } from "../config";
 
 export interface DatabaseProperties {
   id: number;
@@ -50,9 +42,9 @@ export class Database extends BaseModel {
    */
   public get hostname(): string {
     if (this.props.engine === EngineType.PostgreSQL) {
-      return VITE_POSTGRESQL_HOSTNAME || "";
+      return config.postgresqlHostname;
     } else if (this.props.engine === EngineType.MongoDB) {
-      return VITE_MONGODB_HOSTNAME || "";
+      return config.mongodbHostname;
     } else {
       const assertNever = (_: never): string => "";
       return assertNever(this.props.engine);
@@ -64,9 +56,9 @@ export class Database extends BaseModel {
    */
   public get port(): number {
     if (this.props.engine === EngineType.PostgreSQL) {
-      return Number.parseInt(VITE_POSTGRESQL_PORT || "5432");
+      return Number.parseInt(config.postgresqlPort);
     } else if (this.props.engine === EngineType.MongoDB) {
-      return Number.parseInt(VITE_MONGODB_PORT || "27017");
+      return Number.parseInt(config.mongodbPort);
     } else {
       const assertNever = (_: never): number => NaN;
       return assertNever(this.props.engine);
@@ -90,7 +82,7 @@ export class Database extends BaseModel {
     }
   }
   private buildAdminerUrl(searchParams: URLSearchParams): string {
-    const baseUrl = VITE_ADMINER_URL || "";
+    const baseUrl = config.adminerUrl;
 
     if (!baseUrl) {
       return "";
@@ -111,7 +103,7 @@ export class Database extends BaseModel {
    */
   public get adminerUrl(): string {
     if (this.props.engine === EngineType.PostgreSQL) {
-      const adminerServer = VITE_ADMINER_POSTGRESQL_SERVER || `${this.hostname}:${this.port}`;
+      const adminerServer = config.adminerPostgresqlServer || `${this.hostname}:${this.port}`;
       const searchParams = new URLSearchParams({
         pgsql: adminerServer,
         db: this.props.name,
@@ -119,7 +111,7 @@ export class Database extends BaseModel {
 
       return this.buildAdminerUrl(searchParams);
     } else if (this.props.engine === EngineType.MongoDB) {
-      return VITE_ADMINER_URL || "";
+      return config.adminerUrl;
     } else {
       const assertNever = (_: never): string => "";
       return assertNever(this.props.engine);

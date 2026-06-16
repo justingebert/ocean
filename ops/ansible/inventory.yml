@@ -5,6 +5,8 @@ all:
     # HTW outbound HTTP(S) only reachable via this proxy.
     outbound_proxy_url: http://webproxy.rz.htw-berlin.de:3128
     tls_src: "{{ lookup('ansible.builtin.env', 'OCEAN_TLS_SRC', default='') | trim }}"
+    docker_registry_url: gl-ai.f4.htw-berlin.de:5005
+    container_registry_image: "{{ docker_registry_url }}/s0583511/ocean"
   children:
     ops:
       hosts:

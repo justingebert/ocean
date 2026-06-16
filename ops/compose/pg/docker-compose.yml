@@ -34,6 +34,7 @@ services:
   adminer_proxy:
     image: caddy:2-alpine
     restart: unless-stopped
+    env_file: /etc/ocean/compose.env
     depends_on:
       - adminer
     ports:
