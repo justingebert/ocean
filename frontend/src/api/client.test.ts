@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { axiosInstance, decodeJwt, setBearerToken } from "./client";
+import { config } from "../config";
 import MockAdapter from "axios-mock-adapter";
 
 // Mock localStorage methods for testing without affecting the real browser environment
@@ -15,7 +16,7 @@ Object.defineProperty(global, "localStorage", {
 describe("Axios Client (Real Axios)", () => {
   // Verify axios instance default settings, including base URL and headers
   it("should have the correct default configuration", () => {
-    expect(axiosInstance.defaults.baseURL).toBe(import.meta.env.VITE_API_URL || "");
+    expect(axiosInstance.defaults.baseURL).toBe(config.apiUrl);
     expect(axiosInstance.defaults.headers["Content-Type"]).toBe("application/json");
     expect(axiosInstance.defaults.headers["Access-Control-Allow-Origin"]).toBe("*");
   });
