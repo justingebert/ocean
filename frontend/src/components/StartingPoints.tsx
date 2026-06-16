@@ -3,9 +3,6 @@ import { Link } from "react-router-dom";
 
 import { StartingPoint } from "../constants/starting";
 
-/**
- * Props for the `StartingPoints` component.
- */
 export interface StartingPointsProps {
   /** The title displayed at the top of the section. */
   title: string;
@@ -22,11 +19,7 @@ export interface StartingPointsProps {
  * @param description - A short explanation of the starting points.
  * @param startingPoints - The list of navigation options.
  */
-const StartingPoints: React.FC<StartingPointsProps> = ({
-  title,
-  description,
-  startingPoints,
-}) => {
+const StartingPoints: React.FC<StartingPointsProps> = ({ title, description, startingPoints }) => {
   /**
    * Utility function to join class names dynamically.
    *
