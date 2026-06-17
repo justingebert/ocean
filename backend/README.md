@@ -2,26 +2,14 @@
 
 ## Available Scripts
 
-In the project directory, you can run:
-
-### `sbt run -Dconfig.resource=application.dev.conf`
-Runs the app in the development mode.
-
-### `sbt run -Dplay.http.secret.key='SECRET KEY' -Djwt.secret_key='SECRET KEY'`
-Runs the app in the staging mode.
-
-### `sbt test`
-Launches the test runner
-
-### `sbt cov`
-Generates coverage reports.
-
-### `sbt format`
-Runs the formatter.
-
-
-### `sbt dist`
-Builds the app for production
+```sh
+sbt run          # dev mode (defaults match local docker-compose deps)
+sbt test         # run tests
+sbt cov          # coverage report
+sbt format       # scalafmt
+sbt formatCheck  # scalafmt check (CI gate)
+sbt dist         # production build
+```
 
 ## Build With
 
