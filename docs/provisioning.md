@@ -1,12 +1,48 @@
 # Provisioning new VMs
 
-Spin up Ocean on a fresh set of VMs. You do this once; after it, every change
+Stand up Ocean on a fresh set of VMs. You do this once; after it, every change
 ships via [Deploy](deploy.md). For how the moving parts fit together, see
 [Deployment architecture](../ops/README.md).
+
+## Bootstrap order (read this first)
+
+CI does the heavy lifting (it builds the images and deploys the app), but
+**nothing in CI runs until the GitLab runner exists, and the runner runs on the
+ops VM.** On top of that, the app VM has no image to run until CI has built one.
+So the chain is strict and one-directional:
+
+```
+  local bootstrap                 CI (on the ops runner)
+  ┌──────────────────┐      ┌───────────────┐
+  │ pg, mongo,       │ ───▶ │ build images  │ ───▶  deploy:app
+  │ ops (the runner) │      └───────────────┘
+  └──────────────────┘
+     runner            →        images        →        app
+```
+
+1. **Bootstrap locally** (your laptop): bring up the data tiers (`pg`, `mongo`)
+   and register the runner on `ops`. These use public images, so no registry is
+   needed yet.
+2. **CI builds the images**: push to `main`; the build stage pushes
+   `backend` + `frontend` to the registry.
+3. **CI deploys the app**: `deploy:app` pulls those images.
+
+The app VM is never deployed from your laptop: there is nothing to run until CI
+has built an image. Everything you do locally is just enough to make CI work.
 
 > **HTW note:** the VMs have no direct internet access. Outbound traffic goes
 > through the HTW web proxy `http://webproxy.rz.htw-berlin.de:3128`. Ansible and
 > the VMs are already configured for it.
+
+## Prerequisites
+
+- **Four VMs**: `app`, `pg`, `mongo`, `ops` (see step 1).
+- A **GitLab project** with the **Container Registry** enabled and **CI/CD**
+  turned on. HTW GitLab has no shared runners, so you run your own on the `ops`
+  VM, which the local bootstrap registers.
+- On your laptop: `ssh`, `ansible`, the `OCEAN_*` secrets and TLS files (step 3),
+  and a **runner registration token** (GitLab → *Settings → CI/CD → Runners →
+  New project runner*).
 
 ## 1. Request the VMs and certificates
 
@@ -17,15 +53,15 @@ Ask HTW (F4) for the VMs. Ocean needs:
 | app     | frontend + backend                     | yes          |
 | pg      | managed PostgreSQL + Adminer           | yes          |
 | mongo   | managed MongoDB                        | yes          |
-| ops     | GitLab CI runner (optional, recommended) | no         |
+| ops     | GitLab CI runner                       | no           |
 
 Each VM gets an `*.f4.htw-berlin.de` hostname. Also request a **TLS certificate + key** for the app, pg, and mongo hostnames (each terminates TLS itself).
 
 ## 2. Point the inventory at your VMs
 
 Edit `ops/ansible/inventory.yml`. Its header comment lists exactly what to
-change: each VM's `ansible_host`, its `tls_cert_file` / `tls_key_file`, and —
-once — `docker_registry_url` + `container_registry_image` (your GitLab registry).
+change: each VM's `ansible_host`, its `tls_cert_file` / `tls_key_file`, and,
+once, `docker_registry_url` + `container_registry_image` (your GitLab registry).
 
 ## 3. Create the secrets and stage the TLS files
 
@@ -72,6 +108,10 @@ Verify from your laptop:
 ssh ansible@<vm>.f4.htw-berlin.de sudo whoami   # -> root
 ```
 
+> Use the **same** SSH key for all four VMs. CI later reuses its private half
+> (`ANSIBLE_SSH_PRIVATE_KEY`, step 7) to deploy, so this one key authorises both
+> your laptop and the runner.
+
 ## 5. Open the firewall (once per VM)
 
 The HTW base image ships `/root/firewall.sh` (default-DROP) with the app/db ports
@@ -94,42 +134,66 @@ sudo iptables -L INPUT -n    # verify
 Restrict the source to the HTW network (`141.45.0.0/16`, `10.4.0.0/16`) unless
 the app must be reachable from the public internet.
 
-> Firewall automation is not in Ansible yet — this is the one manual step.
+> Firewall automation is not in Ansible yet. This is the one manual step.
 
-## 6. Set up GitLab (for CI deploys)
+## 6. Bootstrap locally: data tiers + runner
 
-To deploy from the pipeline instead of your laptop, configure the project's
-**Settings → CI/CD**:
+Run Ansible from your laptop against `pg`, `mongo`, and `ops`. This brings up the
+managed databases and installs + registers the GitLab runner. `app` is left out
+on purpose: its image does not exist yet (step 8).
 
-- **Variables** — the five `OCEAN_*` secrets from step 3, plus
-  `ANSIBLE_SSH_PRIVATE_KEY` (the private key matching the bootstrap public key).
-- **Secure Files** — the TLS cert/key pairs from step 3.
-- The image registry uses the built-in `CI_REGISTRY_*` credentials — nothing to add.
+The run reads these from the environment:
 
-CI jobs run on the **ops runner** VM (jobs are tagged `ocean`). Bring it up once
-from your laptop, then the pipeline can deploy the rest:
+| Env var                         | What it is                                          | Used by |
+| ------------------------------- | --------------------------------------------------- | ------- |
+| `OCEAN_PG_CLUSTER_PASSWORD`     | managed-Postgres superuser password (from step 3)   | pg      |
+| `OCEAN_MONGODB_CLUSTER_PASSWORD`| managed-Mongo root password (from step 3)           | mongo   |
+| `OCEAN_TLS_SRC`                 | path to the dir holding the cert/key files (step 3) | pg, mongo |
+| `GITLAB_RUNNER_TOKEN`           | runner registration token (Prerequisites)           | ops     |
 
-```sh
-cd ops/ansible
-GITLAB_RUNNER_TOKEN='<token>' ansible-playbook -i inventory.yml playbook.yml --limit ops
-```
-
-(The `deploy:ops` CI job exists too, but it's hidden behind a `DEPLOY_OPS=true`
-pipeline variable to avoid touching the runner that's executing it.)
-
-## 7. First deploy
-
-Run the full deploy. From CI, run `deploy:app`, `deploy:pg`, and `deploy:mongo`.
-From your laptop:
+Sourcing the whole `prod.env` is fine. The other `OCEAN_*` values are simply
+unused here.
 
 ```sh
 cd ops/ansible
 ansible-galaxy install -r requirements.yml
-set -a; . ../../.secrets/prod.env; set +a
-export OCEAN_TLS_SRC="$(pwd)/../../.secrets/certs"
-ansible -i inventory.yml all -m ping            # check connectivity
-ansible-playbook -i inventory.yml playbook.yml  # all tiers
+
+set -a; . ../../.secrets/prod.env; set +a              # OCEAN_* secrets
+export OCEAN_TLS_SRC="$(pwd)/../../.secrets/certs"      # TLS cert/key dir
+export GITLAB_RUNNER_TOKEN='<token from GitLab>'        # registers the runner
+
+ansible -i inventory.yml pg:mongo:ops -m ping           # check connectivity
+ansible-playbook -i inventory.yml playbook.yml --limit pg:mongo:ops
 ```
+
+The runner only needs registering once. After this, `ops` is normally left
+alone: you don't want a deploy restarting the runner that is executing it.
+
+## 7. Enable CI
+
+So the runner can build images and deploy, configure the project's
+**Settings → CI/CD**:
+
+| Setting                                  | Value                                                          |
+| ---------------------------------------- | ------------------------------------------------------------- |
+| **Variable**, the five `OCEAN_*`         | the secrets from step 3                                        |
+| **Variable** `ANSIBLE_SSH_PRIVATE_KEY`   | the private key matching the bootstrap public key (step 4)     |
+| **Secure Files**                         | the TLS cert/key pairs from step 3                             |
+| Image registry                           | built-in `CI_REGISTRY_*`, nothing to add                       |
+
+CI jobs run on the `ops` runner (jobs are tagged `ocean`).
+
+## 8. Build and deploy via CI
+
+Push to `main`. CI builds the `backend` + `frontend` images and pushes them to
+the registry, then exposes the manual deploy jobs:
+
+- **`deploy:app`**: stands the app VM up from scratch (base + TLS + the stack)
+  and pulls the freshly built images.
+- `deploy:pg` / `deploy:mongo`: only when you later change their config or the
+  inventory; the data tiers are already running from step 6.
+
+From here on, every change ships this way. See [Deploy](deploy.md).
 
 ## Verify
 
@@ -137,4 +201,4 @@ ansible-playbook -i inventory.yml playbook.yml  # all tiers
 - Create a PostgreSQL and a MongoDB database from the UI.
 - The database ports should be reachable only from the app VM and the HTW network.
 
-Next: [Operations](operations.md) — TLS renewal, secret rotation, redeploys.
+Next: [Operations](operations.md) for TLS renewal, secret rotation, redeploys.

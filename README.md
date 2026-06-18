@@ -19,10 +19,10 @@ Ocean is a fully managed database platform: log in and launch a **PostgreSQL** o
 | Guide                                         | Use it to…                               |
 |-----------------------------------------------|------------------------------------------|
 | [Local development](docs/local-dev.md)        | run the whole stack on your laptop       |
-| [Deployment architecture](ops/README.md)     | understand the IaC setup at a glance     |
 | [Deploy](docs/deploy.md)                      | ship a change to the running VMs         |
 | [Provisioning](docs/provisioning.md)          | spin up Ocean on fresh VMs      |
 | [Operations](docs/operations.md)              | renew TLS, rotate secrets, debug |
+| [Deployment architecture](ops/README.md)     | understand the IaC setup at a glance     |
 
 ## Architecture overview
 

@@ -27,24 +27,3 @@ Most changes are app code, so most deploys are just the `deploy:app` job.
 Images are tagged `:latest`, so a deploy pulls the newest build. 
 
 Rollback: TODO
-
-### Deploy locally (alternative)
-
-Same outcome without CI, useful for the ops runner or when CI isn't set up yet:
-
-```sh
-cd ops/ansible
-ansible-galaxy install -r requirements.yml
-
-set -a; . ../../.secrets/prod.env; set +a                     # the five OCEAN_* secrets
-export OCEAN_TLS_SRC="$(pwd)/../../.secrets/certs"            # the TLS cert/key files
-
-ansible -i inventory.yml all -m ping                          # check connectivity
-ansible-playbook -i inventory.yml playbook.yml                # all tiers
-ansible-playbook -i inventory.yml playbook.yml --limit ops    # one tier
-```
-
-A local **app** deploy also needs `GITLAB_REGISTRY_USER` +
-`GITLAB_REGISTRY_PASSWORD` set, to pull the images.
-
-For TLS renewal, secret rotation, troubleshooting see [Operations](operations.md).

@@ -1,32 +1,72 @@
-# Frontend
+# Ocean frontend
 
-This is a frontend project built using **React 19**, **Vite**, and **TailwindCSS**. It utilizes **Redux Toolkit** for state management, **React Router** for navigation, and **TanStack Query** for data fetching.
+The web app users log into to provision and manage their databases. A React 19
+SPA (Vite + Tailwind 4) that talks to the Play backend over `/v1`.
 
-## Installation
+## Stack
 
-### Prerequisites
+React 19 · Vite 6 · Tailwind 4 · Redux Toolkit + redux-saga (client state) ·
+TanStack Query v5 (server state) · React Router 7 · Formik + Yup (forms) ·
+axios + jose (API + JWT). Tests: Vitest + Cypress.
 
-- **Node.js** (Latest LTS version recommended)
-- **npm** (Bundled with Node.js)
+## Layout
 
-### Setup
+Everything lives under `src/`:
+
+| Path          | What it is                                                           |
+| ------------- |----------------------------------------------------------------------|
+| `views/`      | route-level screens (overview, databases, settings, sign-in, …)      |
+| `layouts/`    | shells the views render inside                                       |
+| `components/` | reusable UI: lists, modals, forms, navigation, stats                 |
+| `api/`        | one axios client per resource (database, role, invitation, …) + auth |
+| `hooks/`      | TanStack Query hooks wrapping the API clients                        |
+| `redux/`      | store, slices and sagas: session/auth state                          |
+| `types/`      | shared TypeScript types                                              |
+| `config.ts`   | resolves runtime + build-time config into one `config` object        |
+
+Tests are **colocated** (`foo.ts` + `foo.test.ts`); Cypress specs live in
+`cypress/` (component) and `cypress/e2e/`.
+
+## The model
+
+- **Routing** (`views/index.tsx`) splits public (`/login`) from protected
+  routes. `ProtectedRoute` gates everything behind `session.isLoggedIn`; screens
+  are lazy-loaded behind a `Suspense` fallback.
+- **Server state** is TanStack Query, never Redux. Hooks in `hooks/` call the
+  axios clients in `api/`, which all hit the backend at `/v1`.
+- **Client state** is Redux Toolkit + saga, effectively just the auth session.
+- **Auth**: sign-in stores access + refresh JWTs in `localStorage`. The shared
+  axios instance (`api/client.ts`) attaches the bearer token; a response
+  interceptor catches `401`s, refreshes the access token once, and retries, 
+  logging out if the refresh itself fails.
+
+## Config
+
+Two layers, resolved in `config.ts`:
+
+- **Build-time:** `VITE_*` vars baked in by Vite (see `.env.example`). Used for
+  local dev.
+- **Runtime:** `window.__OCEAN_CONFIG__` from `public/config.js`, swapped in per
+  deploy so one built image works across environments. Runtime wins over
+  build-time.
+
+`apiUrl` defaults to `/v1` (same origin),  in production Caddy reverse-proxies
+`/v1/*` to the backend (see `Caddyfile`).
+
+## Running it
 
 ```sh
-cd frontend
 npm install
+npm run dev        # Vite dev server
+npm run build      # tsc -b && vite build  → dist/
+npm run lint       # ESLint
+npm run vitest     # unit/component tests (single run)
+npm run test:e2e   # Cypress E2E, dev server must be running
 ```
 
-## Scripts
 
-```sh
-npm run dev                      # Vite dev server
-npm run build                    # production build
-npm run preview                  # serve built output
-npm run lint                     # ESLint
-npm run vitest                   # unit/component tests
-npm run vitest:coverage          # Vitest coverage report
-npm run cypress:component        # Cypress component tests (dev server must NOT be running)
-npm run test:e2e                 # Cypress E2E tests (dev server must be running)
-npm run test                     # Vitest + Cypress component tests
-npm run generate-coverage-report # unified NYC report (copy vitest coverage-final.json to .nyc_output first)
-```
+## Build & deploy
+
+`Dockerfile` builds the static bundle and serves it from `caddy:2-alpine`. Caddy
+terminates TLS, does the SPA fallback, and proxies `/v1/*` to the backend. The
+image is built and shipped by the deploy tooling: see [`ops/`](../ops/README.md).
