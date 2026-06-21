@@ -1,0 +1,76 @@
+#!/bin/sh
+# MANAGED BY ANSIBLE (roles/firewall), do not edit on the host; re-runs overwrite it.
+# Derived from the HTW firewall.sh (wagnera 13.2.2023).
+################################################
+# firewall.sh: Skript zur Konfiguration von iptables
+# usage: als root ./firewall.sh ausfuehren
+################################################
+# Alle Regeln aller Chains in Tabelle Filter loeschen
+iptables -F
+#
+# Standart Policy fuer alle Chains DROP
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+#
+# auf bestehenden und zugehoerigen verbindungen alles erlauben
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+#
+# loopback device zulassen
+iptables -A INPUT -i lo -s 127.0.0.0/8 -d 127.0.0.0/8 -j ACCEPT
+iptables -A OUTPUT -o lo -d 127.0.0.0/8 -s 127.0.0.0/8 -j ACCEPT
+{% if firewall_allow_docker_bridge %}
+#
+# Ocean: host-local procs (docker-proxy, ssh -L) duerfen die Docker-Bridge erreichen
+iptables -A OUTPUT -d 172.16.0.0/12 -j ACCEPT
+{% endif %}
+#
+# NESSUS Netzwerkscanner
+iptables -A INPUT -p tcp -s 10.45.64.36 -j ACCEPT
+#
+# Ping zulassen
+iptables -A INPUT  -p icmp -s 141.45.0.0/16,10.4.0.0/16 -j ACCEPT
+iptables -A OUTPUT -p icmp -d 141.45.0.0/16,10.4.0.0/16 -j ACCEPT
+#
+# Webproxy zulassen (für apt)
+iptables -A OUTPUT -p tcp --dport 3128 -d 141.45.0.0/16 -j ACCEPT
+{% if firewall_allow_ldaps %}
+#
+# LDAPS zu AD zulassen (Ocean Backend Login gegen HTW AD)
+iptables -A OUTPUT -p tcp --dport 636 -d 141.45.0.0/16 -j ACCEPT
+{% endif %}
+#
+# SSH INPUT zulassen
+iptables -A INPUT -s 141.45.0.0/16,10.4.0.0/16 -p tcp --dport 22 -j ACCEPT
+#
+# Ocean: inbound app/db ports fuer HTW-Netz
+{% for port in firewall_open_ports %}
+iptables -A INPUT -s {{ firewall_htw_sources }} -p tcp --dport {{ port }} -j ACCEPT
+{% endfor %}
+#   fuer die Welt (auskommentiert: nur oeffnen, wenn oeffentlich erreichbar)
+{% for port in firewall_open_ports %}
+#iptables -A INPUT -p tcp --dport {{ port }} -j ACCEPT
+{% endfor %}
+#
+# HTTP(S) OUTPUT zulassen
+iptables -A OUTPUT -p tcp --dport 80 -j ACCEPT
+iptables -A OUTPUT -p tcp --dport 443 -j ACCEPT
+#
+# DNS zulassen
+iptables -A OUTPUT -p udp --dport 53 -d 141.45.0.0/16,10.4.0.0/16 -j ACCEPT
+#
+# NTP (Network Time Protocoll)
+iptables -A OUTPUT -p udp --dport 123 -d 141.45.0.0/16 -j ACCEPT
+iptables -A OUTPUT -p tcp --dport 123 -d 141.45.0.0/16 -j ACCEPT
+#
+# Quarantänenetz ignorieren
+iptables -A INPUT -s 172.0.0.1/8 -j DROP
+#
+iptables-save > /etc/firewall.conf
+echo -n "#"      > /etc/network/if-up.d/iptables
+echo -n !       >> /etc/network/if-up.d/iptables
+echo /bin/sh    >> /etc/network/if-up.d/iptables
+echo "iptables-restore < /etc/firewall.conf" >> /etc/network/if-up.d/iptables
+#
+chmod +x /etc/network/if-up.d/iptables
