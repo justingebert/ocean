@@ -51,8 +51,8 @@
         -i inventory.yml \
         playbook.yml \
         --limit "$ANSIBLE_LIMIT" \
-        -e "backend_image=$BACKEND_IMAGE:latest" \
-        -e "frontend_image=$FRONTEND_IMAGE:latest"
+        -e "backend_image=$BACKEND_IMAGE:$CI_COMMIT_SHORT_SHA" \
+        -e "frontend_image=$FRONTEND_IMAGE:$CI_COMMIT_SHORT_SHA"
 
 deploy:app:
   extends: .deploy_ansible

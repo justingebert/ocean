@@ -6,6 +6,9 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-06-22 pin deploys to commit SHA
+- Build now tags/pushes images with git commit -> better verisoning and rollback
+
 ## 2026-06-21 firewall into Ansible
 - decided for firewall template script (might be a probnlme when htw standard changes)
 

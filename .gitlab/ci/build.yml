@@ -11,10 +11,6 @@ build:backend:
   extends: .build_image
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-      changes:
-        - .gitlab-ci.yml
-        - .gitlab/ci/**/*.yml
-        - backend/**/*
   script:
     - docker pull "$BACKEND_IMAGE:latest" || true
     - |
@@ -24,18 +20,16 @@ build:backend:
         --build-arg HTTP_PROXY="$HTTP_PROXY" \
         --build-arg HTTPS_PROXY="$HTTPS_PROXY" \
         --build-arg NO_PROXY="$NO_PROXY" \
+        -t "$BACKEND_IMAGE:$CI_COMMIT_SHORT_SHA" \
         -t "$BACKEND_IMAGE:latest" \
         backend
+    - docker push "$BACKEND_IMAGE:$CI_COMMIT_SHORT_SHA"
     - docker push "$BACKEND_IMAGE:latest"
 
 build:frontend:
   extends: .build_image
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-      changes:
-        - .gitlab-ci.yml
-        - .gitlab/ci/**/*.yml
-        - frontend/**/*
   script:
     - docker pull "$FRONTEND_IMAGE:latest" || true
     - |
@@ -45,6 +39,8 @@ build:frontend:
         --build-arg HTTP_PROXY="$HTTP_PROXY" \
         --build-arg HTTPS_PROXY="$HTTPS_PROXY" \
         --build-arg NO_PROXY="$NO_PROXY" \
+        -t "$FRONTEND_IMAGE:$CI_COMMIT_SHORT_SHA" \
         -t "$FRONTEND_IMAGE:latest" \
         frontend
+    - docker push "$FRONTEND_IMAGE:$CI_COMMIT_SHORT_SHA"
     - docker push "$FRONTEND_IMAGE:latest"
