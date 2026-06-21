@@ -14,7 +14,7 @@ axios + jose (API + JWT). Tests: Vitest + Cypress.
 Everything lives under `src/`:
 
 | Path          | What it is                                                           |
-| ------------- |----------------------------------------------------------------------|
+| ------------- | -------------------------------------------------------------------- |
 | `views/`      | route-level screens (overview, databases, settings, sign-in, …)      |
 | `layouts/`    | shells the views render inside                                       |
 | `components/` | reusable UI: lists, modals, forms, navigation, stats                 |
@@ -37,7 +37,7 @@ Tests are **colocated** (`foo.ts` + `foo.test.ts`); Cypress specs live in
 - **Client state** is Redux Toolkit + saga, effectively just the auth session.
 - **Auth**: sign-in stores access + refresh JWTs in `localStorage`. The shared
   axios instance (`api/client.ts`) attaches the bearer token; a response
-  interceptor catches `401`s, refreshes the access token once, and retries, 
+  interceptor catches `401`s, refreshes the access token once, and retries,
   logging out if the refresh itself fails.
 
 ## Config
@@ -50,7 +50,7 @@ Two layers, resolved in `config.ts`:
   deploy so one built image works across environments. Runtime wins over
   build-time.
 
-`apiUrl` defaults to `/v1` (same origin),  in production Caddy reverse-proxies
+`apiUrl` defaults to `/v1` (same origin), in production Caddy reverse-proxies
 `/v1/*` to the backend (see `Caddyfile`).
 
 ## Running it
@@ -63,7 +63,6 @@ npm run lint       # ESLint
 npm run vitest     # unit/component tests (single run)
 npm run test:e2e   # Cypress E2E, dev server must be running
 ```
-
 
 ## Build & deploy
 
