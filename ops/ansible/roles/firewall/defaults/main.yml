@@ -1,0 +1,5 @@
+# Inbound TCP ports opened to the HTW network. Set per group in group_vars/.
+firewall_open_ports: []
+# app-only outbound exceptions (default DROP policy otherwise blocks them).
+firewall_allow_ldaps: false
+firewall_allow_docker_bridge: false

@@ -1,3 +1,10 @@
+- name: Firewall on app/db hosts
+  hosts: app:pg:mongo
+  become: true
+  roles:
+    - firewall
+  tags: firewall
+
 - name: Base setup on all hosts
   hosts: all
   become: true

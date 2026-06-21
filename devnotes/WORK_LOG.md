@@ -6,9 +6,21 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
-## 2026-06-10
+## 2026-06-21 firewall into Ansible
+- decided for firewall template script (might be a probnlme when htw standard changes)
 
-## 2026-06-10 — local dev LDAP off bitnami → osixia + rich seed
+## 2026-06-16 docs improvements
+- keep working on docs
+- split deploy.md into deploy (ship a change) + provisioning (fresh VMs)
+- folded the IaC/deployment-architecture overview into ops/README.md (roles table + "compose = what runs, roles = setup" model); dropped the separate architecture.md
+
+## 2026-06-10 inventory cleanup / config consolidation
+- Tidy the Ansible deploy toward inventory.yml: derive the app's ocean_hostname from its ansible_host, move the registry vars into inventory
+
+## 2026-06-10: start deploy docs
+- Rewrote the deployment docs: root README (with topology diagram) + docs/{local-dev,deploy,operations}; retired the stale Docsify site. Aim: a new student stands Ocean up on fresh VMs by changing a handful of values.
+
+## 2026-06-10 local dev LDAP off bitnami → osixia + rich seed
 - swapped the frozen legacy openldap for newer maintaned one
 - apply config to this ldap so seed dev users and similar behavoir to real ldap
 
