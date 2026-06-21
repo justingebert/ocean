@@ -16,12 +16,6 @@ HTW certificates expire **2026-11-30**. Request reissue ~30 days before.
    ansible-playbook -i inventory.yml playbook.yml --tags tls
    ```
 
-3. Make sure `:443` is open on the app VM (see the firewall step in
-   [Provisioning](provisioning.md#5-open-the-firewall-once-per-vm)).
-
-The backend image bundles the HTW LDAP CA separately; renewing the server
-certificates does not affect it.
-
 ## Rotate a secret
 
 1. Change the value in `.secrets/prod.env` (or the GitLab CI/CD variable).

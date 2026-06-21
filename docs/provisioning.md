@@ -112,29 +112,23 @@ ssh ansible@<vm>.f4.htw-berlin.de sudo whoami   # -> root
 > (`ANSIBLE_SSH_PRIVATE_KEY`, step 7) to deploy, so this one key authorises both
 > your laptop and the runner.
 
-## 5. Open the firewall (once per VM)
+## 5. Firewall (handled by Ansible)
 
-The HTW base image ships `/root/firewall.sh` (default-DROP) with the app/db ports
-commented out. Open the ports each VM needs. Reference scripts with the final
-rules per role live in [`../ops/firewall/`](../ops/firewall/).
+Each app/db VM runs a default-DROP iptables policy. The `firewall` role renders
+it to `/root/firewall.sh` (overwriting the HTW original) and applies it at the **start** of the
+playbook, before Docker, so there is no manual step. The inbound ports per role
+live in `ops/ansible/group_vars/`:
 
-```sh
-ssh ansible@<vm>.f4.htw-berlin.de
-sudo -e /root/firewall.sh    # edit: uncomment the lines for this VM
-sudo /root/firewall.sh       # apply + persist (writes /etc/firewall.conf)
-sudo iptables -L INPUT -n    # verify
-```
+| VM    | Open inbound (`firewall_open_ports`)  |
+| ----- | ------------------------------------- |
+| app   | 80, 443                               |
+| pg    | 80, 443 (Adminer), 5432 (PostgreSQL)  |
+| mongo | 27017 (MongoDB)                       |
 
-| VM    | Open inbound                     |
-| ----- | -------------------------------- |
-| app   | 80, 443                          |
-| pg    | 443 (Adminer), 5432 (PostgreSQL) |
-| mongo | 27017 (MongoDB)                  |
-
-Restrict the source to the HTW network (`141.45.0.0/16`, `10.4.0.0/16`) unless
-the app must be reachable from the public internet.
-
-> Firewall automation is not in Ansible yet. This is the one manual step.
+Sources are restricted to the HTW network (`141.45.0.0/16`, `10.4.0.0/16`) via
+`firewall_htw_sources`. To change what a VM exposes, edit its `group_vars` file
+and re-run the playbook: the role re-applies, persists across reboot, and bounces Docker so it reinstalls
+its own chains. 
 
 ## 6. Bootstrap locally: data tiers + runner
 

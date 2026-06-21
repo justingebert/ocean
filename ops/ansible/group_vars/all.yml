@@ -6,6 +6,7 @@ ocean_jwt_secret: "{{ lookup('ansible.builtin.env', 'OCEAN_JWT_SECRET') | defaul
 ocean_postgres_orm_password: "{{ lookup('ansible.builtin.env', 'OCEAN_POSTGRES_ORM_PASSWORD') | default('', true) | trim }}"
 ocean_pg_cluster_password: "{{ lookup('ansible.builtin.env', 'OCEAN_PG_CLUSTER_PASSWORD') | default('', true) | trim }}"
 ocean_mongodb_cluster_password: "{{ lookup('ansible.builtin.env', 'OCEAN_MONGODB_CLUSTER_PASSWORD') | default('', true) | trim }}"
+firewall_htw_sources: "141.45.0.0/16,10.4.0.0/16"
 outbound_no_proxy: localhost,127.0.0.1,docker
 outbound_proxy_env:
   HTTP_PROXY: "{{ outbound_proxy_url | default('') }}"
