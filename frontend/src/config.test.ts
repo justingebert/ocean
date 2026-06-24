@@ -8,11 +8,11 @@ describe("config", () => {
   });
 
   it("uses Vite env values as a local development fallback", async () => {
-    vi.stubEnv("VITE_API_URL", "/v1");
+    vi.stubEnv("VITE_API_URL", "/custom-v1");
 
     const { config } = await import("./config");
 
-    expect(config.apiUrl).toBe("/v1");
+    expect(config.apiUrl).toBe("/custom-v1");
   });
 
   it("prefers runtime config over build-time env values", async () => {
@@ -40,5 +40,21 @@ describe("config", () => {
     const { config } = await import("./config");
 
     expect(config.mongodbTls).toBe(true);
+  });
+
+  it("defaults MongoDB TLS to enabled when no override is configured", async () => {
+    vi.stubEnv("VITE_MONGODB_TLS", undefined);
+
+    const { config } = await import("./config");
+
+    expect(config.mongodbTls).toBe(true);
+  });
+
+  it("allows build-time env to disable MongoDB TLS for local development", async () => {
+    vi.stubEnv("VITE_MONGODB_TLS", "false");
+
+    const { config } = await import("./config");
+
+    expect(config.mongodbTls).toBe(false);
   });
 });
