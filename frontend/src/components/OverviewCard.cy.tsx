@@ -5,7 +5,7 @@ import { UserProperties } from "../types/user";
 import { Database } from "../types/database";
 import { EngineType } from "../types/engine";
 
-// Tests for OverviewCard component to verify correct rendering, database engine handling, clipboard interactions, and Adminer link validation
+// Tests for OverviewCard component to verify correct rendering, database engine handling, clipboard interactions, and admin UI link validation
 describe("OverviewCard Component", () => {
   // Mock user data to simulate an authenticated user with different database interactions
   const mockUser: UserProperties = {
@@ -87,7 +87,7 @@ describe("OverviewCard Component", () => {
     cy.contains("mocked-mongodb-connection-string").should("exist");
   });
   // Ensure the Adminer link is rendered and verify its text
-  it("renders the Adminer link and validates its URL", () => {
+  it("renders the Adminer link for PostgreSQL and validates its URL", () => {
     // Create a mock for the connectionString method
     const mockPostgresDatabase = new Database({
       id: 1,
@@ -100,10 +100,50 @@ describe("OverviewCard Component", () => {
     // Mock the connectionString method dynamically
     mockPostgresDatabase.connectionString = (username?: string) =>
       `mocked-psql-connection-string-${username}`;
-    const expectedAdminerUrl = mockPostgresDatabase.adminerUrl;
+    const expectedAdminerUrl = mockPostgresDatabase.adminUrl || "#";
 
     mount(<OverviewCard database={mockPostgresDatabase} user={mockUser} />);
     cy.get("a").contains("Adminer").should("have.attr", "href", expectedAdminerUrl);
+  });
+  it("renders the MongoDB Compass link with the credentialed connection string", () => {
+    const mockMongoDatabase = new Database({
+      id: 2,
+      name: "TestMongoDB",
+      engine: EngineType.MongoDB,
+      createdAt: new Date(),
+      userId: 456,
+    });
+
+    const mongoUser = {
+      id: 1,
+      instanceId: 2,
+      name: "TestMongoDB",
+      password: "secret",
+    };
+
+    mount(<OverviewCard database={mockMongoDatabase} user={mockUser} mongoUser={mongoUser} />);
+    cy.get("a")
+      .contains("MongoDB Compass")
+      .should(
+        "have.attr",
+        "href",
+        mockMongoDatabase.connectionString(mongoUser.name, mongoUser.password),
+      );
+    cy.get("a")
+      .contains("Download Compass")
+      .should("have.attr", "href", "https://www.mongodb.com/try/download/compass");
+  });
+  it("does not render the Compass download link for PostgreSQL", () => {
+    const mockPostgresDatabase = new Database({
+      id: 1,
+      name: "TestPostgresDB",
+      engine: EngineType.PostgreSQL,
+      createdAt: new Date(),
+      userId: 123,
+    });
+
+    mount(<OverviewCard database={mockPostgresDatabase} user={mockUser} />);
+    cy.contains("Download Compass").should("not.exist");
   });
   // Ensure the component handles cases where no database is provided
   it("handles the undefined database case correctly", () => {

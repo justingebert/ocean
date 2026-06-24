@@ -32,4 +32,13 @@ describe("config", () => {
 
     expect(config.adminerUrl).toBe("https://pg.example.test/");
   });
+
+  it("parses MongoDB TLS from runtime config before build-time env", async () => {
+    vi.stubEnv("VITE_MONGODB_TLS", "false");
+    window.__OCEAN_CONFIG__ = { mongodbTls: true };
+
+    const { config } = await import("./config");
+
+    expect(config.mongodbTls).toBe(true);
+  });
 });

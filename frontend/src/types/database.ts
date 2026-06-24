@@ -66,42 +66,53 @@ export class Database extends BaseModel {
   }
   /**
    * Generates the connection string for the database.
-   * @param psqlUsername - The PostgreSQL username (optional, required for PostgreSQL).
+   * @param username - DB user (PostgreSQL: LDAP username; MongoDB: the role/login name).
+   * @param password - MongoDB login password, embedded so the string is copy-paste ready.
    * @returns A connection string for PostgreSQL or MongoDB.
    */
-  public connectionString(psqlUsername?: string): string {
+  public connectionString(username?: string, password?: string): string {
     if (this.props.engine === EngineType.PostgreSQL) {
-      return `psql "postgresql://${psqlUsername}@${this.hostname}:${this.port}/${this.props.name}?sslmode=verify-full&sslrootcert=system"`;
+      return `psql "postgresql://${username}@${this.hostname}:${this.port}/${this.props.name}?sslmode=verify-full&sslrootcert=system"`;
     } else if (this.props.engine === EngineType.MongoDB) {
-      return `mongodb://${this.hostname}:${this.port.toString()}/?authSource=${
-        this.props.name
-      }&tls=true`;
+      const credentials =
+        username && password
+          ? `${encodeURIComponent(username)}:${encodeURIComponent(password)}@`
+          : "";
+      const tls = config.mongodbTls ? "?tls=true" : "";
+      return `mongodb://${credentials}${this.hostname}:${this.port}/${this.props.name}${tls}`;
     } else {
       const assertNever = (_: never): string => "";
       return assertNever(this.props.engine);
     }
   }
-  private buildAdminerUrl(searchParams: URLSearchParams): string {
-    const baseUrl = config.adminerUrl;
-
+  private buildUrl(baseUrl: string, searchParams?: URLSearchParams): string {
     if (!baseUrl) {
       return "";
     }
 
     try {
       const url = new URL(baseUrl);
-      searchParams.forEach((value, key) => url.searchParams.set(key, value));
+      searchParams?.forEach((value, key) => url.searchParams.set(key, value));
       return url.toString();
     } catch {
+      if (searchParams === undefined) {
+        return baseUrl;
+      }
+
       const separator = baseUrl.includes("?") ? "&" : "?";
       return `${baseUrl}${separator}${searchParams.toString()}`;
     }
   }
+
+  private buildAdminerUrl(searchParams: URLSearchParams): string {
+    return this.buildUrl(config.adminerUrl, searchParams);
+  }
+
   /**
-   * Retrieves the Adminer URL for database management.
-   * @returns The Adminer URL as a string.
+   * Retrieves the admin UI URL for database management.
+   * @returns The admin UI URL as a string.
    */
-  public get adminerUrl(): string {
+  public get adminUrl(): string {
     if (this.props.engine === EngineType.PostgreSQL) {
       const adminerServer = config.adminerPostgresqlServer || `${this.hostname}:${this.port}`;
       const searchParams = new URLSearchParams({
@@ -111,7 +122,25 @@ export class Database extends BaseModel {
 
       return this.buildAdminerUrl(searchParams);
     } else if (this.props.engine === EngineType.MongoDB) {
-      return config.adminerUrl;
+      return this.connectionString();
+    } else {
+      const assertNever = (_: never): string => "";
+      return assertNever(this.props.engine);
+    }
+  }
+
+  /**
+   * Backwards-compatible alias for existing call sites and tests.
+   */
+  public get adminerUrl(): string {
+    return this.adminUrl;
+  }
+
+  public get adminToolName(): string {
+    if (this.props.engine === EngineType.PostgreSQL) {
+      return "Adminer";
+    } else if (this.props.engine === EngineType.MongoDB) {
+      return "MongoDB Compass";
     } else {
       const assertNever = (_: never): string => "";
       return assertNever(this.props.engine);

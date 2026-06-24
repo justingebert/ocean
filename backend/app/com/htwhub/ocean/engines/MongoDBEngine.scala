@@ -64,32 +64,29 @@ class MongoDBEngine @Inject() (config: Configuration)(implicit ec: ExecutionCont
       "pwd" -> BsonString(password),
       "roles" -> BsonArray(readWriteRoleDoc)
     )
-    processCommand(databaseName, createUserDoc)
+    runDatabaseCommand(databaseName, createUserDoc)
   }
 
-  def deleteDatabase(databaseName: String): Future[Unit] = {
+  def deleteDatabase(databaseName: String): Future[Unit] =
+    for {
+      _ <- deleteAllUsers(databaseName)
+      _ <- mongoClient.getDatabase(databaseName).drop().toFuture()
+    } yield ()
+
+  def deleteUser(databaseName: String, username: String): Future[Any] =
+    runDatabaseCommand(databaseName, Document("dropUser" -> BsonString(username)))
+
+  def deleteUsers(databaseName: String, usernames: List[String]): Future[List[Any]] =
+    Future.sequence(usernames.map(deleteUser(databaseName, _)))
+
+  def deleteAllUsers(databaseName: String): Future[Any] =
+    runDatabaseCommand(databaseName, Document("dropAllUsersFromDatabase" -> BsonInt32(1)))
+
+  private def runDatabaseCommand(databaseName: String, document: Document): Future[Any] = {
     val database = mongoClient.getDatabase(databaseName)
-    database.drop().toFuture()
-  }
-
-  def deleteUser(databaseName: String, username: String): Future[Any] = {
-    val dropUserDoc = Document(
-      "dropUser" -> BsonString(username)
-    )
-    processCommand(databaseName, dropUserDoc)
-  }
-
-  def deleteUsers(databaseName: String, usernames: List[String]): Future[List[Any]] = {
-    val jobs = usernames.map(username => deleteUser(databaseName, username))
-    Future.sequence(jobs)
-  }
-
-  private def processCommand(databaseName: String, document: Document): Future[Any] = {
-    val database = mongoClient.getDatabase(databaseName)
-    // ignore bson code problem, scala dogshi.
-    database
-      .runCommand(document)
-      .toFuture()
-      .recoverWith(_ => Future.successful(true))
+    // Decode the reply into BsonDocument. The default result type would be the mutable
+    // `Document` imported above, whose codec can only encode, not decode the server reply
+    // ("The BsonCodec can only encode to Bson").
+    database.runCommand[BsonDocument](document).toFuture()
   }
 }

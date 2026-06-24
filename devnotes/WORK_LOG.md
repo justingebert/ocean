@@ -6,6 +6,20 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-06-24 Switch MongoDB UI path to Compass
+- Dropped hosted Mongo GUI entirely: DbGate leaks shared state, Adminer Mongo is too hacky, and Compass is the clean student-facing GUI.
+- Mongo users now live in their own database auth namespace, so the overview URI is a simple Compass-ready `mongodb://user:pass@host:27017/db?tls=true`.
+- Mongo VM no longer serves a web UI; production Mongo keeps `--tlsMode=requireTLS` and only exposes 27017.
+
+## 2026-06-24 evalute dbgate and adminer with claude prototypes
+- adminer kinda hacky with php plugins
+- abgate is statefuill so sesions leak to othjer users this is not good
+- mongodb compass would be the best i think
+
+## 2026-06-24 MongoDB: auto default user
+- Mongo dbs now auto-provision a default login user (named after the db) on create, so students get a copy-paste connection string instead of hand-creating a user and editing the URI.
+- Engine cleanup: Mongo command errors now propagate instead of being swallowed.
+
 ## 2026-06-22 pin deploys to commit SHA
 - Build now tags/pushes images with git commit -> better verisoning and rollback
 

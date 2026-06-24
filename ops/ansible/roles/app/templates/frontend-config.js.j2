@@ -1,4 +1,5 @@
 window.__OCEAN_CONFIG__ = {
   postgresqlHostname: {{ hostvars[groups['pg'][0]].ansible_host | to_json }},
-  mongodbHostname: {{ hostvars[groups['mongo'][0]].ansible_host | to_json }}
+  mongodbHostname: {{ hostvars[groups['mongo'][0]].ansible_host | to_json }},
+  mongodbTls: true
 };

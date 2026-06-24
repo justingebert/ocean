@@ -13,6 +13,7 @@ import com.htwhub.ocean.models.RoleId
 import com.htwhub.ocean.models.User
 import com.htwhub.ocean.models.UserId
 import com.htwhub.ocean.serializers.database.CreateDatabaseRequest
+import com.htwhub.ocean.serializers.role.CreateRoleRequest
 import com.htwhub.ocean.service.InstanceService
 import com.htwhub.ocean.service.InvitationService
 import com.htwhub.ocean.service.RoleService
@@ -38,6 +39,7 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
   val defaultUserService: UserService = mock[UserService]
   val defaultPostgreSQLEngine: PostgreSQLEngine = mock[PostgreSQLEngine]
   val defaultMongoDBEngine: MongoDBEngine = mock[MongoDBEngine]
+  val defaultRoleManager: RoleManager = mock[RoleManager]
 
   private def createDatabaseManager(
     instanceService: InstanceService = defaultInstanceService,
@@ -46,6 +48,7 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
     userService: UserService = defaultUserService,
     postgreSQLEngine: PostgreSQLEngine = defaultPostgreSQLEngine,
     mongoDBEngine: MongoDBEngine = defaultMongoDBEngine,
+    roleManager: RoleManager = defaultRoleManager,
   ): DatabaseManager =
     new DatabaseManager(
       instanceService,
@@ -53,7 +56,8 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
       invitationService,
       userService,
       postgreSQLEngine,
-      mongoDBEngine
+      mongoDBEngine,
+      roleManager
     )
 
   "DatabaseManager" when {
@@ -144,11 +148,17 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
         val postgreSQLEngine = mock[PostgreSQLEngine]
         when(postgreSQLEngine.createDatabase(any[String])).thenReturn(Future(Vector(1)))
 
+        // The default login user is provisioned by delegating to RoleManager.
+        val defaultRole = Role(RoleId(0), instance.id, instance.name, "password")
+        val roleManager = mock[RoleManager]
+        when(roleManager.addRole(any[CreateRoleRequest], any[User])).thenReturn(Future(defaultRole))
+
         val databaseManager =
           createDatabaseManager(
             instanceService = instanceService,
             postgreSQLEngine = postgreSQLEngine,
-            mongoDBEngine = mongoDBEngine
+            mongoDBEngine = mongoDBEngine,
+            roleManager = roleManager
           )
 
         // Act
@@ -159,6 +169,7 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
         futureInstance.map { actual =>
           verify(mongoDBEngine, times(1)).createDatabase(instance.name)
           verify(postgreSQLEngine, never()).createDatabase(any[String])
+          verify(roleManager, times(1)).addRole(CreateRoleRequest(instance.id.value, instance.name), user)
           actual shouldBe instance
         }
       }
@@ -229,6 +240,50 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
           verify(postgreSQLEngine, times(1)).revokeDatabaseAccessBulk(any[List[String]], any[String])
           verify(mongoDBEngine, never()).createDatabase(any[String])
           actual.isEmpty shouldBe false
+        }
+      }
+      "delete a database with engine type mongodb" in {
+        // Arrange
+
+        val user = User(UserId(1), "user", "firstName", "lastName", "mail", "unknown")
+        val instance = Instance(InstanceId(1), user.id, "mongo_docs", MongoDBSQLEngineType, Timestamp.from(Instant.now))
+        val roles: List[Role] = List(
+          Role(RoleId(1), instance.id, "mongo_docs", "password"),
+          Role(RoleId(2), instance.id, "mongo_docs_reader", "password")
+        )
+
+        val instanceService = mock[InstanceService]
+        when(instanceService.getUserInstanceById(InstanceId(anyLong()), UserId(anyLong()))).thenReturn(Future(instance))
+        when(instanceService.deleteInstance(InstanceId(anyLong()), UserId(anyLong()))).thenReturn(Future(1))
+
+        val roleService = mock[RoleService]
+        when(roleService.getRolesByInstanceId(InstanceId(anyLong()), UserId(anyLong()))).thenReturn(Future(roles))
+        when(roleService.deleteRolesByIds(any[List[RoleId]], UserId(anyLong()))).thenReturn(Future(List(1, 1)))
+
+        val mongoDBEngine = mock[MongoDBEngine]
+        when(mongoDBEngine.deleteDatabase(any[String])).thenReturn(Future(()))
+
+        val postgreSQLEngine = mock[PostgreSQLEngine]
+        when(postgreSQLEngine.deleteDatabase(any[String])).thenReturn(Future(Vector(1)))
+
+        val databaseManager =
+          createDatabaseManager(
+            instanceService = instanceService,
+            roleService = roleService,
+            postgreSQLEngine = postgreSQLEngine,
+            mongoDBEngine = mongoDBEngine,
+          )
+
+        // Act
+        val futureReturn = databaseManager.deleteDatabase(instance.id, user)
+
+        // Assert
+        futureReturn.map { actual =>
+          verify(mongoDBEngine, times(1)).deleteDatabase(instance.name)
+          verify(roleService, times(1)).deleteRolesByIds(List(RoleId(1), RoleId(2)), user.id)
+          verify(instanceService, times(1)).deleteInstance(instance.id, user.id)
+          verify(postgreSQLEngine, never()).deleteDatabase(any[String])
+          actual shouldBe List(1, 1, 1)
         }
       }
     }

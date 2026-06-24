@@ -195,7 +195,13 @@ const DatabaseDetailView: React.FC = () => {
    */
   const renderTabContent = (): React.ReactNode => {
     if (activeId === 1) {
-      return <OverviewCard database={database ? new Database(database) : undefined} user={user} />;
+      return (
+        <OverviewCard
+          database={database ? new Database(database) : undefined}
+          user={user}
+          mongoUser={roles?.find((role) => role.name === database?.name)}
+        />
+      );
     } else if (activeId === 2) {
       return (
         <div className="mt-6">

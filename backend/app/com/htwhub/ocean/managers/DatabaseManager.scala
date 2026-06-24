@@ -8,9 +8,11 @@ import com.htwhub.ocean.models.Instance
 import com.htwhub.ocean.models.Instance.MongoDBSQLEngineType
 import com.htwhub.ocean.models.Instance.PostgreSQLEngineType
 import com.htwhub.ocean.models.InstanceId
+import com.htwhub.ocean.models.Role
 import com.htwhub.ocean.models.User
 import com.htwhub.ocean.serializers.database.AvailabilityDatabaseRequest
 import com.htwhub.ocean.serializers.database.CreateDatabaseRequest
+import com.htwhub.ocean.serializers.role.CreateRoleRequest
 import com.htwhub.ocean.service.exceptions.ServiceException
 import com.htwhub.ocean.service.InstanceService
 import com.htwhub.ocean.service.InvitationService
@@ -29,7 +31,8 @@ class DatabaseManager @Inject() (
   invitationService: InvitationService,
   userService: UserService,
   postgreSQLEngine: PostgreSQLEngine,
-  mongoDBEngine: MongoDBEngine
+  mongoDBEngine: MongoDBEngine,
+  roleManager: RoleManager
 )(implicit
   ec: ExecutionContext
 ) {
@@ -70,7 +73,7 @@ class DatabaseManager @Inject() (
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
       _ <- instance match {
         case value: Instance if value.engine == PostgreSQLEngineType => addDatabaseForPostgreSQL(value, user)
-        case value: Instance if value.engine == MongoDBSQLEngineType => addDatabaseForMongoDB(value)
+        case value: Instance if value.engine == MongoDBSQLEngineType => addDatabaseForMongoDB(value, user)
       }
     } yield instance
   }
@@ -92,12 +95,15 @@ class DatabaseManager @Inject() (
 
     } yield job1.toList ++ job2.toList ++ job3.toList ++ job4.toList
 
-  def addDatabaseForMongoDB(instance: Instance): Future[Unit] =
+  def addDatabaseForMongoDB(instance: Instance, user: User): Future[Role] =
     for {
-      job1 <- mongoDBEngine
+      _ <- mongoDBEngine
         .createDatabase(instance.name)
         .recoverWith { t: Throwable => internalError(t.getMessage) }
-    } yield job1
+      // Auto-provision the default login user (named after the database) so students get
+      // a ready-to-use connection string without manually creating a Mongo user first.
+      role <- roleManager.addRole(CreateRoleRequest(instance.id.value, instance.name), user)
+    } yield role
 
   def deleteDatabase(instanceId: InstanceId, user: User): Future[List[Int]] =
     for {
@@ -165,10 +171,15 @@ class DatabaseManager @Inject() (
 
   def deleteDatabaseForMongoDB(instance: Instance, user: User): Future[List[Int]] =
     for {
-      job1 <- deleteRolesForMongoDB(instance, user)
+      roles <- roleService
+        .getRolesByInstanceId(instance.id, user.id)
+        .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
       _ <- mongoDBEngine
         .deleteDatabase(instance.name)
         .recoverWith { t: Throwable => internalError(t.getMessage) }
+      job1 <- roleService
+        .deleteRolesByIds(roles.map(_.id).toList, user.id)
+        .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
       job3 <- instanceService
         .deleteInstance(instance.id, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
@@ -178,12 +189,13 @@ class DatabaseManager @Inject() (
     for {
       roles <- roleService
         .getRolesByInstanceId(instance.id, user.id)
+        .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+      _ <- mongoDBEngine
+        .deleteUsers(instance.name, roles.map(_.name).toList)
+        .recoverWith { t: Throwable => internalError(t.getMessage) }
       job1 <- roleService
         .deleteRolesByIds(roles.map(_.id).toList, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      job2 <- mongoDBEngine
-        .deleteUsers(instance.name, roles.map(_.name).toList)
-        .recoverWith { t: Throwable => internalError(t.getMessage) }
     } yield job1
 
   def serviceErrorMapper(exception: ServiceException): Future[Nothing] = {

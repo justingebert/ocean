@@ -1,24 +1,29 @@
 import React from "react";
 import { Database } from "../types/database";
 import { UserProperties } from "../types/user";
+import { RoleProperties } from "../types/role";
 import { getDatabaseEngineTitle } from "./DatabaseList/databaseListFormat";
 import { EngineType } from "../types/engine";
+
+const MONGODB_COMPASS_DOWNLOAD_URL = "https://www.mongodb.com/try/download/compass";
 
 export interface OverviewCardProps {
   /** The database object containing its details (optional). */
   database?: Database;
   /** The user object associated with the database (optional). */
   user?: UserProperties;
+  /** The default MongoDB login role, used to build a credentialed connection string. */
+  mongoUser?: RoleProperties;
 }
 /**
  * Renders an overview card displaying database details.
  * - Displays database name, hostname, port, engine type, and connection string.
- * - Provides an option to copy the connection string and open Adminer.
+ * - Provides an option to copy the connection string and open the database admin UI.
  *
  * @param database - The database object containing details.
  * @param user - The user object to personalize the connection string.
  */
-const OverviewCard: React.FC<OverviewCardProps> = ({ database, user }) => {
+const OverviewCard: React.FC<OverviewCardProps> = ({ database, user, mongoUser }) => {
   /**
    * Retrieves the appropriate connection string based on the database engine.
    *
@@ -28,7 +33,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({ database, user }) => {
     if (database?.engine === EngineType.PostgreSQL) {
       return database.connectionString(user?.username || "");
     } else if (database?.engine === EngineType.MongoDB) {
-      return database.connectionString() || "";
+      return database.connectionString(mongoUser?.name, mongoUser?.password) || "";
     } else if (database === undefined) {
       return "..";
     } else {
@@ -36,6 +41,16 @@ const OverviewCard: React.FC<OverviewCardProps> = ({ database, user }) => {
       return assertNever(database?.engine);
     }
   };
+
+  const getAdminToolUrl = (): string => {
+    if (database?.engine === EngineType.MongoDB) {
+      return getEngineConnectionString();
+    }
+
+    return database?.adminUrl || "#";
+  };
+
+  const shouldShowMongoCompassDownload = database?.engine === EngineType.MongoDB;
 
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -93,13 +108,25 @@ const OverviewCard: React.FC<OverviewCardProps> = ({ database, user }) => {
                       Strg-C
                     </button>
                     <a
-                      href={database.adminerUrl || "#"}
+                      href={getAdminToolUrl()}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="border border-gray-200 rounded px-2 text-sm font-sans font-medium text-gray-400 hover:border-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
-                      Adminer
+                      {database.adminToolName}
                     </a>
+                    {shouldShowMongoCompassDownload && (
+                      <span className="ml-2 text-sm text-gray-500">
+                        <a
+                          href={MONGODB_COMPASS_DOWNLOAD_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-indigo-600 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                          Download Compass
+                        </a>
+                      </span>
+                    )}
                   </div>
                 </div>
               </dd>

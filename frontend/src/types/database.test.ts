@@ -11,6 +11,7 @@ describe("Database", () => {
     vi.stubEnv("VITE_POSTGRESQL_PORT", "5555");
     vi.stubEnv("VITE_MONGODB_HOSTNAME", "localhost");
     vi.stubEnv("VITE_MONGODB_PORT", "27017");
+    vi.stubEnv("VITE_MONGODB_TLS", "true");
   });
 
   afterEach(() => {
@@ -25,6 +26,20 @@ describe("Database", () => {
       id: 1,
       name,
       engine: EngineType.PostgreSQL,
+      createdAt: new Date(),
+      userId: 1,
+    };
+
+    return new Database(props);
+  };
+
+  const createMongoDatabase = async (name = "customer_docs") => {
+    vi.resetModules();
+    const { Database } = await import("./database");
+    const props: DatabaseProperties = {
+      id: 2,
+      name,
+      engine: EngineType.MongoDB,
       createdAt: new Date(),
       userId: 1,
     };
@@ -56,6 +71,42 @@ describe("Database", () => {
 
     expect(database.adminerUrl).toBe(
       "http://localhost:8080/?pgsql=pg_cluster%3A5432&db=customer_db",
+    );
+  });
+
+  it("uses MongoDB Compass as the MongoDB admin tool", async () => {
+    const database = await createMongoDatabase();
+
+    expect(database.adminToolName).toBe("MongoDB Compass");
+    expect(database.adminUrl).toBe("mongodb://localhost:27017/customer_docs?tls=true");
+  });
+
+  it("uses Adminer as the PostgreSQL admin UI", async () => {
+    const database = await createPostgresDatabase();
+
+    expect(database.adminToolName).toBe("Adminer");
+  });
+
+  it("builds a MongoDB connection string with embedded credentials and database auth", async () => {
+    const database = await createMongoDatabase("customer_docs");
+
+    expect(database.connectionString("customer_docs", "s3cret")).toBe(
+      "mongodb://customer_docs:s3cret@localhost:27017/customer_docs?tls=true",
+    );
+  });
+
+  it("omits credentials from the MongoDB connection string when the login is unknown", async () => {
+    const database = await createMongoDatabase("customer_docs");
+
+    expect(database.connectionString()).toBe("mongodb://localhost:27017/customer_docs?tls=true");
+  });
+
+  it("drops tls from the MongoDB connection string when TLS is disabled", async () => {
+    vi.stubEnv("VITE_MONGODB_TLS", "false");
+    const database = await createMongoDatabase("customer_docs");
+
+    expect(database.connectionString("customer_docs", "s3cret")).toBe(
+      "mongodb://customer_docs:s3cret@localhost:27017/customer_docs",
     );
   });
 });
