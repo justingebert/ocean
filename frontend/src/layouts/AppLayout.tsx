@@ -150,11 +150,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) =
               </TransitionChild>
 
               <div className="flex-shrink-0 flex items-center px-4">
-                <img
-                  className="h-8 w-auto"
-                  src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Logo_HTW_Berlin.svg"
-                  alt="HTW logo"
-                />
+                <img className="h-8 w-auto" src="/ocean-logo.png" alt="Ocean logo" />
               </div>
               {/* Sidebar Navigation */}
               <nav
@@ -223,11 +219,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) =
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-col flex-grow bg-cyan-700 pt-5 pb-4 overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
-              <img
-                className="h-8 w-auto self"
-                src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Logo_HTW_Berlin.svg"
-                alt="HTW logo"
-              />
+              <img className="h-8 w-auto self" src="/ocean-logo.png" alt="HTW logo" />
             </div>
             <nav
               className="mt-5 flex-1 flex flex-col divide-y divide-cyan-800 overflow-y-auto"
