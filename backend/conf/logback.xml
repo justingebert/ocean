@@ -10,6 +10,8 @@
     </encoder>
   </appender>
 
+  <logger name="org.apache.directory" level="WARN"/>
+
   <root level="INFO">
     <appender-ref ref="STDOUT"/>
   </root>
