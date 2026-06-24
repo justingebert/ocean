@@ -26,7 +26,7 @@ const env = import.meta.env;
 
 const postgresqlHostname = runtimeConfig.postgresqlHostname || env.VITE_POSTGRESQL_HOSTNAME || "";
 const mongodbHostname = runtimeConfig.mongodbHostname || env.VITE_MONGODB_HOSTNAME || "";
-const mongodbTls = runtimeConfig.mongodbTls ?? (env.VITE_MONGODB_TLS?.toLowerCase() !== "false");
+const mongodbTls = runtimeConfig.mongodbTls ?? env.VITE_MONGODB_TLS?.toLowerCase() !== "false";
 
 export const config: OceanConfig = {
   apiUrl: env.VITE_API_URL || "/v1",
