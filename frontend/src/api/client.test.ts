@@ -72,8 +72,12 @@ describe("Axios Client (Real Axios)", () => {
 
   // Validate decodeJwt() safely handles null input without breaking
   it("should return null if token is null", () => {
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
     const result = decodeJwt(null as unknown as string);
     expect(result).toBeNull();
+
+    consoleErrorSpy.mockRestore();
   });
 
   // Test that setBearerToken() correctly updates axios Authorization header

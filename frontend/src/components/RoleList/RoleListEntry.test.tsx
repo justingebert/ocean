@@ -17,7 +17,13 @@ describe("RoleListEntry Component", () => {
       onDelete: mockOnDelete,
       ...props,
     };
-    return render(<RoleListEntry {...defaultProps} />);
+    return render(
+      <table>
+        <tbody>
+          <RoleListEntry {...defaultProps} />
+        </tbody>
+      </table>,
+    );
   };
   // Ensure the component renders the role name and the "show" button while hiding the password initially
   it('renders the role name and "show" button initially', () => {

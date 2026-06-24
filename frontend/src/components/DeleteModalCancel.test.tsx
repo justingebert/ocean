@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { describe, it, expect, vi } from "vitest";
 import DeleteModal, { DeleteModalProps } from "./DeleteModal";
@@ -24,14 +25,16 @@ describe("DeleteModal Cancel Button", () => {
     return render(<DeleteModal {...defaultProps} {...props} />);
   };
   // Ensure clicking the cancel button triggers the onClose function
-  it("calls onClose when cancel button is clicked", () => {
+  it("calls onClose when cancel button is clicked", async () => {
+    const user = userEvent.setup();
     // Create a mock function to track calls to onClose
     const onCloseMock = vi.fn();
     renderComponent({ onClose: onCloseMock });
     // Locate the cancel button inside the modal
     const cancelButton = screen.getByText(modalContent.cancelText);
-    // Simulate clicking the cancel button
-    fireEvent.click(cancelButton);
+
+    await user.click(cancelButton);
+
     // Verify that onClose was called exactly once
     expect(onCloseMock).toHaveBeenCalledTimes(1);
   });

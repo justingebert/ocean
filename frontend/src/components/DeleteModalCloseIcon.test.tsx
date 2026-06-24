@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { describe, it, expect, vi } from "vitest";
 import DeleteModal, { DeleteModalProps } from "./DeleteModal";
@@ -24,14 +25,16 @@ describe("DeleteModal Close Icon", () => {
     return render(<DeleteModal {...defaultProps} {...props} />);
   };
   // Ensure clicking the close icon triggers the onClose function
-  it("calls onClose when the close icon is clicked", () => {
+  it("calls onClose when the close icon is clicked", async () => {
+    const user = userEvent.setup();
     // Create a mock function to track calls to onClose
     const onCloseMock = vi.fn();
     renderComponent({ onClose: onCloseMock });
     // Locate the close icon button inside the modal
     const closeButton = screen.getByRole("button", { name: /close/i });
-    // Simulate clicking the close icon
-    fireEvent.click(closeButton);
+
+    await user.click(closeButton);
+
     // Verify that onClose was called exactly once
     expect(onCloseMock).toHaveBeenCalledTimes(1);
   });

@@ -22,7 +22,13 @@ vi.mock("../../../types/user", () => ({
 describe("InvitationListEntry Component", () => {
   // Helper function to render the InvitationListEntry component with provided props
   const renderComponent = (props: InvitationListEntryProps) =>
-    render(<InvitationListEntry {...props} />);
+    render(
+      <table>
+        <tbody>
+          <InvitationListEntry {...props} />
+        </tbody>
+      </table>,
+    );
   // Ensure that the invited user's details are displayed correctly
   it("renders the invited user's details", () => {
     renderComponent({ invitedUser: mockInvitedUser });

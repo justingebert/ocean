@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { describe, it, expect, vi } from "vitest";
 import DeleteModal, { DeleteModalProps } from "./DeleteModal";
@@ -24,14 +25,16 @@ describe("DeleteModal Submit Button", () => {
     return render(<DeleteModal {...defaultProps} {...props} />);
   };
   // Ensure clicking the delete button triggers the onSubmit function
-  it("calls onSubmit when delete button is clicked", () => {
+  it("calls onSubmit when delete button is clicked", async () => {
+    const user = userEvent.setup();
     // Create a mock function to track calls to onSubmit
     const onSubmitMock = vi.fn();
     renderComponent({ onSubmit: onSubmitMock });
     // Locate the delete button inside the modal
     const deleteButton = screen.getByText(modalContent.submitText);
-    // Simulate clicking the delete button
-    fireEvent.click(deleteButton);
+
+    await user.click(deleteButton);
+
     // Verify that onSubmit was called exactly once
     expect(onSubmitMock).toHaveBeenCalledTimes(1);
   });

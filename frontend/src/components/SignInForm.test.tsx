@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import SignInForm from "./SignInForm";
 
@@ -77,13 +78,13 @@ describe("<SignInForm />", () => {
 
   // Ensure the component does not break when onSubmit is not provided
   it("does not throw an error if onSubmit is not provided", async () => {
+    const user = userEvent.setup();
+
     render(<SignInForm />);
 
     fireEvent.change(screen.getByLabelText(/username/i), { target: { value: "testuser" } });
     fireEvent.change(screen.getByLabelText(/password/i), { target: { value: "password123" } });
-    // Simulate clicking the sign-in button without an onSubmit function
-    fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
 
-    // No assertion needed: The test passes if no error is thrown
+    await user.click(screen.getByRole("button", { name: /sign in/i }));
   });
 });

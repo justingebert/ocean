@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import CreateRoleForm, { CreateRoleFormProps } from "./CreateRoleForm";
 import { EngineType } from "../../types/engine";
@@ -59,10 +60,13 @@ describe("CreateRoleForm", () => {
     });
   });
   // Ensure clicking the cancel button triggers the onClose function
-  it("calls onClose when cancel button is clicked", () => {
+  it("calls onClose when cancel button is clicked", async () => {
+    const user = userEvent.setup();
+
     render(<CreateRoleForm {...defaultProps} />);
-    // Simulate clicking the Cancel button
-    fireEvent.click(screen.getByText(/cancel/i));
+
+    await user.click(screen.getByText(/cancel/i));
+
     // Verify that the onClose function was triggered
     expect(mockOnClose).toHaveBeenCalled();
   });
