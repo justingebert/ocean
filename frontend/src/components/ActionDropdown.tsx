@@ -48,10 +48,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({ onDelete }) => {
                       )}
                       onClick={() => onDelete && onDelete()}
                     >
-                      <TrashIcon
-                        className="mr-3 h-5 w-5 text-destructive"
-                        aria-hidden="true"
-                      />
+                      <TrashIcon className="mr-3 h-5 w-5 text-destructive" aria-hidden="true" />
                       Delete
                     </div>
                   )}

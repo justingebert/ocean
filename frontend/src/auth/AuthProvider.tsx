@@ -1,9 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { setBearerToken, setupRequestInterceptors } from "../api/client";
@@ -11,11 +6,7 @@ import { SessionApi } from "../api/sessionApi";
 import { UserClient } from "../api/userClient";
 import { CredentialProperties } from "../types/models";
 import { AuthContext, AuthStatus } from "./authContext";
-import {
-  clearStoredTokens,
-  getStoredAccessToken,
-  storeTokens,
-} from "./tokenStorage";
+import { clearStoredTokens, getStoredAccessToken, storeTokens } from "./tokenStorage";
 
 type AuthProviderProps = {
   children: React.ReactNode;
