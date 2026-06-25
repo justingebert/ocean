@@ -5,7 +5,7 @@ import { CheckCircleIcon, ArrowPathIcon, NoSymbolIcon } from "@heroicons/react/2
 
 import { engineOptions } from "../../constants/engines";
 import { UpstreamDatabaseProperties } from "../../types/database";
-import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
+import { DatabaseClient } from "../../api/databaseClient";
 import { Alert } from "../Feedback/Alert/Alert";
 import Headline from "../Headline";
 import { Button } from "../ui/button";
@@ -51,11 +51,8 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
         name: name,
         engine: engine as EngineTypeValues,
       };
-      const response = await DatabaseClient.availabilityDatabase(payload);
       try {
-        const { availability } = DatabaseValidation.availabilityDatabaseSchema.validateSync(
-          response.data,
-        );
+        const availability = await DatabaseClient.availabilityDatabase(payload);
         if (availability) {
           return true;
         }

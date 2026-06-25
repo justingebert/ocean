@@ -1,18 +1,12 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import CreateDatabaseForm, { CreateDatabaseFormProps } from "./CreateDatabaseForm";
-import { AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
+import { DatabaseClient } from "../../api/databaseClient";
 import { EngineType } from "../../types/engine";
 
 vi.mock("../../api/databaseClient", () => ({
   DatabaseClient: {
-    availabilityDatabase: vi.fn(() => Promise.resolve({ data: { availability: true } })),
-  },
-  DatabaseValidation: {
-    availabilityDatabaseSchema: {
-      validateSync: vi.fn(() => ({ availability: true })),
-    },
+    availabilityDatabase: vi.fn(() => Promise.resolve(true)),
   },
 }));
 
@@ -68,21 +62,7 @@ describe("CreateDatabaseForm", () => {
   });
 
   it("validateDatabaseValues returns true when availability is true", async () => {
-    const mockResponse: AxiosResponse = {
-      data: { availability: false },
-      status: 200,
-      statusText: "OK",
-      headers: {},
-      config: {
-        headers: {},
-      } as InternalAxiosRequestConfig,
-    };
-
-    const spyApi = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(mockResponse);
-
-    const spyValidation = vi
-      .spyOn(DatabaseValidation.availabilityDatabaseSchema, "validateSync")
-      .mockImplementation(() => ({ availability: true }));
+    const spyApi = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(true);
 
     render(<CreateDatabaseForm {...defaultProps} />);
 
@@ -96,11 +76,8 @@ describe("CreateDatabaseForm", () => {
         name: "valid_name",
         engine: EngineType.PostgreSQL,
       });
-
-      expect(spyValidation).toHaveBeenCalledWith(mockResponse.data);
     });
 
     spyApi.mockRestore();
-    spyValidation.mockRestore();
   });
 });

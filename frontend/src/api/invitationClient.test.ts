@@ -76,7 +76,7 @@ describe("InvitationClient", () => {
 
       const result = await InvitationClient.deleteInvitationForDatabase(1);
       expect(axiosInstance.delete).toHaveBeenCalledWith("/invitations/1");
-      expect(result).toEqual(mockResponse);
+      expect(result).toBeUndefined();
     });
 
     it("should handle errors gracefully", async () => {

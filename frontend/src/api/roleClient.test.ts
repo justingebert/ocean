@@ -47,20 +47,19 @@ describe("RoleClient Tests", () => {
       permissions: ["read"],
       instanceId: 1,
     };
-    const mockResponse = { available: true };
+    const mockResponse = { availability: true };
 
     mockAxios.onPost("/roles/_availability_").reply(200, mockResponse);
 
-    const response = await RoleClient.availabilityRoleForDatabase(mockRole);
+    const availability = await RoleClient.availabilityRoleForDatabase(mockRole);
 
-    expect(response.status).toBe(200);
-    expect(response.data).toEqual(mockResponse);
+    expect(availability).toBe(true);
 
     expect(mockAxios.history.post[0].url).toBe("/roles/_availability_");
     expect(JSON.parse(mockAxios.history.post[0].data)).toEqual(mockRole);
   });
 
-  it("should delete a role by ID and return the response data", async () => {
+  it("should delete a role by ID", async () => {
     const roleId = 3;
     const mockResponse = { success: true };
 
@@ -68,7 +67,7 @@ describe("RoleClient Tests", () => {
 
     const response = await RoleClient.deleteRoleForDatabase(roleId);
 
-    expect(response).toEqual(mockResponse);
+    expect(response).toBeUndefined();
 
     expect(mockAxios.history.delete[0].url).toBe(`/roles/${roleId}`);
   });

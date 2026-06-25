@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { DatabasesNavigation } from "../../constants/menu.ts";
 import { getDatabaseCreatedAt, getDatabaseEngineTitle } from "./databaseListFormat";
 import { DatabaseProperties } from "../../types/database";
-import { CircleStackIcon } from "@heroicons/react/24/outline";
+import DatabaseEngineLogo from "./DatabaseEngineLogo";
 
 interface DesktopDatabaseListEntryProps {
   database: DatabaseProperties;
@@ -24,10 +24,7 @@ const DesktopDatabaseListEntry: React.FC<DesktopDatabaseListEntryProps> = ({
             to={DatabasesNavigation.to}
             className="group inline-flex space-x-2 truncate text-sm"
           >
-            <CircleStackIcon
-              className="flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-gray-500"
-              aria-hidden="true"
-            />
+            <DatabaseEngineLogo className="h-5 w-5" engine={database.engine} />
             <p className="text-gray-500 truncate group-hover:text-gray-900">{database.name}</p>
           </Link>
         </div>

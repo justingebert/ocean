@@ -18,8 +18,7 @@ export class InvitationClient {
     return data;
   };
 
-  public static deleteInvitationForDatabase = async (id: number) => {
-    const { data } = await axiosInstance.delete<unknown>(`/invitations/${id.toString()}`);
-    return data;
+  public static deleteInvitationForDatabase = async (id: number): Promise<void> => {
+    await axiosInstance.delete(`/invitations/${id.toString()}`);
   };
 }

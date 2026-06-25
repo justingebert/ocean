@@ -7,6 +7,10 @@ interface AvailabilityResponse {
   availability: boolean;
 }
 
+const existsRoleForDatabaseSchema: yup.ObjectSchema<AvailabilityResponse> = yup.object({
+  availability: yup.boolean().required(),
+});
+
 export class RoleClient {
   public static getRolesForDatabase = async (databaseId: number): Promise<RoleProperties[]> => {
     const { data } = await axiosInstance.get<RoleProperties[]>(
@@ -22,17 +26,15 @@ export class RoleClient {
     return data;
   };
 
-  public static availabilityRoleForDatabase = (role: UpstreamCreateRoleProperties) =>
-    axiosInstance.post<AvailabilityResponse>("/roles/_availability_", role);
+  public static availabilityRoleForDatabase = async (
+    role: UpstreamCreateRoleProperties,
+  ): Promise<boolean> => {
+    const { data } = await axiosInstance.post<AvailabilityResponse>("/roles/_availability_", role);
 
-  public static deleteRoleForDatabase = async (id: number) => {
-    const { data } = await axiosInstance.delete<unknown>(`/roles/${id.toString()}`);
-    return data;
+    return existsRoleForDatabaseSchema.validateSync(data).availability;
   };
-}
 
-export class RoleValidation {
-  public static existsRoleForDatabaseSchema = yup.object().shape({
-    availability: yup.boolean().required(),
-  });
+  public static deleteRoleForDatabase = async (id: number): Promise<void> => {
+    await axiosInstance.delete(`/roles/${id.toString()}`);
+  };
 }

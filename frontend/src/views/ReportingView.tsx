@@ -49,11 +49,11 @@ const ReportingView: React.FC = () => {
     const result: IStats[] = [];
     if (metrics) {
       result.push({
-        name: "Total Databases",
+        name: "Databases",
         value: metrics.totalInstances.toLocaleString(),
       });
       result.push({
-        name: "Total Users",
+        name: "Users",
         value: metrics.totalUsers.toLocaleString(),
       });
     }
@@ -77,7 +77,6 @@ const ReportingView: React.FC = () => {
   const renderMetrics = (): React.ReactElement => {
     return (
       <div>
-        <h2 className="mt-5 text-2xl leading-6 font-medium text-gray-900">Metrics: Total</h2>
         <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {getStats().map((item, index) => (
             <Stats key={index} name={item.name} value={item.value} />
@@ -90,7 +89,7 @@ const ReportingView: React.FC = () => {
   const renderDatabases = (): React.ReactElement => {
     return (
       <div>
-        <h2 className="mt-10 text-2xl leading-6 font-medium text-gray-900">All Databases</h2>
+        <h2 className="mt-10 text-2xl leading-6 font-medium">Databases</h2>
         <DatabaseAdminList
           databases={databases}
           onDelete={(database) => deleteDatabaseWithPermissionMutation.mutate(database.id)}
@@ -102,7 +101,7 @@ const ReportingView: React.FC = () => {
   const renderUsers = (): React.ReactElement => {
     return (
       <div>
-        <h2 className="mt-10 text-2xl leading-6 font-medium text-gray-900">All Users</h2>
+        <h2 className="mt-10 text-2xl leading-6 font-medium">Users</h2>
         <UserAdminList users={users} />
       </div>
     );

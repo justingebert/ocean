@@ -85,13 +85,13 @@ describe("DatabaseClient", () => {
     };
 
     (axiosInstance.post as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      data: { available: true },
+      data: { availability: true },
     });
 
     const result = await DatabaseClient.availabilityDatabase(databaseCheck);
 
     expect(axiosInstance.post).toHaveBeenCalledWith("/databases/_availability_", databaseCheck);
-    expect(result).toEqual({ data: { available: true } });
+    expect(result).toBe(true);
   });
 
   it("deletes a database by ID", async () => {
@@ -102,7 +102,7 @@ describe("DatabaseClient", () => {
     const result = await DatabaseClient.deleteDatabase(1);
 
     expect(axiosInstance.delete).toHaveBeenCalledWith("/databases/1");
-    expect(result).toEqual({ success: true });
+    expect(result).toBeUndefined();
   });
 
   it("deletes a database with additional permissions", async () => {
@@ -113,6 +113,6 @@ describe("DatabaseClient", () => {
     const result = await DatabaseClient.deleteDatabaseWithPermission(1);
 
     expect(axiosInstance.delete).toHaveBeenCalledWith("/databases/1/_permission_");
-    expect(result).toEqual({ success: true });
+    expect(result).toBeUndefined();
   });
 });

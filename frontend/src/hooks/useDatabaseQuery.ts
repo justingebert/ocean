@@ -15,7 +15,7 @@ export const useDatabasesQuery = (options?: UseQueryOptions<ReadonlyArray<Databa
 };
 
 export const useDeleteDatabaseWithPermissionMutation = (
-  options?: Omit<UseMutationOptions<unknown, Error, number>, "mutationFn">,
+  options?: Omit<UseMutationOptions<void, Error, number>, "mutationFn">,
 ) => {
   return useMutation({
     mutationFn: async (variables: number) => {

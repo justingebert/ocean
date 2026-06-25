@@ -7,6 +7,10 @@ interface AvailabilityResponse {
   availability: boolean;
 }
 
+const availabilityDatabaseSchema: yup.ObjectSchema<AvailabilityResponse> = yup.object({
+  availability: yup.boolean().required(),
+});
+
 export class DatabaseClient {
   public static getAllDatabases = async (): Promise<DatabaseProperties[]> => {
     const { data } = await axiosInstance.get<DatabaseProperties[]>("/databases/_all_");
@@ -30,24 +34,22 @@ export class DatabaseClient {
     return data;
   };
 
-  public static availabilityDatabase = (database: UpstreamDatabaseProperties) =>
-    axiosInstance.post<AvailabilityResponse>("/databases/_availability_", database);
-
-  public static deleteDatabase = async (id: number) => {
-    const { data } = await axiosInstance.delete<unknown>(`/databases/${id.toString()}`);
-    return data;
-  };
-
-  public static deleteDatabaseWithPermission = async (id: number) => {
-    const { data } = await axiosInstance.delete<unknown>(
-      `/databases/${id.toString()}/_permission_`,
+  public static availabilityDatabase = async (
+    database: UpstreamDatabaseProperties,
+  ): Promise<boolean> => {
+    const { data } = await axiosInstance.post<AvailabilityResponse>(
+      "/databases/_availability_",
+      database,
     );
-    return data;
-  };
-}
 
-export class DatabaseValidation {
-  public static availabilityDatabaseSchema = yup.object().shape({
-    availability: yup.boolean().required(),
-  });
+    return availabilityDatabaseSchema.validateSync(data).availability;
+  };
+
+  public static deleteDatabase = async (id: number): Promise<void> => {
+    await axiosInstance.delete(`/databases/${id.toString()}`);
+  };
+
+  public static deleteDatabaseWithPermission = async (id: number): Promise<void> => {
+    await axiosInstance.delete(`/databases/${id.toString()}/_permission_`);
+  };
 }

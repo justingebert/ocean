@@ -56,9 +56,11 @@ describe("<DatabaseList />", () => {
 
     expect(database1Item).toBeDefined();
     expect(within(database1Item!).getByText("PostgreSQL")).toBeInTheDocument();
+    expect(within(database1Item!).getByAltText("PostgreSQL logo")).toBeInTheDocument();
 
     expect(database2Item).toBeDefined();
     expect(within(database2Item!).getByText("MongoDB")).toBeInTheDocument();
+    expect(within(database2Item!).getByAltText("MongoDB logo")).toBeInTheDocument();
 
     expect(database3Item).toBeDefined();
     expect(within(database3Item!).getByText("Unknown")).toBeInTheDocument();
@@ -84,9 +86,11 @@ describe("<DatabaseList />", () => {
 
     expect(database1Row).toBeDefined();
     expect(within(database1Row!).getByText("PostgreSQL")).toBeInTheDocument();
+    expect(within(database1Row!).getByAltText("PostgreSQL logo")).toBeInTheDocument();
 
     expect(database2Row).toBeDefined();
     expect(within(database2Row!).getByText("MongoDB")).toBeInTheDocument();
+    expect(within(database2Row!).getByAltText("MongoDB logo")).toBeInTheDocument();
 
     expect(database3Row).toBeDefined();
     expect(within(database3Row!).getByText("Unknown")).toBeInTheDocument();

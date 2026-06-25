@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { CircleStackIcon } from "@heroicons/react/24/outline";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Database } from "../../types/database";
@@ -14,6 +13,7 @@ import { InvitationClient } from "../../api/invitationClient";
 import { RoleClient } from "../../api/roleClient";
 import { UserClient } from "../../api/userClient";
 import { DatabaseClient } from "../../api/databaseClient";
+import DatabaseEngineLogo from "../../components/DatabaseList/DatabaseEngineLogo";
 import { getDatabaseEngineTitle } from "../../components/DatabaseList/databaseListFormat";
 import AppLayout from "../../layouts/AppLayout";
 import ActionDropdown from "../../components/ActionDropdown";
@@ -301,7 +301,11 @@ const DatabaseDetailView: React.FC = () => {
     <AppLayout selectedNavigation={DatabasesNavigation.name}>
       <div className="flex space-x-3 mb-4">
         <div className="flex-shrink-0">
-          <CircleStackIcon className="h-10 w-10 rounded-full text-primary" />
+          {database ? (
+            <DatabaseEngineLogo className="h-10 w-10" engine={database.engine} />
+          ) : (
+            <div className="animate-pulse h-10 w-10 rounded-full bg-gray-200" />
+          )}
         </div>
         <div className="min-w-0 flex-1">
           {database ? (

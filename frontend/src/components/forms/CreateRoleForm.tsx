@@ -4,7 +4,7 @@ import * as yup from "yup";
 
 import { DatabaseProperties } from "../../types/database";
 import { UpstreamCreateRoleProperties } from "../../types/role";
-import { RoleClient, RoleValidation } from "../../api/roleClient";
+import { RoleClient } from "../../api/roleClient";
 import { Button } from "../ui/button";
 
 export interface CreateRoleFormProps {
@@ -32,11 +32,8 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
         roleName: `${database.name}_${roleName}`,
         instanceId: database.id,
       };
-      const response = await RoleClient.availabilityRoleForDatabase(payload);
       try {
-        const { availability } = RoleValidation.existsRoleForDatabaseSchema.validateSync(
-          response.data,
-        );
+        const availability = await RoleClient.availabilityRoleForDatabase(payload);
         if (availability) {
           return true;
         }
