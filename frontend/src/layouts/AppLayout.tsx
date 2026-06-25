@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { useAppDispatch } from "../redux/hooks";
-import { logout } from "../redux/slices/session/sessionSlice";
+import { useAuth } from "../auth/authContext";
 import { navigation } from "../constants/menu.ts";
 import { UserClient } from "../api/userClient";
 import { getNavigationForUser, getNavigationSection } from "./utils.ts";
@@ -11,7 +10,6 @@ import { TopBar } from "./TopBar.tsx";
 
 export interface AppLayoutProps {
   children: React.ReactNode;
-
   selectedNavigation: string;
 }
 
@@ -23,11 +21,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) =
   });
 
   const user = userQuery.data;
-  const dispatch = useAppDispatch();
+  const { logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const onLogout = () => {
-    dispatch(logout());
+    logout();
   };
 
   const navigationWithPermission = getNavigationForUser(user);

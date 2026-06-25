@@ -3,8 +3,7 @@ import { mount } from "cypress/react";
 import AppLayout, { AppLayoutProps } from "./AppLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router } from "react-router-dom";
-import { Provider } from "react-redux";
-import { store } from "../redux/store";
+import { AuthProvider } from "../auth/AuthProvider";
 import { navigation, SettingsNavigation } from "../constants/menu";
 
 const queryClient = new QueryClient();
@@ -19,15 +18,16 @@ describe("AppLayout Tests", () => {
 
   beforeEach(() => {
     cy.intercept("GET", "/v1/user", { body: mockUser }).as("getUser");
+    localStorage.setItem("accessToken", "test-access-token");
 
     mount(
-      <Provider store={store}>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
           <Router>
             <AppLayout {...defaultProps} />
           </Router>
-        </QueryClientProvider>
-      </Provider>,
+        </AuthProvider>
+      </QueryClientProvider>,
     );
   });
 

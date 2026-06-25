@@ -1,7 +1,8 @@
 import React, { Suspense } from "react";
 import { BrowserRouter as Router, Route, Navigate, Routes, Outlet } from "react-router-dom";
-import { useAppSelector } from "../redux/hooks";
 
+import { useAuth } from "../auth/authContext";
+import { AuthLoadingScreen } from "../components/AuthLoadingScreen";
 import SignInView from "./SignInView";
 import LoadingView from "./LoadingView";
 
@@ -15,13 +16,20 @@ const FAQView = React.lazy(() => import("./FAQView"));
 const PageNotFoundView = React.lazy(() => import("./PageNotFoundView"));
 
 const RootView: React.FC = () => {
-  const { isLoggedIn } = useAppSelector((state) => state.session.session);
+  const { status } = useAuth();
+
+  if (status === "checking") {
+    return <AuthLoadingScreen />;
+  }
 
   return (
     <Router>
       <Suspense fallback={<LoadingView />}>
         <Routes>
-          <Route path="/" element={<Navigate to={isLoggedIn ? "/overview" : "/login"} />} />
+          <Route
+            path="/"
+            element={<Navigate to={status === "authenticated" ? "/overview" : "/login"} replace />}
+          />
 
           <Route path="/login" element={<SignInView />} />
 
@@ -48,8 +56,13 @@ const RootView: React.FC = () => {
 };
 
 const ProtectedRoute = () => {
-  const { isLoggedIn } = useAppSelector((state) => state.session.session);
-  return isLoggedIn ? <Outlet /> : <Navigate to="/login" />;
+  const { status } = useAuth();
+
+  if (status === "checking") {
+    return <AuthLoadingScreen />;
+  }
+
+  return status === "authenticated" ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 export default RootView;

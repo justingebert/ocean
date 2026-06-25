@@ -1,26 +1,24 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useAuth } from "../auth/authContext";
 import { OverviewNavigation } from "../constants/menu.ts";
 import { CredentialProperties } from "../types/models";
-import { useAppSelector, useAppDispatch } from "../redux/hooks";
-import { loginStart } from "../redux/slices/session/sessionSlice";
 
 import SignInForm from "../components/SignInForm";
 
 const SignInView: React.FC = () => {
   const navigate = useNavigate();
-  const { loading, error, isLoggedIn } = useAppSelector((state) => state.session.session);
-  const dispatch = useAppDispatch();
+  const { status, loginPending, loginError, login } = useAuth();
 
   useEffect(() => {
-    if (isLoggedIn === true) {
-      navigate(OverviewNavigation.to);
+    if (status === "authenticated") {
+      navigate(OverviewNavigation.to, { replace: true });
     }
-  }, [isLoggedIn, navigate]);
+  }, [status, navigate]);
 
   const onSubmit = (credentials: CredentialProperties) => {
-    dispatch(loginStart(credentials));
+    void login(credentials);
   };
 
   return (
@@ -30,7 +28,7 @@ const SignInView: React.FC = () => {
           Sign in to your HTW account
         </h2>
       </div>
-      <SignInForm loading={loading} errorMessage={error} onSubmit={onSubmit} />
+      <SignInForm loading={loginPending} errorMessage={loginError} onSubmit={onSubmit} />
     </div>
   );
 };

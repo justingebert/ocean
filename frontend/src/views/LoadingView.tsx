@@ -1,9 +1,9 @@
 import React from "react";
 
-import AppLayout from "../layouts/AppLayout";
+import { AuthLoadingScreen } from "../components/AuthLoadingScreen";
 
 const LoadingView: React.FC = () => {
-  return <AppLayout selectedNavigation="">LoadingView</AppLayout>;
+  return <AuthLoadingScreen />;
 };
 
 export default LoadingView;
