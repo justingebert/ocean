@@ -10,6 +10,7 @@ import {
 } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 
+import { cn } from "../../lib/utils.ts";
 import { User, UserProperties } from "../../types/user";
 
 export interface UserSelectorProps {
@@ -20,10 +21,6 @@ export interface UserSelectorProps {
   onSelect?: (value: UserProperties) => void;
 
   onDeselect?: (value: UserProperties) => void;
-}
-
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
 }
 
 const UserSelector: React.FC<UserSelectorProps> = ({
@@ -68,7 +65,7 @@ const UserSelector: React.FC<UserSelectorProps> = ({
               <ListboxOption
                 key={user.username}
                 className={({ focus }) =>
-                  classNames(
+                  cn(
                     focus ? "text-white bg-indigo-600" : "text-gray-900",
                     "cursor-default select-none relative py-2 pl-3 pr-9",
                   )
@@ -79,7 +76,7 @@ const UserSelector: React.FC<UserSelectorProps> = ({
                   <>
                     <div className="flex">
                       <span
-                        className={classNames(
+                        className={cn(
                           selectedUserIds.find((id) => id === user.id)
                             ? "font-semibold"
                             : "font-normal",
@@ -89,10 +86,7 @@ const UserSelector: React.FC<UserSelectorProps> = ({
                         {User.getDisplayName(user)}
                       </span>
                       <span
-                        className={classNames(
-                          focus ? "text-indigo-200" : "text-gray-500",
-                          "ml-2 truncate",
-                        )}
+                        className={cn(focus ? "text-indigo-200" : "text-gray-500", "ml-2 truncate")}
                       >
                         {user.username}
                       </span>
@@ -100,7 +94,7 @@ const UserSelector: React.FC<UserSelectorProps> = ({
 
                     {selectedUserIds.find((id) => id === user.id) ? (
                       <span
-                        className={classNames(
+                        className={cn(
                           focus ? "text-white" : "text-indigo-600",
                           "absolute inset-y-0 right-0 flex items-center pr-4",
                         )}

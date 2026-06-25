@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 import { StartingPoint } from "../constants/starting";
+import { cn } from "../lib/utils.ts";
 
 export interface StartingPointsProps {
   title: string;
@@ -12,10 +13,6 @@ export interface StartingPointsProps {
 }
 
 const StartingPoints: React.FC<StartingPointsProps> = ({ title, description, startingPoints }) => {
-  const classNames = (...classes: string[]): string => {
-    return classes.filter(Boolean).join(" ");
-  };
-
   return (
     <div>
       <h2 className="text-lg font-medium text-gray-900">{title}</h2>
@@ -25,7 +22,7 @@ const StartingPoints: React.FC<StartingPointsProps> = ({ title, description, sta
           <div key={itemIdx} className="flow-root">
             <div className="relative -m-2 p-2 flex items-center space-x-4 rounded-xl hover:bg-gray-50 focus-within:ring-2 focus-within:ring-indigo-500">
               <div
-                className={classNames(
+                className={cn(
                   item.background,
                   "flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-lg",
                 )}

@@ -5,8 +5,9 @@ import { Bars3CenterLeftIcon, ChevronDownIcon } from "@heroicons/react/20/solid"
 
 import CreateDropdown from "../components/CreateDropdown.tsx";
 import { SettingsNavigation } from "../constants/menu.ts";
+import { cn } from "../lib/utils.ts";
 import { UserProperties } from "../types/user.ts";
-import { classNames, getUserInitials } from "./utils.ts";
+import { getUserInitials } from "./utils.ts";
 
 type TopBarProps = {
   user: UserProperties | undefined;
@@ -75,7 +76,7 @@ function ProfileMenu({ user, loading, onLogout }: ProfileMenuProps) {
                 {({ focus }) => (
                   <Link
                     to={SettingsNavigation.to}
-                    className={classNames(focus ? "bg-accent" : "", "block px-4 py-2 text-sm")}
+                    className={cn(focus ? "bg-accent" : "", "block px-4 py-2 text-sm")}
                   >
                     Settings
                   </Link>
@@ -85,7 +86,7 @@ function ProfileMenu({ user, loading, onLogout }: ProfileMenuProps) {
                 {({ focus }) => (
                   <div
                     onClick={onLogout}
-                    className={classNames(focus ? "bg-accent" : "", "block px-4 py-2 text-sm")}
+                    className={cn(focus ? "bg-accent" : "", "block px-4 py-2 text-sm")}
                   >
                     Logout
                   </div>

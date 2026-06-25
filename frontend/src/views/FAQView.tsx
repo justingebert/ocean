@@ -4,6 +4,7 @@ import AppLayout from "../layouts/AppLayout";
 import { FAQNavigation } from "../constants/menu.ts";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { cn } from "../lib/utils.ts";
 
 const faqs = [
   {
@@ -26,10 +27,6 @@ const faqs = [
   },
 ];
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
 const FAQView: React.FC = () => {
   return (
     <AppLayout selectedNavigation={FAQNavigation.name}>
@@ -48,10 +45,7 @@ const FAQView: React.FC = () => {
                         <span className="font-medium text-gray-900">{faq.question}</span>
                         <span className="ml-6 h-7 flex items-center">
                           <ChevronDownIcon
-                            className={classNames(
-                              open ? "-rotate-180" : "rotate-0",
-                              "h-6 w-6 transform",
-                            )}
+                            className={cn(open ? "-rotate-180" : "rotate-0", "h-6 w-6 transform")}
                             aria-hidden="true"
                           />
                         </span>

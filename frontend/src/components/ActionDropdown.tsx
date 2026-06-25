@@ -3,15 +3,13 @@ import React, { Fragment } from "react";
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react";
 import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from "@heroicons/react/20/solid";
 
+import { cn } from "../lib/utils.ts";
+
 export interface ActionDropdownProps {
   onDelete?: () => void;
 }
 
 const ActionDropdown: React.FC<ActionDropdownProps> = ({ onDelete }) => {
-  const classNames = (...classes: string[]): string => {
-    return classes.filter(Boolean).join(" ");
-  };
-
   return (
     <Menu as="div" className="relative inline-block text-left">
       {({ open }) => (
@@ -44,7 +42,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({ onDelete }) => {
                 <MenuItem>
                   {({ focus }) => (
                     <div
-                      className={classNames(
+                      className={cn(
                         focus ? "bg-gray-100 text-gray-900" : "text-gray-700",
                         "group flex items-center px-4 py-2 text-sm text-red-600",
                       )}

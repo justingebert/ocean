@@ -4,7 +4,8 @@ import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/re
 import { XMarkIcon } from "@heroicons/react/20/solid";
 
 import { Navigation } from "../constants/menu.ts";
-import { classNames, getNavigationSection } from "./utils.ts";
+import { cn } from "../lib/utils.ts";
+import { getNavigationSection } from "./utils.ts";
 
 type SidebarNavigationProps = {
   primaryNavigationItems: Navigation[];
@@ -38,7 +39,7 @@ function SidebarNavigation({
     <Link
       key={item.name}
       to={item.to}
-      className={classNames(
+      className={cn(
         item.name === selectedNavigation
           ? "bg-sidebar-accent text-sidebar-accent-foreground"
           : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground",

@@ -4,9 +4,7 @@ import { Link } from "react-router-dom";
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react";
 import { ChevronDownIcon, CircleStackIcon } from "@heroicons/react/20/solid";
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
+import { cn } from "../lib/utils.ts";
 
 const CreateDropdown: React.FC = () => {
   return (
@@ -40,7 +38,7 @@ const CreateDropdown: React.FC = () => {
                     <p>
                       <Link
                         to="/databases/new"
-                        className={classNames(
+                        className={cn(
                           focus ? "bg-gray-100 text-gray-900" : "text-gray-700",
                           "group flex items-center px-4 py-2 text-sm",
                         )}

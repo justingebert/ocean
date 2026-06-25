@@ -1,10 +1,5 @@
 import { Navigation, navigation } from "../constants/menu.ts";
-import { cn } from "../lib/utils.ts";
 import { UserProperties } from "../types/user.ts";
-
-export function classNames(...classes: string[]): string {
-  return cn(...classes);
-}
 
 export function getNavigationForUser(user: UserProperties | undefined): Navigation[] {
   if (!user) {
