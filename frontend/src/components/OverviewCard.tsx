@@ -4,6 +4,7 @@ import { UserProperties } from "../types/user";
 import { RoleProperties } from "../types/role";
 import { getDatabaseEngineTitle } from "./DatabaseList/databaseListFormat";
 import { EngineType } from "../types/engine";
+import { Card } from "./ui/card";
 
 const MONGODB_COMPASS_DOWNLOAD_URL = "https://www.mongodb.com/try/download/compass";
 
@@ -53,7 +54,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({ database, user, mongoUser }
   const shouldShowMongoCompassDownload = database?.engine === EngineType.MongoDB;
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+    <Card className="overflow-hidden">
       <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
         <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
           <div className="sm:col-span-1">
@@ -136,7 +137,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({ database, user, mongoUser }
           </div>
         </dl>
       </div>
-    </div>
+    </Card>
   );
 };
 

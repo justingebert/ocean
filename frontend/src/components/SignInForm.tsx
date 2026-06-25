@@ -3,6 +3,8 @@ import { Formik, Form, Field, FormikHelpers } from "formik";
 import { LockClosedIcon } from "@heroicons/react/20/solid";
 
 import { Alert } from "./Feedback/Alert/Alert";
+import { Button } from "./ui/button";
+import { Card } from "./ui/card";
 import { CredentialProperties } from "../types/models";
 import { UserValidation } from "../api/userClient";
 
@@ -46,7 +48,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
 
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-      <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <Card className="py-8 px-4 sm:px-10">
         <div className="mb-4">
           {errorMessage && <Alert message={errorMessage} title="Error" variant="danger" />}
         </div>
@@ -111,10 +113,10 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
                 </div>
               </div>
               <div>
-                <button
+                <Button
                   type="submit"
                   disabled={loading}
-                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                  className="group relative w-full flex justify-center"
                 >
                   <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                     <LockClosedIcon
@@ -123,12 +125,12 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
                     />
                   </span>
                   Sign in
-                </button>
+                </Button>
               </div>
             </Form>
           )}
         </Formik>
-      </div>
+      </Card>
     </div>
   );
 };

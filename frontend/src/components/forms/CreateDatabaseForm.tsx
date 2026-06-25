@@ -8,6 +8,7 @@ import { UpstreamDatabaseProperties } from "../../types/database";
 import { DatabaseClient, DatabaseValidation } from "../../api/databaseClient";
 import { Alert } from "../Feedback/Alert/Alert";
 import Headline from "../Headline";
+import { Button } from "../ui/button";
 import { EngineGroup } from "./EngineGroup/EngineGroup";
 import { EngineTypeValues } from "../../types/engine";
 
@@ -165,13 +166,14 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
                 </div>
               </div>
               {errorMessage && <Alert message={errorMessage} title="Error" variant="danger" />}
-              <button
+              <Button
                 type="submit"
                 disabled={values.name === "" || !isValid || processing || isValidating}
-                className="mt-6 px-4 w-full py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                size="form"
+                className="mt-6 w-full"
               >
                 Create a database
-              </button>
+              </Button>
             </>
           </Form>
         )}

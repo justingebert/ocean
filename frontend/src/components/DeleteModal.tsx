@@ -2,6 +2,8 @@ import React, { Fragment } from "react";
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react";
 import { XMarkIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
+import { Button } from "./ui/button";
+
 /**
  * Defines the content structure for the delete confirmation modal.
  */
@@ -100,20 +102,22 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ modalContent, open, onSubmit,
 
               {/* Buttons */}
               <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+                <Button
+                  variant="danger"
+                  size="form"
+                  className="w-full sm:ml-3 sm:w-auto"
                   onClick={onSubmit}
                 >
                   {modalContent.submitText}
-                </button>
-                <button
-                  type="button"
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="form"
+                  className="mt-3 w-full hover:text-gray-500 sm:mt-0 sm:w-auto"
                   onClick={onClose}
                 >
                   {modalContent.cancelText}
-                </button>
+                </Button>
               </div>
             </DialogPanel>
           </TransitionChild>

@@ -26,6 +26,7 @@ import OverviewCard from "../../components/OverviewCard";
 import RoleList from "../../components/RoleList/RoleList";
 import UserSelector from "../../components/UserSelector/UserSelector";
 import { Tabs } from "../../components/Navigation/Tabs/Tabs";
+import { Button } from "../../components/ui/button";
 
 /**
  * View component for displaying the details of a database.
@@ -211,14 +212,13 @@ const DatabaseDetailView: React.FC = () => {
               <p className="mt-1 text-sm text-gray-500">Only for this database</p>
             </div>
             <div className="flex-shrink-0">
-              <button
-                type="button"
-                className="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              <Button
+                className="relative"
                 disabled={createRoleMutation.isPending}
                 onClick={() => setOpenCreateRoleModal(true)}
               >
                 Add new user
-              </button>
+              </Button>
             </div>
           </div>
           <RoleList roles={roles || []} onDelete={(role) => deleteRoleMutation.mutate(role.id)} />
