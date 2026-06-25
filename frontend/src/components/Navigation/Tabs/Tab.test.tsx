@@ -19,7 +19,7 @@ describe("Tab Component", () => {
     renderTab({ active: true });
     const tabElement = screen.getByText("Tab 1");
 
-    expect(tabElement).toHaveClass("border-cyan-500", "text-cyan-600");
+    expect(tabElement).toHaveClass("border-primary", "text-foreground");
     expect(tabElement).toHaveAttribute("aria-current", "page");
   });
 

@@ -10,7 +10,7 @@ One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a f
 - extract components from large files
 - add ui components
 - add themeing
-- 
+- consolidate functions (tailwind merge cn)
 
 ## 2026-06-24 Switch MongoDB UI path to Compass
 - Dropped hosted Mongo GUI entirely: DbGate leaks shared state, Adminer Mongo is too hacky, and Compass is the clean student-facing GUI.

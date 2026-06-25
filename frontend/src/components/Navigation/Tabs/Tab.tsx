@@ -29,11 +29,11 @@ export const Tab: React.FC<TabProps> = ({ tab, active, onSelect }) => {
 };
 
 const borderStyles: Record<"active" | "inactive", string> = {
-  active: "border-cyan-500",
+  active: "border-primary",
   inactive: "border-transparent hover:border-gray-300",
 };
 
 const textStyles: Record<"active" | "inactive", string> = {
-  active: "text-cyan-600",
+  active: "text-foreground",
   inactive: "text-gray-500 hover:text-gray-700",
 };

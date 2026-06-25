@@ -301,7 +301,7 @@ const DatabaseDetailView: React.FC = () => {
     <AppLayout selectedNavigation={DatabasesNavigation.name}>
       <div className="flex space-x-3 mb-4">
         <div className="flex-shrink-0">
-          <CircleStackIcon className="h-10 w-10 rounded-full text-cyan-600" />
+          <CircleStackIcon className="h-10 w-10 rounded-full text-primary" />
         </div>
         <div className="min-w-0 flex-1">
           {database ? (
