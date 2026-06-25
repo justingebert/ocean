@@ -40,7 +40,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) =
   const navigationWithPermission = getNavigationForUser(user);
 
   return (
-    <div className="h-screen flex overflow-hidden bg-white">
+    <div className="h-screen flex overflow-hidden bg-background">
       <MobileSidebar
         open={sidebarOpen}
         navigationItems={navigationWithPermission}

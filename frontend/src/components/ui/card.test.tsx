@@ -7,7 +7,14 @@ describe("Card", () => {
   it("renders content with the base surface classes", () => {
     render(<Card>Content</Card>);
 
-    expect(screen.getByText("Content")).toHaveClass("bg-white", "shadow", "sm:rounded-lg");
+    expect(screen.getByText("Content")).toHaveClass(
+      "border",
+      "border-border",
+      "bg-card",
+      "text-card-foreground",
+      "shadow-sm",
+      "sm:rounded-lg",
+    );
   });
 
   it("merges custom classes", () => {

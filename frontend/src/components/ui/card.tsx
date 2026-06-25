@@ -3,5 +3,13 @@ import { HTMLAttributes } from "react";
 import { cn } from "../../lib/utils";
 
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("bg-white shadow sm:rounded-lg", className)} {...props} />;
+  return (
+    <div
+      className={cn(
+        "border border-border bg-card text-card-foreground shadow-sm sm:rounded-lg",
+        className,
+      )}
+      {...props}
+    />
+  );
 }

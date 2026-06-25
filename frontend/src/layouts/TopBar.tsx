@@ -29,7 +29,7 @@ function ProfileMenu({ user, loading, onLogout }: ProfileMenuProps) {
           <div>
             <MenuButton
               disabled={loading}
-              className="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50"
+              className="max-w-xs bg-card rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring lg:p-2 lg:rounded-md lg:hover:bg-accent"
             >
               {loading ? (
                 <div className="animate-pulse rounded-full h-8 w-8 bg-gray-200" />
@@ -46,13 +46,13 @@ function ProfileMenu({ user, loading, onLogout }: ProfileMenuProps) {
                   <div className="rounded-md w-24 h-8 bg-gray-200" />
                 </span>
               ) : (
-                <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
+                <span className="hidden ml-3 text-secondary-foreground text-sm font-medium lg:block">
                   <span className="sr-only">Open user menu for </span>
                   {user && user.firstName}
                 </span>
               )}
               <ChevronDownIcon
-                className="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block"
+                className="hidden flex-shrink-0 ml-1 h-5 w-5 text-muted-foreground lg:block"
                 aria-hidden="true"
               />
             </MenuButton>
@@ -69,16 +69,13 @@ function ProfileMenu({ user, loading, onLogout }: ProfileMenuProps) {
           >
             <MenuItems
               static
-              className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+              className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-popover text-popover-foreground ring-1 ring-border focus:outline-none"
             >
               <MenuItem>
                 {({ focus }) => (
                   <Link
                     to={SettingsNavigation.to}
-                    className={classNames(
-                      focus ? "bg-gray-100" : "",
-                      "block px-4 py-2 text-sm text-gray-700",
-                    )}
+                    className={classNames(focus ? "bg-accent" : "", "block px-4 py-2 text-sm")}
                   >
                     Settings
                   </Link>
@@ -88,10 +85,7 @@ function ProfileMenu({ user, loading, onLogout }: ProfileMenuProps) {
                 {({ focus }) => (
                   <div
                     onClick={onLogout}
-                    className={classNames(
-                      focus ? "bg-gray-100" : "",
-                      "block px-4 py-2 text-sm text-gray-700",
-                    )}
+                    className={classNames(focus ? "bg-accent" : "", "block px-4 py-2 text-sm")}
                   >
                     Logout
                   </div>
@@ -107,16 +101,16 @@ function ProfileMenu({ user, loading, onLogout }: ProfileMenuProps) {
 
 export function TopBar({ user, userLoading, onOpenSidebar, onLogout }: TopBarProps) {
   return (
-    <div className="relative z-10 flex-shrink-0 flex h-16 bg-white border-b border-gray-200 lg:border-none">
+    <div className="relative z-10 flex-shrink-0 flex h-16 bg-card border-b border-border lg:border-none">
       <button
         type="button"
-        className="px-4 border-r border-gray-200 text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cyan-500 lg:hidden"
+        className="px-4 border-r border-border text-muted-foreground focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sidebar-ring lg:hidden"
         onClick={onOpenSidebar}
       >
         <span className="sr-only">Open sidebar</span>
         <Bars3CenterLeftIcon className="h-6 w-6" aria-hidden="true" />
       </button>
-      <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8 border-b-2 border-gray-100">
+      <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8 border-b-2 border-muted">
         <div className="flex-1 flex"></div>
         <div className="ml-4 flex items-center md:ml-6">
           <CreateDropdown />

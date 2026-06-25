@@ -6,6 +6,10 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-06-25: frontend refactoring
+- extract components from large files
+- add ui components
+
 ## 2026-06-24 Switch MongoDB UI path to Compass
 - Dropped hosted Mongo GUI entirely: DbGate leaks shared state, Adminer Mongo is too hacky, and Compass is the clean student-facing GUI.
 - Mongo users now live in their own database auth namespace, so the overview URI is a simple Compass-ready `mongodb://user:pass@host:27017/db?tls=true`.

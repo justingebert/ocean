@@ -40,13 +40,13 @@ function SidebarNavigation({
       to={item.to}
       className={classNames(
         item.name === selectedNavigation
-          ? "bg-cyan-800 text-white"
-          : "text-cyan-100 hover:text-white hover:bg-cyan-600",
+          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+          : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground",
         linkClassName,
       )}
       aria-current={item.name === selectedNavigation ? "page" : undefined}
     >
-      <item.icon className="mr-4 flex-shrink-0 h-6 w-6 text-cyan-200" aria-hidden="true" />
+      <item.icon className="mr-4 flex-shrink-0 h-6 w-6 text-sidebar-icon" aria-hidden="true" />
       {item.name}
     </Link>
   );
@@ -97,7 +97,7 @@ export function MobileSidebar({
           leaveFrom="translate-x-0"
           leaveTo="-translate-x-full"
         >
-          <DialogPanel className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-cyan-700">
+          <DialogPanel className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-sidebar">
             <TransitionChild
               as={Fragment}
               enter="ease-in-out duration-300"
@@ -110,11 +110,14 @@ export function MobileSidebar({
               <div className="absolute top-0 right-0 -mr-12 pt-2">
                 <button
                   type="button"
-                  className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                  className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sidebar-accent-foreground"
                   onClick={onClose}
                 >
                   <span className="sr-only">Close sidebar</span>
-                  <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                  <XMarkIcon
+                    className="h-6 w-6 text-sidebar-accent-foreground"
+                    aria-hidden="true"
+                  />
                 </button>
               </div>
             </TransitionChild>
@@ -126,7 +129,7 @@ export function MobileSidebar({
               primaryNavigationItems={getNavigationSection(navigationItems, "primary")}
               secondaryNavigationItems={getNavigationSection(navigationItems, "secondary")}
               selectedNavigation={selectedNavigation}
-              navClassName="mt-5 flex-shrink-0 h-full divide-y divide-cyan-800 overflow-y-auto"
+              navClassName="mt-5 flex-shrink-0 h-full divide-y divide-sidebar-border overflow-y-auto"
               linkClassName="group flex items-center px-2 py-2 text-base font-medium rounded-md"
             />
           </DialogPanel>
@@ -146,7 +149,7 @@ export function DesktopSidebar({
   return (
     <div className="hidden lg:flex lg:flex-shrink-0">
       <div className="flex flex-col w-64">
-        <div className="flex flex-col flex-grow bg-cyan-700 pt-5 pb-4 overflow-y-auto">
+        <div className="flex flex-col flex-grow bg-sidebar pt-5 pb-4 overflow-y-auto">
           <div className="flex items-center flex-shrink-0 px-4">
             <img className="h-8 w-auto self" src="/ocean-logo.png" alt="HTW logo" />
           </div>
@@ -154,7 +157,7 @@ export function DesktopSidebar({
             primaryNavigationItems={primaryNavigationItems}
             secondaryNavigationItems={secondaryNavigationItems}
             selectedNavigation={selectedNavigation}
-            navClassName="mt-5 flex-1 flex flex-col divide-y divide-cyan-800 overflow-y-auto"
+            navClassName="mt-5 flex-1 flex flex-col divide-y divide-sidebar-border overflow-y-auto"
             linkClassName="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md"
           />
         </div>
