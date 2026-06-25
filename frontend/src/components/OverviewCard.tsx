@@ -9,27 +9,14 @@ import { Card } from "./ui/card";
 const MONGODB_COMPASS_DOWNLOAD_URL = "https://www.mongodb.com/try/download/compass";
 
 export interface OverviewCardProps {
-  /** The database object containing its details (optional). */
   database?: Database;
-  /** The user object associated with the database (optional). */
+
   user?: UserProperties;
-  /** The default MongoDB login role, used to build a credentialed connection string. */
+
   mongoUser?: RoleProperties;
 }
-/**
- * Renders an overview card displaying database details.
- * - Displays database name, hostname, port, engine type, and connection string.
- * - Provides an option to copy the connection string and open the database admin UI.
- *
- * @param database - The database object containing details.
- * @param user - The user object to personalize the connection string.
- */
+
 const OverviewCard: React.FC<OverviewCardProps> = ({ database, user, mongoUser }) => {
-  /**
-   * Retrieves the appropriate connection string based on the database engine.
-   *
-   * @returns A formatted connection string.
-   */
   const getEngineConnectionString = (): string => {
     if (database?.engine === EngineType.PostgreSQL) {
       return database.connectionString(user?.username || "");

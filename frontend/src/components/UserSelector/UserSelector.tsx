@@ -12,51 +12,26 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 
 import { User, UserProperties } from "../../types/user";
 
-/**
- * Props for the `UserSelector` component.
- */
 export interface UserSelectorProps {
-  /** List of available users to select from. */
   users: UserProperties[];
-  /** List of user IDs that have already been selected. */
+
   selectedUserIds: number[];
-  /** Callback function triggered when a user is selected. */
+
   onSelect?: (value: UserProperties) => void;
-  /** Callback function triggered when a user is deselected. */
+
   onDeselect?: (value: UserProperties) => void;
 }
 
-/**
- * Utility function to join class names dynamically.
- *
- * @param classes - An array of class names.
- * @returns A string containing the filtered class names.
- */
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
-/**
- * Renders a user selection dropdown.
- * - Displays a searchable list of users.
- * - Allows selecting or deselecting a user.
- * - Uses `headlessui` for accessibility and styling.
- *
- * @param users - The list of users available for selection.
- * @param selectedUserIds - The list of currently selected user IDs.
- * @param onSelect - Callback function triggered when a user is selected.
- * @param onDeselect - Callback function triggered when a user is deselected.
- */
+
 const UserSelector: React.FC<UserSelectorProps> = ({
   users,
   selectedUserIds,
   onSelect,
   onDeselect,
 }) => {
-  /**
-   * Handles selection and deselection of users.
-   *
-   * @param value - The selected user or `undefined`.
-   */
   const onChange = (value: UserProperties | undefined) => {
     if (value) {
       const isSelected = selectedUserIds.find((id) => id === value.id);

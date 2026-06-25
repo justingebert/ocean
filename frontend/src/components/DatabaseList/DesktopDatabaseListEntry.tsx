@@ -6,21 +6,12 @@ import { getDatabaseCreatedAt, getDatabaseEngineTitle } from "./databaseListForm
 import { DatabaseProperties } from "../../types/database";
 import { CircleStackIcon } from "@heroicons/react/24/outline";
 
-/**
- * Props for the `DesktopDatabaseListEntry` component.
- */
 interface DesktopDatabaseListEntryProps {
-  /** The database to display in the list. */
   database: DatabaseProperties;
-  /** Optional callback function triggered when clicking a database row. */
+
   onClick?: (id: number) => void;
 }
 
-/**
- * Renders a single database entry in the desktop database list.
- * - Displays the database name, engine type, creation date, and action links.
- * - Supports navigation to the database details page.
- */
 const DesktopDatabaseListEntry: React.FC<DesktopDatabaseListEntryProps> = ({
   database,
   onClick,

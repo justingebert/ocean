@@ -8,21 +8,12 @@ export interface DatabaseAdminListProps {
   databases: ReadonlyArray<Database>;
   onDelete?: (database: Database) => void;
 }
-/**
- * Displays a table of all databases in an admin panel.
- * - Allows sorting databases by creation date.
- * - Provides an optional delete action for each database.
- */
+
 export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({ databases, onDelete }) => {
-  /** Sorted list of databases, ordered by creation date (newest first). */
   const sortedDatabases = databases
     .slice(0)
     .sort((left, right) => compareDesc(left.createdAt, right.createdAt));
-  /**
-   * Renders the full database list component.
-   *
-   * @returns The React element containing the database table.
-   */
+
   const render = (): React.ReactElement => {
     return (
       <div className="mt-8 flex flex-col">
@@ -39,11 +30,7 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({ databases,
       </div>
     );
   };
-  /**
-   * Renders the table header for the database list.
-   *
-   * @returns The React element containing column headers.
-   */
+
   const renderTableHead = (): React.ReactElement => {
     return (
       <thead className="bg-gray-50">
@@ -82,11 +69,7 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({ databases,
       </thead>
     );
   };
-  /**
-   * Renders the table body displaying the list of databases.
-   *
-   * @returns The React element containing database rows.
-   */
+
   const renderTableBody = (): React.ReactElement => {
     return (
       <tbody className="divide-y divide-gray-200 bg-white">

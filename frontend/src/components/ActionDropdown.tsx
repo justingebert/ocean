@@ -1,30 +1,13 @@
-/* This example requires Tailwind CSS v2.0+ */
 import React, { Fragment } from "react";
 
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react";
 import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from "@heroicons/react/20/solid";
 
-/**
- * Props for the `ActionDropdown` component.
- */
 export interface ActionDropdownProps {
-  /** Callback function triggered when the delete action is selected (optional). */
   onDelete?: () => void;
 }
-/**
- * Renders a dropdown menu with action options.
- * - Provides a delete action.
- * - Uses `headlessui` for accessibility and animations.
- *
- * @param onDelete - Function triggered when the delete action is selected.
- */
+
 const ActionDropdown: React.FC<ActionDropdownProps> = ({ onDelete }) => {
-  /**
-   * Utility function to join class names dynamically.
-   *
-   * @param classes - An array of class names.
-   * @returns A string containing the filtered class names.
-   */
   const classNames = (...classes: string[]): string => {
     return classes.filter(Boolean).join(" ");
   };

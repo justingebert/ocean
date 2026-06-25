@@ -3,29 +3,16 @@ import { PlusIcon, CircleStackIcon } from "@heroicons/react/20/solid";
 
 import { Button } from "./ui/button";
 
-/**
- * Props for the `EmptyState` component.
- */
 export interface EmptyStateProps {
-  /** The title displayed in the empty state. */
   title: string;
-  /** A brief description explaining the empty state. */
+
   description: string;
-  /** The text displayed on the action button. */
+
   buttonText: string;
-  /** Callback function triggered when the button is clicked. */
+
   onClick: () => void;
 }
-/**
- * Displays an empty state message with an action button.
- * - Encourages users to create new data when no content is available.
- * - Uses Tailwind CSS for styling.
- *
- * @param title - The title displayed in the empty state.
- * @param description - A short explanation of why the state is empty.
- * @param buttonText - The text on the action button.
- * @param onClick - Callback function triggered when the button is clicked.
- */
+
 const EmptyState: React.FC<EmptyStateProps> = ({ title, description, buttonText, onClick }) => {
   return (
     <div className="text-center">

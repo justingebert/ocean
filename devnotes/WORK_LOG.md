@@ -9,6 +9,8 @@ One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a f
 ## 2026-06-25: frontend refactoring
 - extract components from large files
 - add ui components
+- add themeing
+- 
 
 ## 2026-06-24 Switch MongoDB UI path to Compass
 - Dropped hosted Mongo GUI entirely: DbGate leaks shared state, Adminer Mongo is too hacky, and Compass is the clean student-facing GUI.

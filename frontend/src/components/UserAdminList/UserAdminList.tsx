@@ -2,28 +2,13 @@ import React from "react";
 
 import { UserProperties } from "../../types/user";
 
-/**
- * Props for the `UserAdminList` component.
- */
 export interface UserAdminListProps {
-  /** List of users to display in the table. */
   users: ReadonlyArray<UserProperties>;
 }
-/**
- * Renders a table displaying a list of users.
- * - Displays user details including ID, name, username, and employee type.
- * - Sorts users in descending order by `id`.
- *
- * @param users - The list of users to display.
- */
+
 export const UserAdminList: React.FC<UserAdminListProps> = ({ users }) => {
-  /** Sorted list of users, ordered by descending `id`. */
   const sortedUsers = users.slice(0).sort((left, right) => right.id - left.id);
-  /**
-   * Renders the full user table.
-   *
-   * @returns The React element containing the user table.
-   */
+
   const render = (): React.ReactElement => {
     return (
       <div className="mt-8 flex flex-col">
@@ -40,11 +25,7 @@ export const UserAdminList: React.FC<UserAdminListProps> = ({ users }) => {
       </div>
     );
   };
-  /**
-   * Renders the table header.
-   *
-   * @returns The React element containing column headers.
-   */
+
   const renderTableHead = (): React.ReactElement => {
     return (
       <thead className="bg-gray-50">
@@ -83,11 +64,7 @@ export const UserAdminList: React.FC<UserAdminListProps> = ({ users }) => {
       </thead>
     );
   };
-  /**
-   * Renders the table body displaying the list of users.
-   *
-   * @returns The React element containing user rows.
-   */
+
   const renderTableBody = (): React.ReactElement => {
     return (
       <tbody className="divide-y divide-gray-200 bg-white">

@@ -3,24 +3,12 @@ import React from "react";
 import { RoleProperties } from "../../types/role";
 import RoleListEntry from "./RoleListEntry";
 
-/**
- * Props for the `RoleList` component.
- */
 export interface RoleListProps {
-  /** List of roles to display in the table. */
   roles: RoleProperties[];
-  /** Callback function triggered when a role is deleted. */
+
   onDelete: (value: RoleProperties) => void;
 }
 
-/**
- * Renders a table displaying a list of roles.
- * - Lists role names and passwords.
- * - Provides an action button for deleting roles.
- *
- * @param roles - The list of roles to display.
- * @param onDelete - Callback function triggered when a role is deleted.
- */
 const RoleList: React.FC<RoleListProps> = ({ roles, onDelete }) => {
   return (
     <div className="flex flex-col">

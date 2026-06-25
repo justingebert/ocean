@@ -3,31 +3,15 @@ import { useState } from "react";
 
 import { RoleProperties } from "../../types/role";
 
-/**
- * Props for the `RoleListEntry` component.
- */
 export interface RoleListEntryProps {
-  /** The role object containing role details. */
   role: RoleProperties;
-  /** Callback function triggered when a role is deleted. */
+
   onDelete: (role: RoleProperties) => void;
 }
 
-/**
- * Renders a single role entry in the role list.
- * - Displays role name and password.
- * - Provides options to show/hide password.
- * - Includes a delete action.
- */
 const RoleListEntry: React.FC<RoleListEntryProps> = ({ role, onDelete }) => {
-  /** State to toggle password visibility. */
   const [showPassword, setShowPassword] = useState(false);
-  /**
-   * Renders the password field.
-   * - Toggles between showing and hiding the password.
-   *
-   * @returns A React element displaying the password or a "show" button.
-   */
+
   const renderPassword = (): React.ReactNode => {
     if (showPassword) {
       return (

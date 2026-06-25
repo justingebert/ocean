@@ -10,18 +10,11 @@ import { DesktopSidebar, MobileSidebar } from "./Sidebar.tsx";
 import { TopBar } from "./TopBar.tsx";
 
 export interface AppLayoutProps {
-  /** React children elements (main content). */
   children: React.ReactNode;
-  /** The currently selected navigation item. */
+
   selectedNavigation: string;
 }
-/**
- * The main application layout component.
- * Manages sidebar, navigation, user menu, and page content.
- *
- * @param children - The main content of the page.
- * @param selectedNavigation - The currently selected navigation item.
- */
+
 const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) => {
   const userQuery = useQuery({
     queryKey: ["user"],

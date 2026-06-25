@@ -3,30 +3,17 @@ import React from "react";
 import { InvitationProperties } from "../../../types/invitation";
 import { User, UserProperties } from "../../../types/user";
 
-/**
- * Defines the structure of an invited user.
- * - Combines user properties with invitation metadata.
- */
 export type IInvitedUser = Pick<UserProperties, "id" | "username" | "firstName" | "lastName"> &
   Pick<InvitationProperties, "createdAt"> & {
     invitationId: number;
   };
 
-/**
- * Props for the `InvitationListEntry` component.
- */
 export interface InvitationListEntryProps {
-  /** The invited user to display in the list entry. */
   invitedUser: IInvitedUser;
-  /** Optional callback function triggered when the invitation is deleted. */
+
   onDelete?: (user: IInvitedUser) => void;
 }
 
-/**
- * Renders a single entry in the invitation list.
- * - Displays the invited user's username and name.
- * - Provides an option to delete the invitation.
- */
 const InvitationListEntry: React.FC<InvitationListEntryProps> = ({ invitedUser, onDelete }) => {
   return (
     <tr>

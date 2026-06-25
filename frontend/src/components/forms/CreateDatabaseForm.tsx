@@ -12,28 +12,17 @@ import { Button } from "../ui/button";
 import { EngineGroup } from "./EngineGroup/EngineGroup";
 import { EngineTypeValues } from "../../types/engine";
 
-/**
- * Props for the `CreateDatabaseForm` component.
- */
 export interface CreateDatabaseFormProps {
   processing: boolean;
   errorMessage?: string;
   onSubmit: (database: UpstreamDatabaseProperties) => void;
 }
-/**
- * A form component for creating a new database.
- * - Allows users to select a database engine.
- * - Validates the database name based on predefined rules.
- * - Checks for database name uniqueness using an API.
- */
+
 const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
   processing,
   errorMessage,
   onSubmit,
 }) => {
-  /**
-   * Validation schema for creating a new database.
-   */
   const createDatabaseSchema = yup.object().shape({
     name: yup
       .string()
@@ -48,14 +37,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
       ),
     engine: yup.string().required("Engine is required"),
   });
-  /**
-   * Checks if the given database name is unique.
-   * - Calls an API endpoint to validate database name availability.
-   *
-   * @param name - The database name to validate.
-   * @param context - Formik test context for retrieving sibling fields.
-   * @returns `true` if the name is unique, otherwise `false`.
-   */
+
   const validateDatabaseValues = async (
     name: string | undefined,
     context: yup.TestContext<Record<string, unknown>>,
@@ -84,14 +66,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
     }
     return false;
   };
-  /**
-   * Renders an appropriate input status icon based on validation state.
-   *
-   * @param touched - Indicates if the input field has been interacted with.
-   * @param loading - Indicates if validation is in progress.
-   * @param valid - Indicates if the input is valid.
-   * @returns A JSX element representing the input status icon.
-   */
+
   const renderNameInput = (touched: boolean, loading: boolean, valid: boolean): JSX.Element => {
     if (loading) {
       return <ArrowPathIcon className="animate-spin h-5 w-5 text-blue-400" aria-hidden="true" />;

@@ -14,17 +14,9 @@ import { DatabaseAdminList } from "../components/DatabaseAdminList/DatabaseAdmin
 import { useUsersQuery } from "../hooks/useUserQuery";
 import { UserAdminList } from "../components/UserAdminList/UserAdminList";
 
-/**
- * The reporting page displaying metrics, database statistics, and user data.
- * - Fetches and displays system-wide metrics.
- * - Lists all databases and provides deletion functionality.
- * - Lists all users in the system.
- */
 const ReportingView: React.FC = () => {
   const metricsQuery = useMetricsQuery();
-  /**
-   * Interface for metrics data retrieved from the API.
-   */
+
   interface MetricsData {
     totalInstances: number;
     totalUsers: number;
@@ -34,10 +26,7 @@ const ReportingView: React.FC = () => {
   const databases = Array.isArray(databasesQuery.data)
     ? (databasesQuery.data as DatabaseProperties[]).map((db) => new Database(db))
     : [];
-  /**
-   * Mutation hook for deleting a database with required permissions.
-   * - On successful deletion, refreshes database and metrics queries.
-   */
+
   const deleteDatabaseWithPermissionMutation = useDeleteDatabaseWithPermissionMutation({
     onSettled: () => {
       databasesQuery.refetch();
@@ -45,9 +34,7 @@ const ReportingView: React.FC = () => {
     },
   });
   const usersQuery = useUsersQuery();
-  /**
-   * Interface for user properties.
-   */
+
   interface UserProperties {
     id: number;
     username: string;
@@ -57,11 +44,7 @@ const ReportingView: React.FC = () => {
     employeeType: string;
   }
   const users = (usersQuery.data as UserProperties[]) || [];
-  /**
-   * Generates an array of metric statistics to display.
-   *
-   * @returns An array of statistics containing metric names and values.
-   */
+
   const getStats = () => {
     const result: IStats[] = [];
     if (metrics) {
@@ -77,11 +60,7 @@ const ReportingView: React.FC = () => {
 
     return result;
   };
-  /**
-   * Renders the reporting page layout.
-   *
-   * @returns The React element containing all reporting sections.
-   */
+
   const render = (): React.ReactElement => {
     return (
       <AppLayout selectedNavigation={ReportingNavigation.name}>
@@ -94,11 +73,7 @@ const ReportingView: React.FC = () => {
       </AppLayout>
     );
   };
-  /**
-   * Renders the metrics section displaying system-wide statistics.
-   *
-   * @returns The React element containing total database and user counts.
-   */
+
   const renderMetrics = (): React.ReactElement => {
     return (
       <div>
@@ -111,12 +86,7 @@ const ReportingView: React.FC = () => {
       </div>
     );
   };
-  /**
-   * Renders the databases section listing all available databases.
-   * - Provides the option to delete databases with required permissions.
-   *
-   * @returns The React element containing the database list.
-   */
+
   const renderDatabases = (): React.ReactElement => {
     return (
       <div>
@@ -128,11 +98,7 @@ const ReportingView: React.FC = () => {
       </div>
     );
   };
-  /**
-   * Renders the users section listing all registered users.
-   *
-   * @returns The React element containing the user list.
-   */
+
   const renderUsers = (): React.ReactElement => {
     return (
       <div>

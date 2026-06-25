@@ -5,29 +5,18 @@ import MobileDatabaseListEntry from "./MobileDatabaseListEntry";
 import DesktopDatabaseListEntry from "./DesktopDatabaseListEntry";
 import { DatabaseProperties } from "../../types/database";
 
-/**
- * Props for the `DatabaseList` component.
- */
 export interface DatabaseListProps {
-  /** The list of databases to display. */
   databases: ReadonlyArray<DatabaseProperties>;
-  /** Optional callback function triggered when a database entry is clicked. */
+
   onClick?: (id: number) => void;
 }
 
-/**
- * Renders a list of databases in a responsive layout.
- * - Displays databases differently for mobile and desktop views.
- * - Sorts databases by creation date (newest first).
- */
 const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
-  /** Sorted list of databases, ordered by creation date (newest first). */
   const sortedDatabases = databases
     .slice(0)
     .sort((left, right) => compareDesc(left.createdAt, right.createdAt));
   return (
     <>
-      {/*Mobile*/}
       <div className="shadow sm:hidden">
         <ul className="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
           {sortedDatabases.map((database, index) => (
@@ -35,7 +24,7 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
           ))}
         </ul>
       </div>
-      {/*Desktop*/}
+
       <div className="hidden sm:block">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col mt-2">

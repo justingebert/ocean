@@ -10,17 +10,9 @@ import DatabaseList from "../../components/DatabaseList/DatabaseList";
 import EmptyState from "../../components/EmptyState";
 import Headline from "../../components/Headline";
 
-/**
- * View component for displaying the list of user-specific databases.
- * - Fetches databases using `react-query`.
- * - Shows an empty state if no databases are available.
- * - Navigates to a new database creation page or details page when clicked.
- */
 const DatabasesView: React.FC = () => {
   const navigate = useNavigate();
-  /**
-   * Fetches the databases associated with the current user.
-   */
+
   const { data: databases } = useQuery({
     queryKey: ["databases"],
     queryFn: () => DatabaseClient.getUserDatabases(),
@@ -32,16 +24,8 @@ const DatabasesView: React.FC = () => {
         <Headline title="Databases" size="large" />
       </div>
       {(databases || []).length === 0 ? (
-        /**
-         * Displays an empty state when there are no databases.
-         * Provides a button to navigate to the new database creation page.
-         */
         <EmptyState {...emptyDatabaseState} onClick={() => navigate("/databases/new")} />
       ) : (
-        /**
-         * Displays the list of databases if available.
-         * Clicking on a database navigates to its details page.
-         */
         <DatabaseList databases={databases || []} onClick={(id) => navigate(`/databases/${id}`)} />
       )}
     </AppLayout>

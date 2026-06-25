@@ -1,14 +1,12 @@
 describe("Login and Create a Database", () => {
-  const loginApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/auth/signin"; // Login endpoint
-  const userApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/user"; // User data endpoint
-  const createDatabaseApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/databases"; // Create database endpoint
+  const loginApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/auth/signin";
+  const userApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/user";
+  const createDatabaseApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/databases";
   const checkAvailabilityApiUrl =
-    "http://databases.f4.htw-berlin.de:9000/v1/databases/_availability_"; // Check availability endpoint
+    "http://databases.f4.htw-berlin.de:9000/v1/databases/_availability_";
   const getDatabasesUrl = "http://databases.f4.htw-berlin.de:9000/v1/databases";
 
-  // Set up API intercepts to mock backend responses and control test scenarios
   beforeEach(() => {
-    // Mock login API to simulate authentication responses
     cy.intercept("POST", loginApiUrl, (req) => {
       if (req.body.username === "testuser" && req.body.password === "password123") {
         req.reply({
@@ -26,7 +24,6 @@ describe("Login and Create a Database", () => {
       }
     }).as("signinRequest");
 
-    // Mock user data retrieval after successful login
     cy.intercept("GET", userApiUrl, {
       statusCode: 200,
       body: {
@@ -39,7 +36,6 @@ describe("Login and Create a Database", () => {
       },
     }).as("getUser");
 
-    // Mock API response when creating a new database
     cy.intercept("POST", createDatabaseApiUrl, (req) => {
       console.log("POST Request Body:", req.body);
       if (req.body.name === "testdatabase") {
@@ -55,7 +51,6 @@ describe("Login and Create a Database", () => {
       }
     }).as("createDatabase");
 
-    // Intercept availability check API call
     cy.intercept("POST", checkAvailabilityApiUrl, (req) => {
       req.reply({
         statusCode: 200,
@@ -69,25 +64,20 @@ describe("Login and Create a Database", () => {
   });
 
   it("logs in and creates a database", () => {
-    // Visit the login page
     cy.visit("http://localhost:5173/login");
 
-    // Log in with valid credentials
     cy.get('input[name="username"]').type("testuser");
     cy.get('input[name="password"]').type("password123");
     cy.get('button[type="submit"]').click();
 
-    // Wait for the login API and user data
     cy.wait("@signinRequest").its("response.statusCode").should("eq", 200);
     cy.wait("@getUser");
 
-    // Navigate to database creation page
     cy.contains("a", "Create a Database").click();
 
-    // Fill out the form and submit
     cy.get('input[name="name"]').type("testdatabase");
     cy.get('button[type="submit"]').click({ force: true });
-    // Verify redirection to the database list
+
     cy.url().should("include", "/databases");
   });
 });

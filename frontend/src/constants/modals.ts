@@ -1,8 +1,5 @@
 import { ModalContent } from "../components/DeleteModal";
-/**
- * Predefined content for the delete database modal.
- * This object provides the modal title, description, and button texts.
- */
+
 export const deleteModalContent: ModalContent = {
   title: "Delete database",
   description:

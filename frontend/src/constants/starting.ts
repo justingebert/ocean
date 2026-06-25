@@ -1,8 +1,6 @@
 import { Cog8ToothIcon, CircleStackIcon } from "@heroicons/react/24/outline";
 import React from "react";
-/**
- * Interface representing a starting point action in the UI.
- */
+
 export interface StartingPoint {
   title: string;
   description: string;
@@ -10,10 +8,7 @@ export interface StartingPoint {
   to: string;
   background: string;
 }
-/**
- * Predefined starting point actions available for users.
- * These provide quick access to key functionalities.
- */
+
 export const startingPoints: StartingPoint[] = [
   {
     title: "Create a Database",

@@ -4,28 +4,14 @@ import { Link } from "react-router-dom";
 import { StartingPoint } from "../constants/starting";
 
 export interface StartingPointsProps {
-  /** The title displayed at the top of the section. */
   title: string;
-  /** A brief description explaining the purpose of the starting points. */
+
   description: string;
-  /** List of starting points containing navigation options. */
+
   startingPoints: StartingPoint[];
 }
-/**
- * Renders a section with starting points for navigating key actions.
- * - Displays a list of available starting points with icons and descriptions.
- *
- * @param title - The section title.
- * @param description - A short explanation of the starting points.
- * @param startingPoints - The list of navigation options.
- */
+
 const StartingPoints: React.FC<StartingPointsProps> = ({ title, description, startingPoints }) => {
-  /**
-   * Utility function to join class names dynamically.
-   *
-   * @param classes - An array of class names.
-   * @returns A string containing the filtered class names.
-   */
   const classNames = (...classes: string[]): string => {
     return classes.filter(Boolean).join(" ");
   };

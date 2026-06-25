@@ -4,21 +4,12 @@ import { CircleStackIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { getDatabaseCreatedAt, getDatabaseEngineTitle } from "./databaseListFormat";
 import { DatabaseProperties } from "../../types/database";
 
-/**
- * Props for the `MobileDatabaseListEntry` component.
- */
 interface MobileDatabaseListEntryProps {
-  /** The database to display in the mobile list. */
   database: DatabaseProperties;
-  /** Optional callback function triggered when a database entry is clicked. */
+
   onClick?: (id: number) => void;
 }
 
-/**
- * Renders a single database entry in the mobile database list.
- * - Displays database name, creation date, and engine type.
- * - Provides a clickable interface for navigation.
- */
 const MobileDatabaseListEntry: React.FC<MobileDatabaseListEntryProps> = ({ database, onClick }) => {
   return (
     <li key={database.id} onClick={() => onClick && onClick(database.id)}>

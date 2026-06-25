@@ -1,29 +1,13 @@
 import React from "react";
 import { UserProperties } from "../../types/user";
 
-/**
- * Props for the `ProfileCard` component.
- */
 export interface ProfileCardProps {
-  /** The user object containing profile details (optional). */
   user?: UserProperties;
-  /** Boolean flag indicating whether the data is still loading. */
+
   loading?: boolean;
 }
-/**
- * Renders a profile card displaying user details.
- * - Shows placeholders while data is loading.
- * - Displays user full name, employee type, email, and username.
- *
- * @param user - The user object containing personal details.
- * @param loading - Controls whether placeholders should be displayed while loading.
- */
+
 const ProfileCard: React.FC<ProfileCardProps> = ({ user, loading }) => {
-  /**
-   * Renders the user's full name.
-   *
-   * @returns A React element displaying the full name or a placeholder.
-   */
   const renderFullName = (): React.ReactElement => {
     if (loading) {
       return <dd className="mt-1 animate-pulse h-4 w-32 bg-gray-200" />;
@@ -35,11 +19,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, loading }) => {
       return <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">..</dd>;
     }
   };
-  /**
-   * Renders the user's employee type.
-   *
-   * @returns A React element displaying the employee type or a placeholder.
-   */
+
   const renderEmployeType = (): React.ReactElement => {
     if (loading) {
       return <dd className="mt-1 animate-pulse h-4 w-24 bg-gray-200" />;
@@ -51,11 +31,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, loading }) => {
       return <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">..</dd>;
     }
   };
-  /**
-   * Renders the user's email address.
-   *
-   * @returns A React element displaying the email or a placeholder.
-   */
+
   const renderMail = (): React.ReactElement => {
     if (loading) {
       return <dd className="mt-1 animate-pulse h-4 w-48 bg-gray-200" />;
@@ -65,11 +41,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, loading }) => {
       return <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">..</dd>;
     }
   };
-  /**
-   * Renders the user's username.
-   *
-   * @returns A React element displaying the username or a placeholder.
-   */
+
   const renderUsername = (): React.ReactElement => {
     if (loading) {
       return <dd className="mt-1 animate-pulse h-4 w-32 bg-gray-200" />;

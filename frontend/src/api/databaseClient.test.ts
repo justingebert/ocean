@@ -4,7 +4,6 @@ import { axiosInstance } from "./client";
 import { UpstreamDatabaseProperties } from "../types/database";
 import { EngineType } from "../types/engine";
 
-// Mock axiosInstance to prevent real API calls and control responses
 vi.mock("./client", () => ({
   axiosInstance: {
     get: vi.fn(),
@@ -13,9 +12,7 @@ vi.mock("./client", () => ({
   },
 }));
 
-// Tests for DatabaseClient methods that interact with the API
 describe("DatabaseClient", () => {
-  // Mock data
   const mockDatabases = [
     { id: 1, name: "Database 1", engine: "P", createdAt: new Date(), userId: 100 },
     { id: 2, name: "Database 2", engine: "M", createdAt: new Date(), userId: 101 },
@@ -25,7 +22,6 @@ describe("DatabaseClient", () => {
     vi.clearAllMocks();
   });
 
-  // Test case 1: Fetch all databases
   it("fetches all databases", async () => {
     (axiosInstance.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       data: mockDatabases,
@@ -37,7 +33,6 @@ describe("DatabaseClient", () => {
     expect(result).toEqual(mockDatabases);
   });
 
-  // Test case 2: Fetch user databases
   it("fetches user databases", async () => {
     (axiosInstance.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       data: mockDatabases,
@@ -49,7 +44,6 @@ describe("DatabaseClient", () => {
     expect(result).toEqual(mockDatabases);
   });
 
-  // Test case 3: Fetch a single database by ID
   it("fetches a database by ID", async () => {
     const mockDatabase = mockDatabases[0];
     (axiosInstance.get as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
@@ -62,11 +56,10 @@ describe("DatabaseClient", () => {
     expect(result).toEqual(mockDatabase);
   });
 
-  // Test case 4: Create a database
   it("creates a database", async () => {
     const newDatabase: UpstreamDatabaseProperties = {
       name: "Database 3",
-      engine: EngineType.PostgreSQL, // Use enum value
+      engine: EngineType.PostgreSQL,
     };
     const createdDatabase = {
       ...newDatabase,
@@ -85,11 +78,10 @@ describe("DatabaseClient", () => {
     expect(result).toEqual(createdDatabase);
   });
 
-  // Test case 5: Check database availability
   it("checks database availability", async () => {
     const databaseCheck = {
       name: "Database 3",
-      engine: EngineType.PostgreSQL, // Use EngineType instead of raw string
+      engine: EngineType.PostgreSQL,
     };
 
     (axiosInstance.post as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
@@ -102,7 +94,6 @@ describe("DatabaseClient", () => {
     expect(result).toEqual({ data: { available: true } });
   });
 
-  // Test case 6: Delete a database
   it("deletes a database by ID", async () => {
     (axiosInstance.delete as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       data: { success: true },
@@ -114,7 +105,6 @@ describe("DatabaseClient", () => {
     expect(result).toEqual({ success: true });
   });
 
-  // Test case 7: Delete a database with permission
   it("deletes a database with additional permissions", async () => {
     (axiosInstance.delete as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       data: { success: true },

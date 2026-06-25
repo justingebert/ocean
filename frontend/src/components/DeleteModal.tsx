@@ -4,42 +4,26 @@ import { XMarkIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline"
 
 import { Button } from "./ui/button";
 
-/**
- * Defines the content structure for the delete confirmation modal.
- */
 export interface ModalContent {
-  /** The title displayed in the modal. */
   title: string;
-  /** The description providing details about the action. */
+
   description: string;
-  /** The text for the submit (confirm) button. */
+
   submitText: string;
-  /** The text for the cancel button. */
+
   cancelText: string;
 }
-/**
- * Props for the `DeleteModal` component.
- */
+
 export interface DeleteModalProps {
-  /** The content to display in the modal. */
   modalContent: ModalContent;
-  /** Boolean flag indicating whether the modal is open. */
+
   open: boolean;
-  /** Callback function triggered when the confirm button is clicked. */
+
   onSubmit: () => void;
-  /** Callback function triggered when the modal is closed. */
+
   onClose: () => void;
 }
-/**
- * A modal component for confirming deletion actions.
- * - Displays a warning message with a confirmation and cancel button.
- * - Uses `headlessui` for accessibility and smooth transitions.
- *
- * @param modalContent - The content for the modal (title, description, button texts).
- * @param open - Controls whether the modal is displayed.
- * @param onSubmit - Function triggered when the user confirms the deletion.
- * @param onClose - Function triggered when the modal is closed.
- */
+
 const DeleteModal: React.FC<DeleteModalProps> = ({ modalContent, open, onSubmit, onClose }) => {
   return (
     <Transition show={open} as={Fragment}>
@@ -57,7 +41,6 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ modalContent, open, onSubmit,
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
           </TransitionChild>
 
-          {/* Trick to center modal in older browsers */}
           <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
             &#8203;
           </span>
@@ -71,9 +54,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ modalContent, open, onSubmit,
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            {/* Wrap content inside Dialog.Panel */}
             <DialogPanel className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-              {/* Close button */}
               <div className="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
                 <button
                   type="button"
@@ -85,7 +66,6 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ modalContent, open, onSubmit,
                 </button>
               </div>
 
-              {/* Modal Content */}
               <div className="sm:flex sm:items-start">
                 <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                   <ExclamationTriangleIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
@@ -100,7 +80,6 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ modalContent, open, onSubmit,
                 </div>
               </div>
 
-              {/* Buttons */}
               <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                 <Button
                   variant="danger"

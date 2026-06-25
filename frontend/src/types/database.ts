@@ -9,13 +9,9 @@ export interface DatabaseProperties {
   createdAt: Date;
   userId: number;
 }
-/**
- * Defines the required properties for creating a new database.
- */
+
 export type UpstreamDatabaseProperties = Pick<DatabaseProperties, "name" | "engine">;
-/**
- * Represents a Database model with extended functionalities.
- */
+
 export class Database extends BaseModel {
   public readonly props: DatabaseProperties;
 
@@ -23,10 +19,7 @@ export class Database extends BaseModel {
   public readonly engine: EngineTypeValues;
   public readonly createdAt: Date;
   public readonly userId: number;
-  /**
-   * Initializes a new `Database` instance.
-   * @param props - The properties of the database.
-   */
+
   constructor(props: DatabaseProperties) {
     super({ id: props.id });
     this.props = props;
@@ -36,10 +29,7 @@ export class Database extends BaseModel {
     this.createdAt = props.createdAt;
     this.userId = props.userId;
   }
-  /**
-   * Retrieves the hostname for the database based on its engine type.
-   * @returns The hostname as a string.
-   */
+
   public get hostname(): string {
     if (this.props.engine === EngineType.PostgreSQL) {
       return config.postgresqlHostname;
@@ -50,10 +40,7 @@ export class Database extends BaseModel {
       return assertNever(this.props.engine);
     }
   }
-  /**
-   * Retrieves the port number for the database based on its engine type.
-   * @returns The port number as a number.
-   */
+
   public get port(): number {
     if (this.props.engine === EngineType.PostgreSQL) {
       return Number.parseInt(config.postgresqlPort);
@@ -64,12 +51,7 @@ export class Database extends BaseModel {
       return assertNever(this.props.engine);
     }
   }
-  /**
-   * Generates the connection string for the database.
-   * @param username - DB user (PostgreSQL: LDAP username; MongoDB: the role/login name).
-   * @param password - MongoDB login password, embedded so the string is copy-paste ready.
-   * @returns A connection string for PostgreSQL or MongoDB.
-   */
+
   public connectionString(username?: string, password?: string): string {
     if (this.props.engine === EngineType.PostgreSQL) {
       return `psql "postgresql://${username}@${this.hostname}:${this.port}/${this.props.name}?sslmode=verify-full&sslrootcert=system"`;
@@ -108,10 +90,6 @@ export class Database extends BaseModel {
     return this.buildUrl(config.adminerUrl, searchParams);
   }
 
-  /**
-   * Retrieves the admin UI URL for database management.
-   * @returns The admin UI URL as a string.
-   */
   public get adminUrl(): string {
     if (this.props.engine === EngineType.PostgreSQL) {
       const adminerServer = config.adminerPostgresqlServer || `${this.hostname}:${this.port}`;
@@ -129,9 +107,6 @@ export class Database extends BaseModel {
     }
   }
 
-  /**
-   * Backwards-compatible alias for existing call sites and tests.
-   */
   public get adminerUrl(): string {
     return this.adminUrl;
   }

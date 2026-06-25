@@ -1,12 +1,8 @@
-/* This example requires Tailwind CSS v2.0+ */
 import { Fragment } from "react";
 import { Transition } from "@headlessui/react";
 import { CheckCircleIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 
-/**
- * Props for the `Notification` component.
- */
 export interface NotificationProps {
   show: boolean;
   title: string;
@@ -14,17 +10,7 @@ export interface NotificationProps {
   variant?: "success" | "error";
   onClose?: () => void;
 }
-/**
- * Displays a floating notification banner.
- * - Supports `"success"` and `"error"` variants.
- * - Uses Tailwind CSS for styling and `headlessui` for smooth transitions.
- *
- * @param show - Controls the visibility of the notification.
- * @param title - The notification title.
- * @param description - The message to display in the notification.
- * @param variant - Determines if the notification is `"success"` or `"error"`.
- * @param onClose - Callback function triggered when the close button is clicked.
- */
+
 const Notification: React.FC<NotificationProps> = ({
   show,
   title,
@@ -32,11 +18,6 @@ const Notification: React.FC<NotificationProps> = ({
   variant = "success",
   onClose,
 }) => {
-  /**
-   * Renders the appropriate icon based on the notification variant.
-   *
-   * @returns A React element representing the variant-specific icon.
-   */
   const renderIcon = (): React.ReactElement => {
     if (variant === "success") {
       return <CheckCircleIcon className="h-6 w-6 text-green-400" aria-hidden="true" />;
@@ -51,7 +32,6 @@ const Notification: React.FC<NotificationProps> = ({
       className="fixed inset-0 z-50 flex items-end px-4 py-6 pointer-events-none sm:p-6 sm:items-start"
     >
       <div className="w-full flex flex-col items-center space-y-4 sm:items-end">
-        {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
         <Transition
           show={show}
           as={Fragment}

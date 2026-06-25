@@ -4,7 +4,6 @@ import { BrowserRouter } from "react-router-dom";
 import { describe, it, expect } from "vitest";
 import StartingPoints, { StartingPointsProps } from "./StartingPoints";
 
-// Mock data representing different starting points with titles, descriptions, links, and icons
 const mockStartingPoints = [
   {
     title: "Feature A",
@@ -29,13 +28,13 @@ const mockStartingPoints = [
     background: "bg-green-500",
   },
 ];
-// Default props used for rendering the StartingPoints component in tests
+
 const defaultProps: StartingPointsProps = {
   title: "Getting Started",
   description: "Explore the starting points to get familiar with the application.",
   startingPoints: mockStartingPoints,
 };
-// Helper function to render the StartingPoints component within a BrowserRouter
+
 const renderComponent = (props = defaultProps) => {
   return render(
     <BrowserRouter>
@@ -43,35 +42,33 @@ const renderComponent = (props = defaultProps) => {
     </BrowserRouter>,
   );
 };
-// Tests for StartingPoints component to verify correct rendering, links, and interactions
+
 describe("StartingPoints Component", () => {
-  // Ensure the component correctly displays the main title and description
   it("renders the title and description", () => {
     renderComponent();
-    // Verify that the main title appears in the document
+
     expect(screen.getByText("Getting Started")).toBeInTheDocument();
-    // Verify that the main description is rendered correctly
+
     expect(
       screen.getByText("Explore the starting points to get familiar with the application."),
     ).toBeInTheDocument();
   });
-  // Ensure that all starting points are displayed with their respective titles and descriptions
+
   it("renders the starting points with correct data", () => {
     renderComponent();
-    // Verify that each starting point title appears in the document
+
     mockStartingPoints.forEach((point) => {
       expect(screen.getByText(point.title)).toBeInTheDocument();
-      // Verify that each starting point description is displayed correctly
+
       expect(screen.getByText(point.description)).toBeInTheDocument();
     });
   });
-  // Ensure that each starting point title is linked to the correct URL
+
   it("renders links with the correct hrefs", () => {
     renderComponent();
     mockStartingPoints.forEach((point) => {
-      // Locate the nearest anchor element associated with the starting point title
       const linkElement = screen.getByText(point.title).closest("a");
-      // Verify that the anchor element's href attribute matches the expected URL
+
       expect(linkElement).toHaveAttribute("href", point.to);
     });
   });

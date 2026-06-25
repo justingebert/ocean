@@ -6,11 +6,6 @@ import { startingPoints } from "../constants/starting";
 import Headline from "../components/Headline";
 import StartingPoints from "../components/StartingPoints";
 
-/**
- * The overview page that serves as the main landing page after login.
- * - Displays an introduction headline.
- * - Provides links to starting points for quick navigation.
- */
 const OverviewView: React.FC = () => {
   return (
     <AppLayout selectedNavigation={OverviewNavigation.name}>

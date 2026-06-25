@@ -8,34 +8,15 @@ import { Card } from "./ui/card";
 import { CredentialProperties } from "../types/models";
 import { UserValidation } from "../api/userClient";
 
-/**
- * Props for the `SignInForm` component.
- */
 export interface SignInFormProps {
-  /** Indicates whether the form is in a loading state. */
   loading?: boolean;
-  /** An optional error message displayed when authentication fails. */
+
   errorMessage?: string;
-  /** Callback function triggered when the form is submitted. */
+
   onSubmit?: (credentials: CredentialProperties) => void;
 }
-/**
- * Renders a sign-in form with username and password fields.
- * - Uses Formik for form validation and submission handling.
- * - Displays error messages when validation fails.
- * - Calls `onSubmit` when the form is submitted.
- *
- * @param loading - Controls whether the submit button is disabled.
- * @param errorMessage - The error message to display if authentication fails.
- * @param onSubmit - Callback function triggered when the user submits their credentials.
- */
+
 const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit }) => {
-  /**
-   * Returns dynamic class names based on the validation state of an input field.
-   *
-   * @param hasError - Boolean indicating whether the field has an error.
-   * @returns A string containing Tailwind CSS classes.
-   */
   const getFieldClassNames = (hasError: boolean): string => {
     const common =
       "appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm";

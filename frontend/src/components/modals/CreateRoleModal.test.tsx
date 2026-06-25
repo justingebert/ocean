@@ -3,13 +3,10 @@ import { describe, it, beforeEach, vi, expect } from "vitest";
 import CreateRoleModal, { CreateRoleModalProps } from "./CreateRoleModal";
 import { CreateRoleFormProps } from "../forms/CreateRoleForm";
 
-// Mock the CreateRoleForm component to control its rendering and behavior in tests
 vi.mock("../forms/CreateRoleForm", () => {
   return {
     default: vi.fn(({ onSubmit, onClose }: CreateRoleFormProps) => (
-      // Mock structure of the CreateRoleForm component to expose onSubmit and onClose handlers
       <div data-testid="create-role-form">
-        {/* The mock doesn't render buttons; instead, expose onSubmit and onClose */}
         <button
           onClick={() => onSubmit({ roleName: "Admin", instanceId: 1 })}
           data-testid="submit-button"
@@ -23,34 +20,31 @@ vi.mock("../forms/CreateRoleForm", () => {
     )),
   };
 });
-// Tests for CreateRoleModal component to ensure correct rendering and behavior
+
 describe("CreateRoleModal", () => {
-  // Mock function to track form submission
   const mockOnSubmit = vi.fn();
-  // Mock function to track modal closure
+
   const mockOnClose = vi.fn();
-  // Default props for rendering the CreateRoleModal component in tests
+
   const defaultProps: CreateRoleModalProps = {
     open: false,
     onSubmit: mockOnSubmit,
     onClose: mockOnClose,
   };
-  // Helper function to render the component with default and custom props
+
   const renderComponent = (props = {}) => {
     return render(<CreateRoleModal {...defaultProps} {...props} />);
   };
-  // Clear all mock function calls before each test to ensure test isolation
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
-  // Ensure the modal does not render when the open prop is set to false
+
   it("does not render the modal when open is false", () => {
     renderComponent({ open: false });
 
-    // The title should not be in the document
     expect(screen.queryByText("Create a user")).not.toBeInTheDocument();
 
-    // The form should not be in the document
     expect(screen.queryByTestId("create-role-form")).not.toBeInTheDocument();
   });
 });

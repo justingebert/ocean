@@ -9,17 +9,9 @@ import Headline from "../components/Headline";
 import ProfileCard from "../components/ProfileCard/ProfileCard";
 import { Tabs } from "../components/Navigation/Tabs/Tabs";
 
-/**
- * The settings page where users can manage their personal information.
- * - Fetches the current user's data.
- * - Displays user profile details.
- * - Provides navigation between different settings tabs.
- */
 const SettingsView: React.FC = () => {
   const [activeId, setActiveId] = useState(settingsViewTabs[0].id);
-  /**
-   * Fetches the authenticated user's profile information.
-   */
+
   const userQuery = useQuery({
     queryKey: ["user"],
     queryFn: () => UserClient.getUser(),

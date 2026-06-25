@@ -2,30 +2,13 @@ import React from "react";
 
 import InvitationListEntry, { IInvitedUser } from "./InvitationListEntry";
 
-/**
- * Props for the `InvitationList` component.
- */
 export interface InvitationListProps {
-  /** List of invited users to display. */
   invitedUsers: ReadonlyArray<IInvitedUser>;
-  /** Optional callback function triggered when an invitation is deleted. */
+
   onDelete?: (value: IInvitedUser) => void;
 }
-/**
- * Displays a list of invited users in a table format.
- * - Lists usernames and full names.
- * - Provides an action button for each entry (e.g., delete).
- *
- * @param invitedUsers - List of invited users to display.
- * @param onDelete - Callback function triggered when an invitation is deleted.
- */
+
 export const InvitationList: React.FC<InvitationListProps> = ({ invitedUsers, onDelete }) => {
-  /**
-   * Renders a table header cell with consistent styling.
-   *
-   * @param value - The header text.
-   * @returns A React element representing a styled table header cell.
-   */
   const renderHeaderCell = (value: string): React.ReactElement => {
     return (
       <th
