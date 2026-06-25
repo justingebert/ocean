@@ -19,11 +19,11 @@ export interface SignInFormProps {
 const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit }) => {
   const getFieldClassNames = (hasError: boolean): string => {
     const common =
-      "appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm";
+      "appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-muted-foreground focus:outline-none sm:text-sm";
     if (hasError) {
-      return `${common} border-red-600 focus:ring-red-600 focus:border-red-600`;
+      return `${common} border-destructive focus:ring-destructive-ring focus:border-destructive`;
     } else {
-      return `${common} border-gray-300 focus:ring-indigo-500 focus:border-indigo-500`;
+      return `${common} border-input focus:ring-ring focus:border-ring`;
     }
   };
 
@@ -52,7 +52,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
           {({ errors, touched }) => (
             <Form className="space-y-6">
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="username" className="block text-sm font-medium text-foreground">
                   Username*
                 </label>
                 <div className="mt-1">
@@ -65,7 +65,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
                     )}
                   />
                   {errors.username && touched.username && (
-                    <span className="mt-2 text-sm text-red-600" id="usernameHelp">
+                    <span className="mt-2 text-sm text-destructive" id="usernameHelp">
                       {errors.username}
                     </span>
                   )}
@@ -73,7 +73,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="block text-sm font-medium text-foreground">
                   Password*
                 </label>
                 <div className="mt-1">
@@ -87,7 +87,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
                     )}
                   />
                   {errors.password && touched.password && (
-                    <span className="mt-2 text-sm text-red-600" id="passwordHelp">
+                    <span className="mt-2 text-sm text-destructive" id="passwordHelp">
                       {errors.password}
                     </span>
                   )}
@@ -101,7 +101,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
                 >
                   <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                     <LockClosedIcon
-                      className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"
+                      className="h-5 w-5 text-primary group-hover:text-primary-hover"
                       aria-hidden="true"
                     />
                   </span>

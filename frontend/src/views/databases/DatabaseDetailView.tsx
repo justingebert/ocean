@@ -282,8 +282,8 @@ const DatabaseDetailView: React.FC = () => {
         />
         <Notification
           show={showInvitationDeleteSuccessNotification}
-          title="Successfully delete!"
-          description="Invitation was deleted to the database"
+          title="Successfully deleted!"
+          description="Invitation was deleted from the database"
           onClose={() => setShowInvitationDeleteSuccessNotification(false)}
         />
         <Notification

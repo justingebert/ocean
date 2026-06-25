@@ -49,22 +49,22 @@ export const Alert: React.FC<AlertProps> = ({ message, title = "", variant = "pr
 };
 
 const backgroundStyles: Record<AlertVariant, string> = {
-  primary: "bg-blue-50",
-  success: "bg-green-50",
-  danger: "bg-red-50",
-  warning: "bg-yellow-50",
+  primary: "bg-accent",
+  success: "bg-success/10",
+  danger: "bg-destructive/10",
+  warning: "bg-warning/20",
 };
 
 const textStyles: Record<AlertVariant, string> = {
-  primary: "text-blue-700",
-  success: "text-green-700",
-  danger: "text-red-700",
-  warning: "text-yellow-700",
+  primary: "text-primary",
+  success: "text-success",
+  danger: "text-destructive",
+  warning: "text-warning-foreground",
 };
 
 const iconStyles: Record<AlertVariant, string> = {
-  primary: "text-blue-400",
-  success: "text-green-400",
-  danger: "text-red-400",
-  warning: "text-yellow-400",
+  primary: "text-primary",
+  success: "text-success",
+  danger: "text-destructive",
+  warning: "text-warning",
 };

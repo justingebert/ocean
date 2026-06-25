@@ -58,7 +58,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ modalContent, open, onSubmit,
               <div className="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
                 <button
                   type="button"
-                  className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="bg-card rounded-md text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
                   onClick={onClose}
                 >
                   <span className="sr-only">Close</span>
@@ -71,11 +71,11 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ modalContent, open, onSubmit,
                   <ExclamationTriangleIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                  <DialogTitle as="h3" className="text-lg leading-6 font-medium text-gray-900">
+                  <DialogTitle as="h3" className="text-lg leading-6 font-medium text-foreground">
                     {modalContent.title}
                   </DialogTitle>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500">{modalContent.description}</p>
+                    <p className="text-sm text-muted-foreground">{modalContent.description}</p>
                   </div>
                 </div>
               </div>
@@ -92,7 +92,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ modalContent, open, onSubmit,
                 <Button
                   variant="secondary"
                   size="form"
-                  className="mt-3 w-full hover:text-gray-500 sm:mt-0 sm:w-auto"
+                  className="mt-3 w-full hover:text-foreground sm:mt-0 sm:w-auto"
                   onClick={onClose}
                 >
                   {modalContent.cancelText}

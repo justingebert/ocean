@@ -36,14 +36,14 @@ describe("Notification Component", () => {
   it("renders the success icon for success variant", () => {
     const { container } = render(<Notification {...defaultProps} variant="success" />);
 
-    const icon = container.querySelector(".text-green-400");
+    const icon = container.querySelector(".text-success");
     expect(icon).toBeInTheDocument();
   });
 
   it("renders the error icon for error variant", () => {
     const { container } = render(<Notification {...defaultProps} variant="error" />);
 
-    const icon = container.querySelector(".text-red-400");
+    const icon = container.querySelector(".text-destructive");
     expect(icon).toBeInTheDocument();
   });
 
@@ -60,7 +60,7 @@ describe("Notification Component", () => {
     expect(screen.getByText(defaultProps.title)).toBeInTheDocument();
     expect(screen.getByText(defaultProps.description)).toBeInTheDocument();
 
-    const icon = container.querySelector(".text-green-400");
+    const icon = container.querySelector(".text-success");
     expect(icon).toBeInTheDocument();
   });
 });

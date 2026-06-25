@@ -20,9 +20,9 @@ const Notification: React.FC<NotificationProps> = ({
 }) => {
   const renderIcon = (): React.ReactElement => {
     if (variant === "success") {
-      return <CheckCircleIcon className="h-6 w-6 text-green-400" aria-hidden="true" />;
+      return <CheckCircleIcon className="h-6 w-6 text-success" aria-hidden="true" />;
     } else {
-      return <ExclamationTriangleIcon className="h-6 w-6 text-red-400" aria-hidden="true" />;
+      return <ExclamationTriangleIcon className="h-6 w-6 text-destructive" aria-hidden="true" />;
     }
   };
 
@@ -42,17 +42,17 @@ const Notification: React.FC<NotificationProps> = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+          <div className="max-w-sm w-full bg-card shadow-lg rounded-lg pointer-events-auto ring-1 ring-border overflow-hidden">
             <div className="p-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0">{renderIcon()}</div>
                 <div className="ml-3 w-0 flex-1 pt-0.5">
-                  <p className="text-sm font-medium text-gray-900">{title}</p>
-                  <p className="mt-1 text-sm text-gray-500">{description}</p>
+                  <p className="text-sm font-medium text-card-foreground">{title}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{description}</p>
                 </div>
                 <div className="ml-4 flex-shrink-0 flex">
                   <button
-                    className="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="bg-card rounded-md inline-flex text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
                     onClick={onClose}
                   >
                     <span className="sr-only">Close</span>

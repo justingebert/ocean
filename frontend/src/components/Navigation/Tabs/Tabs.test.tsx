@@ -25,7 +25,7 @@ describe("Tabs Component", () => {
     renderTabs({ activeId: 2 });
     const activeTab = screen.getByText("Tab 2");
 
-    expect(activeTab).toHaveClass("border-cyan-500", "text-cyan-600");
+    expect(activeTab).toHaveClass("border-primary", "text-foreground");
   });
 
   it("should call onSelect with the correct id when a tab is clicked", () => {

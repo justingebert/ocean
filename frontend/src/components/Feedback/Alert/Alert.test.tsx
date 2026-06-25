@@ -16,28 +16,28 @@ describe("Alert Component", () => {
   it("renders the correct icon for the primary variant", () => {
     renderComponent({ variant: "primary" });
 
-    const icon = document.querySelector(".text-blue-400");
+    const icon = document.querySelector(".text-primary");
     expect(icon).toBeInTheDocument();
   });
 
   it("renders the correct icon for the success variant", () => {
     renderComponent({ variant: "success" });
 
-    const icon = document.querySelector(".text-green-400");
+    const icon = document.querySelector(".text-success");
     expect(icon).toBeInTheDocument();
   });
 
   it("renders the correct icon for the danger variant", () => {
     renderComponent({ variant: "danger" });
 
-    const icon = document.querySelector(".text-red-400");
+    const icon = document.querySelector(".text-destructive");
     expect(icon).toBeInTheDocument();
   });
 
   it("renders the correct icon for the warning variant", () => {
     renderComponent({ variant: "warning" });
 
-    const icon = document.querySelector(".text-yellow-400");
+    const icon = document.querySelector(".text-warning");
     expect(icon).toBeInTheDocument();
   });
 
@@ -57,10 +57,10 @@ describe("Alert Component", () => {
   it("uses the default variant (primary) when no variant is provided", () => {
     renderComponent({ variant: undefined });
 
-    const icon = document.querySelector(".text-blue-400");
+    const icon = document.querySelector(".text-primary");
     expect(icon).toBeInTheDocument();
 
-    const alertContainer = document.querySelector(".bg-blue-50");
+    const alertContainer = document.querySelector(".bg-accent");
     expect(alertContainer).toBeInTheDocument();
   });
 
@@ -74,10 +74,10 @@ describe("Alert Component", () => {
   it("renders with default title and variant when both are omitted", () => {
     renderComponent({ message: "Test message" });
 
-    const icon = document.querySelector(".text-blue-400");
+    const icon = document.querySelector(".text-primary");
     expect(icon).toBeInTheDocument();
 
-    const alertContainer = document.querySelector(".bg-blue-50");
+    const alertContainer = document.querySelector(".bg-accent");
     expect(alertContainer).toBeInTheDocument();
   });
 });
