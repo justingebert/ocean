@@ -4,7 +4,7 @@ import AppLayout, { AppLayoutProps } from "./AppLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router } from "react-router-dom";
 import { AuthProvider } from "../auth/AuthProvider";
-import { navigation, SettingsNavigation } from "../constants/menu";
+import { navigation, SettingsNavigation } from "../navigation/navigation";
 
 const queryClient = new QueryClient();
 

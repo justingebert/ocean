@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { FAQNavigation, ReportingNavigation, SettingsNavigation } from "../constants/menu.ts";
+import { FAQNavigation, ReportingNavigation, SettingsNavigation } from "../navigation/navigation.ts";
 import { UserProperties } from "../types/user.ts";
 import { getNavigationForUser, getNavigationSection, getUserInitials } from "./utils.ts";
 

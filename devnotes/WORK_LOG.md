@@ -6,6 +6,9 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-06-26 frontend refactoring
+- imrpove and cleanup routing
+
 ## 2026-06-25: frontend refactoring
 - extract components from large files
 - add ui components

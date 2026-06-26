@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-import { DatabasesNavigation } from "../../constants/menu.ts";
+import { DatabasesNavigation } from "../../navigation/navigation.ts";
 import { getDatabaseCreatedAt, getDatabaseEngineTitle } from "./databaseListFormat";
 import { DatabaseProperties } from "../../types/database";
 import DatabaseEngineLogo from "./DatabaseEngineLogo";

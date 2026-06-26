@@ -1,4 +1,4 @@
-import { Navigation, navigation } from "../constants/menu.ts";
+import { Navigation, navigation } from "../navigation/navigation.ts";
 import { UserProperties } from "../types/user.ts";
 
 export function getNavigationForUser(user: UserProperties | undefined): Navigation[] {

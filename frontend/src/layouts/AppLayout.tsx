@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { useAuth } from "../auth/authContext";
-import { navigation } from "../constants/menu.ts";
 import { UserClient } from "../api/userClient";
 import { getNavigationForUser, getNavigationSection } from "./utils.ts";
 import { DesktopSidebar, MobileSidebar } from "./Sidebar.tsx";
@@ -39,7 +38,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, selectedNavigation }) =
         onClose={() => setSidebarOpen(false)}
       />
       <DesktopSidebar
-        primaryNavigationItems={getNavigationSection(navigation, "primary")}
+        primaryNavigationItems={getNavigationSection(navigationWithPermission, "primary")}
         secondaryNavigationItems={getNavigationSection(navigationWithPermission, "secondary")}
         selectedNavigation={selectedNavigation}
       />

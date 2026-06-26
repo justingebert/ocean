@@ -2,7 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import { DatabasesNavigation } from "../../constants/menu.ts";
+import { DatabasesNavigation } from "../../navigation/navigation.ts";
+import { routeBuilders, routePaths } from "../../navigation/routes.ts";
 import { emptyDatabaseState } from "../../constants/empty";
 import { DatabaseClient } from "../../api/databaseClient";
 import AppLayout from "../../layouts/AppLayout";
@@ -24,9 +25,12 @@ const DatabasesView: React.FC = () => {
         <Headline title="Databases" size="large" />
       </div>
       {(databases || []).length === 0 ? (
-        <EmptyState {...emptyDatabaseState} onClick={() => navigate("/databases/new")} />
+        <EmptyState {...emptyDatabaseState} onClick={() => navigate(routePaths.createDatabase)} />
       ) : (
-        <DatabaseList databases={databases || []} onClick={(id) => navigate(`/databases/${id}`)} />
+        <DatabaseList
+          databases={databases || []}
+          onClick={(id) => navigate(routeBuilders.databaseDetail(id))}
+        />
       )}
     </AppLayout>
   );

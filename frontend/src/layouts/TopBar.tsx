@@ -4,7 +4,7 @@ import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/r
 import { Bars3CenterLeftIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 
 import CreateDropdown from "../components/CreateDropdown.tsx";
-import { SettingsNavigation } from "../constants/menu.ts";
+import { SettingsNavigation } from "../navigation/navigation.ts";
 import { cn } from "../lib/utils.ts";
 import { UserProperties } from "../types/user.ts";
 import { getUserInitials } from "./utils.ts";

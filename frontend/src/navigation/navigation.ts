@@ -7,58 +7,56 @@ import {
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
-// TODO: create a map for all routes
+import { routePaths } from "./routes.ts";
+
 export type LinkProps = {
   name: string;
-
   to: string;
 };
 
 export type Navigation = LinkProps & {
   section: "primary" | "secondary";
-
   requiredPermission?: string;
-
   icon: React.ElementType;
 };
 
 export const OverviewNavigation: Navigation = {
   name: "Overview",
-  to: "/overview",
+  to: routePaths.overview,
   section: "primary",
   icon: HomeIcon,
 };
 
 export const DatabasesNavigation: Navigation = {
   name: "Databases",
-  to: "/databases",
+  to: routePaths.databases,
   section: "primary",
   icon: CircleStackIcon,
 };
 
 export const SettingsNavigation: Navigation = {
   name: "Settings",
-  to: "/settings",
+  to: routePaths.settings,
   section: "secondary",
   icon: Cog8ToothIcon,
 };
 
 export const FAQNavigation: Navigation = {
   name: "FAQ",
-  to: "/faq",
+  to: routePaths.faq,
   section: "secondary",
   icon: QuestionMarkCircleIcon,
 };
 
 export const ReportingNavigation: Navigation = {
   name: "Reporting",
-  to: "/reporting",
+  to: routePaths.reporting,
   section: "secondary",
   requiredPermission: "Staff",
   icon: ChartBarIcon,
 };
 
-export const navigation = [
+export const navigation: Navigation[] = [
   OverviewNavigation,
   DatabasesNavigation,
   SettingsNavigation,

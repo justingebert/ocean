@@ -5,6 +5,7 @@ import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/r
 import { ChevronDownIcon, CircleStackIcon } from "@heroicons/react/20/solid";
 
 import { cn } from "../lib/utils.ts";
+import { routePaths } from "../navigation/routes.ts";
 
 const CreateDropdown: React.FC = () => {
   return (
@@ -37,7 +38,7 @@ const CreateDropdown: React.FC = () => {
                   {({ focus }) => (
                     <p>
                       <Link
-                        to="/databases/new"
+                        to={routePaths.createDatabase}
                         className={cn(
                           focus ? "bg-gray-100 text-gray-900" : "text-gray-700",
                           "group flex items-center px-4 py-2 text-sm",

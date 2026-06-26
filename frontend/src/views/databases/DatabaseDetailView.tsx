@@ -6,7 +6,8 @@ import { Database } from "../../types/database";
 import { User, UserProperties } from "../../types/user";
 import { UpstreamCreateRoleProperties } from "../../types/role";
 import { Invitation, UpstreamCreateInvitationProperties } from "../../types/invitation";
-import { DatabasesNavigation } from "../../constants/menu.ts";
+import { DatabasesNavigation } from "../../navigation/navigation.ts";
+import { routePaths } from "../../navigation/routes.ts";
 import { deleteModalContent } from "../../constants/modals";
 import { getDetailViewTabsFor } from "../../constants/tabs";
 import { InvitationClient } from "../../api/invitationClient";
@@ -142,7 +143,7 @@ const DatabaseDetailView: React.FC = () => {
     onSuccess: () => {
       setDeleteDatabaseOpenModal(false);
       queryClient.invalidateQueries({ queryKey: ["databases"] });
-      navigate("/databases");
+      navigate(routePaths.databases);
     },
   });
 

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../auth/authContext";
-import { OverviewNavigation } from "../constants/menu.ts";
+import { routePaths } from "../navigation/routes.ts";
 import { CredentialProperties } from "../types/models";
 
 import SignInForm from "../components/SignInForm";
@@ -13,7 +13,7 @@ const SignInView: React.FC = () => {
 
   useEffect(() => {
     if (status === "authenticated") {
-      navigate(OverviewNavigation.to, { replace: true });
+      navigate(routePaths.overview, { replace: true });
     }
   }, [status, navigate]);
 

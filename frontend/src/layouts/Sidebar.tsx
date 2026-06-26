@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 
-import { Navigation } from "../constants/menu.ts";
+import { Navigation } from "../navigation/navigation.ts";
 import { cn } from "../lib/utils.ts";
 import { getNavigationSection } from "./utils.ts";
 

@@ -157,7 +157,7 @@ describe("DatabaseDetailView Test", () => {
     cy.get('input[name="username"]').type("testuser");
     cy.get('input[name="password"]').type("password123");
     cy.get('button[type="submit"]').click();
-    cy.get('a[href="/databases/"]').click();
+    cy.get('a[href="/databases"]').click();
 
     cy.wait("@getDatabases");
 
@@ -188,7 +188,7 @@ describe("DatabaseDetailView Test", () => {
     cy.get('input[name="username"]').type("testuser");
     cy.get('input[name="password"]').type("password123");
     cy.get('button[type="submit"]').click();
-    cy.get('a[href="/databases/"]').click();
+    cy.get('a[href="/databases"]').click();
 
     cy.wait("@getDatabases");
 
@@ -218,7 +218,7 @@ describe("DatabaseDetailView Test", () => {
     cy.get('input[name="username"]').type("testuser");
     cy.get('input[name="password"]').type("password123");
     cy.get('button[type="submit"]').click();
-    cy.get('a[href="/databases/"]').click();
+    cy.get('a[href="/databases"]').click();
 
     cy.wait("@getDatabases");
 
@@ -249,7 +249,7 @@ describe("DatabaseDetailView Test", () => {
     cy.get('input[name="username"]').type("testuser");
     cy.get('input[name="password"]').type("password123");
     cy.get('button[type="submit"]').click();
-    cy.get('a[href="/databases/"]').click();
+    cy.get('a[href="/databases"]').click();
 
     cy.wait("@getDatabases");
 
@@ -279,7 +279,7 @@ describe("DatabaseDetailView Test", () => {
     cy.get('input[name="username"]').type("testuser");
     cy.get('input[name="password"]').type("password123");
     cy.get('button[type="submit"]').click();
-    cy.get('a[href="/databases/"]').click();
+    cy.get('a[href="/databases"]').click();
 
     cy.wait("@getDatabases");
 
@@ -310,7 +310,7 @@ describe("DatabaseDetailView Test", () => {
     cy.get('input[name="username"]').type("testuser");
     cy.get('input[name="password"]').type("password123");
     cy.get('button[type="submit"]').click();
-    cy.get('a[href="/databases/"]').click();
+    cy.get('a[href="/databases"]').click();
 
     cy.wait("@getDatabases");
 
@@ -341,7 +341,7 @@ describe("DatabaseDetailView Test", () => {
     cy.get('input[name="username"]').type("testuser");
     cy.get('input[name="password"]').type("password123");
     cy.get('button[type="submit"]').click();
-    cy.get('a[href="/databases/"]').click();
+    cy.get('a[href="/databases"]').click();
 
     cy.wait("@getDatabases");
 

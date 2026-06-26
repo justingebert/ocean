@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { SettingsNavigation } from "../constants/menu.ts";
+import { SettingsNavigation } from "../navigation/navigation.ts";
 import { settingsViewTabs } from "../constants/tabs";
 import { UserClient } from "../api/userClient";
 import AppLayout from "../layouts/AppLayout";
