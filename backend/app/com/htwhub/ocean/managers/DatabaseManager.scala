@@ -71,12 +71,27 @@ class DatabaseManager @Inject() (
       instance <- instanceService
         .addInstance(localInstance, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      _ <- instance match {
-        case value: Instance if value.engine == PostgreSQLEngineType => addDatabaseForPostgreSQL(value, user)
-        case value: Instance if value.engine == MongoDBSQLEngineType => addDatabaseForMongoDB(value, user)
-      }
+      _ <- Saga.withCompensation {
+        instance match {
+          case value: Instance if value.engine == PostgreSQLEngineType => addDatabaseForPostgreSQL(value, user)
+          case value: Instance if value.engine == MongoDBSQLEngineType => addDatabaseForMongoDB(value, user)
+        }
+      }(compensateAddDatabase(instance, user))
     } yield instance
   }
+
+  /** Undo a failed database provisioning: drop the (possibly partially created) cluster database and remove the
+    * orphaned metadata row.
+    */
+  private def compensateAddDatabase(instance: Instance, user: User): Future[Any] =
+    for {
+      _ <- (instance.engine match {
+        case PostgreSQLEngineType => postgreSQLEngine.deleteDatabase(instance.name)
+        case MongoDBSQLEngineType => mongoDBEngine.deleteDatabase(instance.name)
+        case _                    => Future.successful(())
+      }).recover { case _: Throwable => () } // best-effort: still remove the metadata row below
+      _ <- instanceService.deleteInstance(instance.id, user.id)
+    } yield ()
 
   def addDatabaseForPostgreSQL(instance: Instance, user: User): Future[List[Int]] =
     for {

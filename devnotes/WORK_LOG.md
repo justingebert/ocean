@@ -6,6 +6,14 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-07-08 — saga compensation for dual-write provisioning
+- The add flows (database, role, invitation) write the internal metadata row first, then run the managed-cluster op; a cluster failure left the metadata row (and sometimes a half-provisioned cluster object) dangling, since `recoverWith` only mapped the error without undoing anything.
+- Remaining gap: if the compensation itself fails, state can still dangle: needs a periodic reconciliation/cleanup pass later.
+
+## 2026-07-08 shadcn compoentns + ocean theme + theme toggler
+- refactoring fo large pages into components
+- add shadcn components + ocean theme
+
 ## 2026-06-26 frontend refactoring
 - imrpove and cleanup routing
 

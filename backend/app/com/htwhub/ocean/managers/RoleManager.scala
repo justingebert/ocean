@@ -58,13 +58,27 @@ class RoleManager @Inject() (
       role <- roleService
         .addRole(localRole, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      _ <- role match {
-        case _ if instance.engine == Instance.PostgreSQLEngineType => addRoleForPostgreSQL(role, instance)
-        case _ if instance.engine == Instance.MongoDBSQLEngineType => addRoleForMongoDB(role, instance)
-        case _                                                     => internalError("Wrong engine type")
-      }
+      _ <- Saga.withCompensation {
+        role match {
+          case _ if instance.engine == Instance.PostgreSQLEngineType => addRoleForPostgreSQL(role, instance)
+          case _ if instance.engine == Instance.MongoDBSQLEngineType => addRoleForMongoDB(role, instance)
+          case _                                                     => internalError("Wrong engine type")
+        }
+      }(compensateAddRole(role, instance, user))
     } yield role
   }
+
+  /** Undo a failed role provisioning: drop the (possibly created) cluster role/user and remove the orphaned metadat row.
+    */
+  private def compensateAddRole(role: Role, instance: Instance, user: User): Future[Any] =
+    for {
+      _ <- (instance.engine match {
+        case Instance.PostgreSQLEngineType => postgreSQLEngine.dropRole(role.name)
+        case Instance.MongoDBSQLEngineType => mongoDBEngine.deleteUser(instance.name, role.name)
+        case _                             => Future.successful(())
+      }).recover { case _: Throwable => () } // best-effort: still remove the metadata row below
+      _ <- roleService.deleteRoleById(role.id, user.id)
+    } yield ()
 
   def addRoleForPostgreSQL(role: Role, instance: Instance): Future[List[Int]] =
     for {

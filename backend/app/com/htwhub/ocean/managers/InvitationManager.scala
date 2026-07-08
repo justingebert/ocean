@@ -68,9 +68,11 @@ class InvitationManager @Inject() (
       invitation <- invitationService
         .addInvitation(localInvitation, user.id)
         .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
-      _ <- postgreSQLEngine
-        .grantDatabaseAccess(instance.name, invitedUser.username)
-        .recoverWith { t: Throwable => internalError(t.getMessage) }
+      _ <- Saga.withCompensation {
+        postgreSQLEngine
+          .grantDatabaseAccess(instance.name, invitedUser.username)
+          .recoverWith { t: Throwable => internalError(t.getMessage) }
+      }(invitationService.deleteInvitationById(invitation.id, user.id))
     } yield invitation
   }
 
