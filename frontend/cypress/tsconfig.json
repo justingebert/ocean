@@ -6,6 +6,10 @@
     "types": ["cypress", "node", "vite/client"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,

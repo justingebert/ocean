@@ -3,14 +3,14 @@ import * as yup from "yup";
 import { Field, Form, Formik, FormikHelpers } from "formik";
 import { CheckCircleIcon, ArrowPathIcon, NoSymbolIcon } from "@heroicons/react/24/outline";
 
-import { engineOptions } from "../../constants/engines";
-import { UpstreamDatabaseProperties } from "../../types/database";
-import { DatabaseClient } from "../../api/databaseClient";
+import { engineOptions } from "@/constants/engines.ts";
+import { UpstreamDatabaseProperties } from "@/types/database.ts";
+import { DatabaseClient } from "@/api/databaseClient.ts";
 import { Alert } from "../Feedback/Alert/Alert";
 import Headline from "../Headline";
 import { Button } from "../ui/button";
 import { EngineGroup } from "./EngineGroup/EngineGroup";
-import { EngineTypeValues } from "../../types/engine";
+import { EngineTypeValues } from "@/types/engine.ts";
 
 export interface CreateDatabaseFormProps {
   processing: boolean;
@@ -141,8 +141,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
               <Button
                 type="submit"
                 disabled={values.name === "" || !isValid || processing || isValidating}
-                size="form"
-                className="mt-6 w-full"
+                className="mt-6 h-10 w-full text-base sm:text-sm"
               >
                 Create a database
               </Button>

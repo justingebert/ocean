@@ -52,6 +52,21 @@ describe("AppLayout Tests", () => {
     cy.get("button[aria-label='Open sidebar']").should("not.exist");
   });
 
+  it("highlights the selected desktop navigation item", () => {
+    cy.viewport(1280, 800);
+    cy.wait("@getUser");
+
+    cy.get("nav[aria-label='Sidebar'] a[aria-current='page']")
+      .should("contain.text", "Overview")
+      .and("have.class", "bg-sidebar-primary")
+      .and("have.class", "text-sidebar-primary-foreground");
+
+    cy.get("nav[aria-label='Sidebar'] a[aria-current='page'] svg").should(
+      "have.class",
+      "text-sidebar-primary-foreground",
+    );
+  });
+
   it("renders children content", () => {
     cy.contains("Test Content").should("exist");
   });

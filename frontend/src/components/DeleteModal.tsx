@@ -82,17 +82,17 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ modalContent, open, onSubmit,
 
               <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                 <Button
-                  variant="danger"
-                  size="form"
-                  className="w-full sm:ml-3 sm:w-auto"
+                  type="button"
+                  variant="destructive"
+                  className="h-10 w-full sm:ml-3 sm:w-auto"
                   onClick={onSubmit}
                 >
                   {modalContent.submitText}
                 </Button>
                 <Button
+                  type="button"
                   variant="secondary"
-                  size="form"
-                  className="mt-3 w-full hover:text-foreground sm:mt-0 sm:w-auto"
+                  className="mt-3 h-10 w-full hover:text-foreground sm:mt-0 sm:w-auto"
                   onClick={onClose}
                 >
                   {modalContent.cancelText}

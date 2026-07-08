@@ -173,8 +173,7 @@ describe("DatabaseDetailView Test", () => {
 
     cy.wait("@createInvitationError").its("response.statusCode").should("eq", 400);
 
-    cy.contains("p", "Something went wrong :(").should("exist");
-    cy.contains("button", "Close").click();
+    cy.contains("Something went wrong").should("exist");
   });
 
   it("Successfully delete an invitation", () => {
@@ -203,8 +202,7 @@ describe("DatabaseDetailView Test", () => {
     cy.contains("div", "Delete").click();
 
     cy.wait("@deleteInvitation2").its("response.statusCode").should("eq", 200);
-    cy.contains("p", "Successfully delete!").should("exist");
-    cy.contains("button", "Close").click();
+    cy.contains("Successfully deleted!").should("exist");
   });
 
   it("Fails to delete an invitation", () => {
@@ -234,8 +232,7 @@ describe("DatabaseDetailView Test", () => {
 
     cy.wait("@deleteInvitation2").its("response.statusCode").should("eq", 400);
 
-    cy.contains("p", "Something went wrong :(").should("exist");
-    cy.contains("button", "Close").click();
+    cy.contains("Something went wrong").should("exist");
   });
 
   it("Successfully delete a user", () => {
@@ -264,8 +261,7 @@ describe("DatabaseDetailView Test", () => {
     cy.contains("div", "Delete").click();
 
     cy.wait("@deleteRole").its("response.statusCode").should("eq", 200);
-    cy.contains("p", "Successfully deleted!").should("exist");
-    cy.contains("button", "Close").click();
+    cy.contains("Successfully deleted!").should("exist");
   });
 
   it("Fails to delete a user", () => {
@@ -295,8 +291,7 @@ describe("DatabaseDetailView Test", () => {
 
     cy.wait("@deleteRole").its("response.statusCode").should("eq", 400);
 
-    cy.contains("p", "Something went wrong").should("exist");
-    cy.contains("button", "Close").click();
+    cy.contains("Something went wrong").should("exist");
   });
 
   it("Fails to create new user", () => {
@@ -327,12 +322,11 @@ describe("DatabaseDetailView Test", () => {
     cy.contains("Add new user").click();
     cy.get('input[name="roleName"]').type("new_role");
     cy.wait(1000);
-    cy.get("button.bg-indigo-600").contains("Create").click();
+    cy.contains("button", "Create").click();
 
     cy.wait("@createRoleError").its("response.statusCode").should("eq", 400);
 
-    cy.contains("p", "Something went wrong :(").should("exist");
-    cy.contains("button", "Close").click();
+    cy.contains("Something went wrong").should("exist");
   });
 
   it("Login and visit the detail db view", () => {
@@ -372,7 +366,7 @@ describe("DatabaseDetailView Test", () => {
     cy.contains("button", "Actions").click();
     cy.contains("Delete").click();
 
-    cy.contains("button", "Close").click();
+    cy.contains("button", "Cancel").click();
 
     cy.contains("button", "Actions").click();
     cy.contains("Delete").click();
@@ -395,18 +389,16 @@ describe("DatabaseDetailView Test", () => {
 
     cy.get('input[name="roleName"]').type("new_role");
     cy.wait(1000);
-    cy.get("button.bg-indigo-600").contains("Create").click();
+    cy.contains("button", "Create").click();
 
     cy.wait("@createRole").its("response.statusCode").should("eq", 200);
-    cy.contains("p", "Successfully created!").should("exist");
-    cy.contains("button", "Close").click();
+    cy.contains("Successfully created!").should("exist");
 
     cy.contains("Invitations").click();
     cy.get('button.relative.w-full[aria-haspopup="listbox"]').click();
     cy.get('[role="option"]').contains("O. User1").click();
 
     cy.wait("@createInvitation").its("response.statusCode").should("eq", 200);
-    cy.contains("p", "Successfully created!").should("exist");
-    cy.contains("button", "Close").click();
+    cy.contains("Successfully created!").should("exist");
   });
 });

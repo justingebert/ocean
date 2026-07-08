@@ -35,22 +35,32 @@ function SidebarNavigation({
   navClassName,
   linkClassName,
 }: SidebarNavigationProps) {
-  const renderLink = (item: Navigation) => (
-    <Link
-      key={item.name}
-      to={item.to}
-      className={cn(
-        item.name === selectedNavigation
-          ? "bg-sidebar-accent text-sidebar-accent-foreground"
-          : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground",
-        linkClassName,
-      )}
-      aria-current={item.name === selectedNavigation ? "page" : undefined}
-    >
-      <item.icon className="mr-4 flex-shrink-0 h-6 w-6 text-sidebar-icon" aria-hidden="true" />
-      {item.name}
-    </Link>
-  );
+  const renderLink = (item: Navigation) => {
+    const selected = item.name === selectedNavigation;
+
+    return (
+      <Link
+        key={item.name}
+        to={item.to}
+        className={cn(
+          selected
+            ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+            : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground",
+          linkClassName,
+        )}
+        aria-current={selected ? "page" : undefined}
+      >
+        <item.icon
+          className={cn(
+            "mr-4 flex-shrink-0 h-6 w-6",
+            selected ? "text-sidebar-primary-foreground" : "text-sidebar-icon",
+          )}
+          aria-hidden="true"
+        />
+        {item.name}
+      </Link>
+    );
+  };
 
   return (
     <nav className={navClassName} aria-label="Sidebar">

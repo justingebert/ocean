@@ -4,3 +4,7 @@ coverage
 cypress/screenshots
 cypress/videos
 package-lock.json
+src/components/ui/alert-dialog.tsx
+src/components/ui/button.tsx
+src/components/ui/dialog.tsx
+src/components/ui/sonner.tsx

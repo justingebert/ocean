@@ -2,9 +2,9 @@ import React from "react";
 import { Field, Form, Formik } from "formik";
 import * as yup from "yup";
 
-import { DatabaseProperties } from "../../types/database";
-import { UpstreamCreateRoleProperties } from "../../types/role";
-import { RoleClient } from "../../api/roleClient";
+import { DatabaseProperties } from "@/types/database.ts";
+import { UpstreamCreateRoleProperties } from "@/types/role.ts";
+import { RoleClient } from "@/api/roleClient.ts";
 import { Button } from "../ui/button";
 
 export interface CreateRoleFormProps {
@@ -80,13 +80,13 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
               </span>
             )}
             <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-              <Button type="submit" size="form" className="w-full sm:col-start-2">
+              <Button type="submit" className="h-10 w-full sm:col-start-2">
                 Create
               </Button>
               <Button
+                type="button"
                 variant="secondary"
-                size="form"
-                className="mt-3 w-full sm:mt-0 sm:col-start-1"
+                className="mt-3 h-10 w-full sm:col-start-1 sm:mt-0"
                 onClick={onClose}
               >
                 Cancel
