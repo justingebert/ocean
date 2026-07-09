@@ -5,19 +5,13 @@ import { StartingPoint } from "../constants/starting";
 import { cn } from "../lib/utils.ts";
 
 export interface StartingPointsProps {
-  title: string;
-
-  description: string;
-
   startingPoints: StartingPoint[];
 }
 
-const StartingPoints: React.FC<StartingPointsProps> = ({ title, description, startingPoints }) => {
+const StartingPoints: React.FC<StartingPointsProps> = ({ startingPoints }) => {
   return (
     <div>
-      <h2 className="text-lg font-medium text-foreground">{title}</h2>
-      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      <div className="mt-6 border-t border-b border-border py-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div className="mt-6 py-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
         {startingPoints.map((item, itemIdx) => (
           <div key={itemIdx} className="flow-root">
             <div className="relative -m-2 p-2 flex items-center space-x-4 rounded-xl hover:bg-muted focus-within:ring-2 focus-within:ring-ring">

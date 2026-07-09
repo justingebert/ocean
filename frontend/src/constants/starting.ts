@@ -17,20 +17,20 @@ export const startingPoints: StartingPoint[] = [
     description: "Add a new database now.",
     icon: CircleStackIcon,
     to: routePaths.createDatabase,
-    background: "bg-pink-500",
+    background: "bg-primary",
   },
   {
     title: "Manage Databases",
     description: "Manage databases in one place.",
     icon: CircleStackIcon,
     to: routePaths.databases,
-    background: "bg-pink-500",
+    background: "bg-chart-1",
   },
   {
     title: "Manage your profile",
     description: "All your user-specific settings are located here.",
     icon: Cog8ToothIcon,
     to: routePaths.settings,
-    background: "bg-yellow-500",
+    background: "bg-sidebar-primary",
   },
 ];

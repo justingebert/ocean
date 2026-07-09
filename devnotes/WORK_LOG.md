@@ -6,6 +6,14 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-07-09 — extract ProfileMenu, migrate to shadcn DropdownMenu + Avatar
+- Pulled the inline `ProfileMenu` out of `TopBar.tsx` into its own `components/ProfileMenu.tsx`; migrated it off Headless-UI to the shadcn `DropdownMenu` and replaced the hand-rolled SVG avatar with the shadcn `Avatar`/`AvatarFallback` (initials).
+- TopBar shed its Headless-UI/heroicons/cn imports as a result.
+
+## 2026-07-08 — migrate CreateDropdown/ActionDropdown to shadcn DropdownMenu
+- Replaced the Headless-UI `Menu`/`Transition` boilerplate in both dropdowns with the shadcn `DropdownMenu` + `Button` primitives (Radix handles open state, focus, portal, animation); Delete uses the built-in `variant="destructive"`.
+- Trimmed the tests to only what's ours: deleted `CreateDropdown.cy.tsx` (tested framework internals + a helper that no longer exists), kept a single `ActionDropdown` test asserting `onDelete` wiring.
+
 ## 2026-07-08 — saga compensation for dual-write provisioning
 - The add flows (database, role, invitation) write the internal metadata row first, then run the managed-cluster op; a cluster failure left the metadata row (and sometimes a half-provisioned cluster object) dangling, since `recoverWith` only mapped the error without undoing anything.
 - Remaining gap: if the compensation itself fails, state can still dangle: needs a periodic reconciliation/cleanup pass later.

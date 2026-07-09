@@ -10,11 +10,7 @@ const OverviewView: React.FC = () => {
   return (
     <AppLayout selectedNavigation={OverviewNavigation.name}>
       <Headline title="Overview" size="large" />
-      <StartingPoints
-        title="Getting started"
-        description="Get started by selecting a template."
-        startingPoints={startingPoints}
-      />
+      <StartingPoints startingPoints={startingPoints} />
     </AppLayout>
   );
 };

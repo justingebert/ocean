@@ -1,28 +1,17 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { describe, it, expect, vi } from "vitest";
 import ActionDropdown from "./ActionDropdown";
 
 describe("ActionDropdown", () => {
-  it("renders the Actions button", () => {
-    render(<ActionDropdown />);
+  it("calls onDelete when Delete is selected", async () => {
+    const onDelete = vi.fn();
+    render(<ActionDropdown onDelete={onDelete} />);
 
-    const button = screen.getByRole("button", { name: /actions/i });
+    await userEvent.click(screen.getByRole("button", { name: /actions/i }));
+    await userEvent.click(await screen.findByText(/delete/i));
 
-    expect(button).toBeInTheDocument();
-  });
-
-  it("calls onDelete when Delete is clicked", () => {
-    const onDeleteMock = vi.fn();
-    render(<ActionDropdown onDelete={onDeleteMock} />);
-
-    const button = screen.getByRole("button", { name: /actions/i });
-    fireEvent.click(button);
-
-    const deleteOption = screen.getByText(/delete/i);
-
-    fireEvent.click(deleteOption);
-
-    expect(onDeleteMock).toHaveBeenCalledTimes(1);
+    expect(onDelete).toHaveBeenCalledTimes(1);
   });
 });
