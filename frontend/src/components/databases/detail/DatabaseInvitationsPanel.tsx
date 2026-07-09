@@ -10,8 +10,8 @@ import {
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 
 import Headline from "../../Headline";
-import { cn } from "../../../lib/utils";
-import { InvitedUserProperties, User, UserProperties } from "../../../types/user";
+import { cn } from "@/lib/utils.ts";
+import { InvitedUserProperties, User, UserProperties } from "@/types/user.ts";
 
 interface DatabaseInvitationsPanelProps {
   users: UserProperties[];

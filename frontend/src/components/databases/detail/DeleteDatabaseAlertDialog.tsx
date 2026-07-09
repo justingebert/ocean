@@ -30,7 +30,7 @@ export function DeleteDatabaseAlertDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogMedia className="bg-red-100 text-red-600">
+          <AlertDialogMedia className={"bg-destructive/10 text-destructive"}>
             <ExclamationTriangleIcon className="h-6 w-6" aria-hidden="true" />
           </AlertDialogMedia>
           <AlertDialogTitle>{deleteModalContent.title}</AlertDialogTitle>
