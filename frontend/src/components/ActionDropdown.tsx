@@ -17,15 +17,13 @@ export interface ActionDropdownProps {
 const ActionDropdown: React.FC<ActionDropdownProps> = ({ onDelete }) => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="secondary">
-          Actions
-          <ChevronDownIcon />
-        </Button>
+      <DropdownMenuTrigger render={<Button variant="secondary" />}>
+        Actions
+        <ChevronDownIcon data-icon="inline-end" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuItem variant="destructive" onSelect={() => onDelete?.()}>
-          <Trash2Icon />
+        <DropdownMenuItem variant="destructive" onClick={() => onDelete?.()}>
+          <Trash2Icon data-icon="inline-start" />
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>

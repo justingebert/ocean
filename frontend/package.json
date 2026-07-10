@@ -21,6 +21,8 @@
     "test": "npm run vitest && npm run cypress:component"
   },
   "dependencies": {
+    "@base-ui/react": "^1.6.0",
+    "@fontsource-variable/inter": "^5.2.8",
     "@headlessui/react": "^2.0.0",
     "@heroicons/react": "^2.0.0",
     "@tailwindcss/forms": "^0.5.0",
@@ -33,7 +35,6 @@
     "jose": "^5.9.6",
     "lucide-react": "^1.21.0",
     "next-themes": "^0.4.6",
-    "radix-ui": "^1.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.0.0",
@@ -67,7 +68,7 @@
     "jsdom": "^26.0.0",
     "nyc": "^17.1.0",
     "prettier": "^3.8.3",
-    "shadcn": "^4.11.1",
+    "shadcn": "^4.13.0",
     "typescript": "~5.7.0",
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5",

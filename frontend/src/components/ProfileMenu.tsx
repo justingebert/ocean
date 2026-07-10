@@ -31,23 +31,21 @@ export function ProfileMenu({ user, loading, onLogout }: ProfileMenuProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="ml-3 h-auto gap-2 lg:px-2 lg:py-1.5">
-          <Avatar>
-            <AvatarFallback>{getUserInitials(user)}</AvatarFallback>
-          </Avatar>
-          <span className="hidden text-sm font-medium lg:block">
-            <span className="sr-only">Open user menu for </span>
-            {user?.firstName}
-          </span>
-          <ChevronDownIcon className="hidden text-muted-foreground lg:block" />
-        </Button>
+      <DropdownMenuTrigger
+        render={<Button variant="ghost" className="ml-3 h-auto gap-2 lg:px-2 lg:py-1.5" />}
+      >
+        <Avatar>
+          <AvatarFallback>{getUserInitials(user)}</AvatarFallback>
+        </Avatar>
+        <span className="hidden text-sm font-medium lg:block">
+          <span className="sr-only">Open user menu for </span>
+          {user?.firstName}
+        </span>
+        <ChevronDownIcon data-icon="inline-end" className="hidden text-muted-foreground lg:block" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem asChild>
-          <Link to={SettingsNavigation.to}>Settings</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => onLogout()}>Logout</DropdownMenuItem>
+        <DropdownMenuItem render={<Link to={SettingsNavigation.to} />}>Settings</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onLogout()}>Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

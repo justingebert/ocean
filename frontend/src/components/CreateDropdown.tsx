@@ -15,18 +15,14 @@ import { routePaths } from "../navigation/routes.ts";
 const CreateDropdown: React.FC = () => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button>
-          Create
-          <ChevronDownIcon />
-        </Button>
+      <DropdownMenuTrigger render={<Button />}>
+        Create
+        <ChevronDownIcon data-icon="inline-end" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuItem asChild>
-          <Link to={routePaths.createDatabase}>
-            <DatabaseIcon />
-            Databases
-          </Link>
+        <DropdownMenuItem render={<Link to={routePaths.createDatabase} />}>
+          <DatabaseIcon data-icon="inline-start" />
+          Databases
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
