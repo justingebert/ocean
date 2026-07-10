@@ -1,16 +1,27 @@
-import React, { JSX } from "react";
+import React from "react";
 import * as yup from "yup";
-import { Field, Form, Formik, FormikHelpers } from "formik";
-import { CheckCircleIcon, ArrowPathIcon, NoSymbolIcon } from "@heroicons/react/24/outline";
+import { Form, Formik } from "formik";
+import { CircleCheckIcon, CircleXIcon } from "lucide-react";
 
 import { engineOptions } from "@/constants/engines.ts";
 import { UpstreamDatabaseProperties } from "@/types/database.ts";
 import { DatabaseClient } from "@/api/databaseClient.ts";
+import type { EngineTypeValues } from "@/types/engine.ts";
 import { Alert } from "../Feedback/Alert/Alert";
 import Headline from "../Headline";
 import { Button } from "../ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "../ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "../ui/input-group";
+import { Spinner } from "../ui/spinner";
 import { EngineGroup } from "./EngineGroup/EngineGroup";
-import { EngineTypeValues } from "@/types/engine.ts";
 
 export interface CreateDatabaseFormProps {
   processing: boolean;
@@ -64,27 +75,10 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
     return false;
   };
 
-  const renderNameInput = (touched: boolean, loading: boolean, valid: boolean): JSX.Element => {
-    if (loading) {
-      return <ArrowPathIcon className="animate-spin h-5 w-5 text-blue-400" aria-hidden="true" />;
-    } else if (touched && valid) {
-      return <CheckCircleIcon className="h-5 w-5 text-green-400" aria-hidden="true" />;
-    } else if (!valid && touched) {
-      return <NoSymbolIcon className="h-5 w-5 text-red-400" aria-hidden="true" />;
-    }
-    return <NoSymbolIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />;
-  };
-
   return (
     <>
       <div className="mb-5">
         <Headline title="Create a database" size="large" />
-      </div>
-      <div className="mb-3">
-        <Headline title="Choose a database engine" size="medium" />
-      </div>
-      <div className="text-sm font-light mb-3">
-        A database runs a single database engine that powers one or more individual databases.
       </div>
       <Formik
         initialValues={{
@@ -92,62 +86,101 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
           engine: "P",
         }}
         validationSchema={createDatabaseSchema}
-        onSubmit={(
-          values: UpstreamDatabaseProperties,
-          { setSubmitting }: FormikHelpers<UpstreamDatabaseProperties>,
-        ) => {
+        onSubmit={(values: UpstreamDatabaseProperties) => {
           onSubmit(values);
-          setSubmitting(true);
         }}
       >
-        {({ errors, touched, values, setFieldValue, isValidating, isValid }) => (
-          <Form className="space-y-6">
-            <>
-              <EngineGroup
-                engineOptions={engineOptions}
-                selectedValue={values.engine}
-                onSelect={(value) => setFieldValue("engine", value)}
-              />
-              <div className="text-xl text-gray-600 sm:text-2xl mt-6 mb-3">
-                Choose a unique database name
-              </div>
-              <div className="text-sm font-light">
-                Names must be lowercase and start with a letter. They can be between 4 and 32
-                characters long and may contain underscores.
-              </div>
-              <div className="mt-3">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Database Name
-                </label>
-                {errors.name && touched.name && (
-                  <span className="mt-2 text-sm text-red-600" id="nameHelp">
-                    {errors.name}
-                  </span>
-                )}
-                <div className="mt-1 relative rounded-md shadow-sm">
-                  <Field
-                    id="name"
-                    name="name"
-                    type="text"
-                    placeholder="abcd_1234"
-                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-10 sm:text-sm border-gray-300 rounded-md"
-                  />
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    {renderNameInput(values.name !== "", isValidating, isValid)}
-                  </div>
-                </div>
-              </div>
-              {errorMessage && <Alert message={errorMessage} title="Error" variant="danger" />}
-              <Button
-                type="submit"
-                disabled={values.name === "" || !isValid || processing || isValidating}
-                className="mt-6 h-10 w-full text-base sm:text-sm"
-              >
-                Create a database
-              </Button>
-            </>
-          </Form>
-        )}
+        {({
+          errors,
+          touched,
+          values,
+          setFieldValue,
+          isValidating,
+          isValid,
+          handleBlur,
+          handleChange,
+        }) => {
+          const nameInvalid = Boolean(touched.name && errors.name);
+          const nameAvailable = Boolean(
+            values.name && touched.name && !isValidating && isValid && !errors.name,
+          );
+
+          return (
+            <Form>
+              <FieldGroup>
+                <FieldSet>
+                  <FieldLegend>Choose a database engine</FieldLegend>
+                  <FieldDescription>
+                    A database runs a single database engine that powers one or more individual
+                    databases.
+                  </FieldDescription>
+                  <Field>
+                    <EngineGroup
+                      engineOptions={engineOptions}
+                      selectedValue={values.engine}
+                      onSelect={(value) => setFieldValue("engine", value)}
+                    />
+                  </Field>
+                </FieldSet>
+
+                <Field data-invalid={nameInvalid}>
+                  <FieldLabel htmlFor="name">Database name</FieldLabel>
+                  <FieldDescription id="database-name-description">
+                    Names must be lowercase and start with a letter. They can be between 4 and 32
+                    characters long and may contain underscores.
+                  </FieldDescription>
+                  <InputGroup>
+                    <InputGroupInput
+                      id="name"
+                      name="name"
+                      type="text"
+                      value={values.name}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      placeholder="database_123"
+                      autoComplete="off"
+                      aria-required="true"
+                      aria-invalid={nameInvalid}
+                      aria-describedby={
+                        nameInvalid
+                          ? "database-name-description database-name-error"
+                          : "database-name-description"
+                      }
+                    />
+                    {(isValidating || nameAvailable || nameInvalid) && (
+                      <InputGroupAddon align="inline-end" aria-live="polite">
+                        {isValidating ? (
+                          <Spinner aria-label="Checking name availability" />
+                        ) : nameAvailable ? (
+                          <>
+                            <CircleCheckIcon className="text-success" aria-hidden="true" />
+                            <span className="sr-only">Name is available</span>
+                          </>
+                        ) : (
+                          <CircleXIcon className="text-destructive" aria-hidden="true" />
+                        )}
+                      </InputGroupAddon>
+                    )}
+                  </InputGroup>
+                  {nameInvalid && <FieldError id="database-name-error">{errors.name}</FieldError>}
+                </Field>
+
+                {errorMessage && <Alert message={errorMessage} title="Error" variant="danger" />}
+
+                <Field>
+                  <Button
+                    type="submit"
+                    disabled={values.name === "" || !isValid || processing || isValidating}
+                    className="w-full"
+                  >
+                    {processing && <Spinner data-icon="inline-start" />}
+                    {processing ? "Creating database..." : "Create a database"}
+                  </Button>
+                </Field>
+              </FieldGroup>
+            </Form>
+          );
+        }}
       </Formik>
     </>
   );

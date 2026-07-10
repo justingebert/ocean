@@ -1,13 +1,15 @@
 import React from "react";
 
-import { EngineOption, IEngineOption } from "./EngineOption";
+import type { DatabaseEngineOption } from "@/constants/engines.ts";
+import type { EngineTypeValues } from "@/types/engine.ts";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group.tsx";
 
 export interface EngineSelectorProps {
-  engineOptions: ReadonlyArray<IEngineOption>;
+  engineOptions: ReadonlyArray<DatabaseEngineOption>;
 
-  selectedValue: string;
+  selectedValue: EngineTypeValues;
 
-  onSelect?: (value: string) => void;
+  onSelect?: (value: EngineTypeValues) => void;
 }
 
 export const EngineGroup: React.FC<EngineSelectorProps> = ({
@@ -16,17 +18,30 @@ export const EngineGroup: React.FC<EngineSelectorProps> = ({
   onSelect,
 }) => {
   return (
-    <div className="flex flex-col space-y-3">
-      <div className="flex flex-row space-x-4">
-        {engineOptions.map((engineOption, index) => (
-          <EngineOption
-            key={index.toString()}
-            engineOption={engineOption}
-            selected={engineOption.value === selectedValue}
-            onSelect={onSelect}
-          />
-        ))}
-      </div>
-    </div>
+    <ToggleGroup
+      value={[selectedValue]}
+      onValueChange={(values) => {
+        const nextValue = values[0] as EngineTypeValues | undefined;
+        if (nextValue) {
+          onSelect?.(nextValue);
+        }
+      }}
+      variant="outline"
+      size="lg"
+      spacing={2}
+      aria-label="Database engine"
+      className="grid w-full grid-cols-1 sm:grid-cols-2"
+    >
+      {engineOptions.map((engineOption) => (
+        <ToggleGroupItem
+          key={engineOption.id}
+          value={engineOption.value}
+          className="h-auto w-full flex-col gap-3 p-4"
+        >
+          <img className="h-12 w-auto" src={engineOption.imageSrc} alt="" aria-hidden="true" />
+          <span>{engineOption.label}</span>
+        </ToggleGroupItem>
+      ))}
+    </ToggleGroup>
   );
 };

@@ -55,9 +55,11 @@ describe("<SignInForm />", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/username is required/i)).toBeInTheDocument();
-
       expect(screen.getByText(/password is required/i)).toBeInTheDocument();
     });
+
+    expect(screen.getByLabelText(/username/i)).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByLabelText(/password/i)).toHaveAttribute("aria-invalid", "true");
   });
 
   it("displays an error message when errorMessage is set", () => {
@@ -75,5 +77,12 @@ describe("<SignInForm />", () => {
     fireEvent.change(screen.getByLabelText(/password/i), { target: { value: "password123" } });
 
     await user.click(screen.getByRole("button", { name: /sign in/i }));
+  });
+
+  it("shows progress and disables submission while signing in", () => {
+    render(<SignInForm loading />);
+
+    expect(screen.getByRole("button", { name: /signing in/i })).toBeDisabled();
+    expect(screen.getByRole("status", { name: /loading/i })).toBeInTheDocument();
   });
 });

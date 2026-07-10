@@ -1,11 +1,14 @@
 import React from "react";
-import { Field, Form, Formik } from "formik";
+import { Form, Formik } from "formik";
 import * as yup from "yup";
 
 import { DatabaseProperties } from "@/types/database.ts";
 import { UpstreamCreateRoleProperties } from "@/types/role.ts";
 import { RoleClient } from "@/api/roleClient.ts";
 import { Button } from "../ui/button";
+import { DialogFooter } from "../ui/dialog";
+import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "../ui/input-group";
 
 export interface CreateRoleFormProps {
   database?: DatabaseProperties;
@@ -46,56 +49,60 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
   };
 
   return (
-    <>
-      <Formik
-        initialValues={{
-          roleName: "",
-        }}
-        validationSchema={schema}
-        onSubmit={(values) => {
-          if (database) {
-            onSubmit({ roleName: `${database.name}_${values.roleName}`, instanceId: database.id });
-          }
-        }}
-      >
-        {({ errors }) => (
-          <Form className="space-y-6">
-            <label htmlFor="company-website" className="block text-sm font-medium text-gray-700">
-              Username
-            </label>
-            <div className="mt-1 flex rounded-md shadow-sm">
-              <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
-                {database ? `${database.name}_` : ":("}
-              </span>
-              <Field
-                id="roleName"
-                name="roleName"
-                type="text"
-                className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300"
-              />
-            </div>
-            {errors.roleName && (
-              <span className="mt-2 text-sm text-red-600" id="roleNameHelp">
-                {errors.roleName}
-              </span>
-            )}
-            <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-              <Button type="submit" className="h-10 w-full sm:col-start-2">
-                Create
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                className="mt-3 h-10 w-full sm:col-start-1 sm:mt-0"
-                onClick={onClose}
-              >
-                Cancel
-              </Button>
-            </div>
+    <Formik
+      initialValues={{
+        roleName: "",
+      }}
+      validationSchema={schema}
+      onSubmit={(values, { setSubmitting }) => {
+        if (database) {
+          onSubmit({ roleName: `${database.name}_${values.roleName}`, instanceId: database.id });
+        }
+        setSubmitting(false);
+      }}
+    >
+      {({ errors, touched, values, handleBlur, handleChange, isSubmitting }) => {
+        const roleNameInvalid = Boolean(touched.roleName && errors.roleName);
+
+        return (
+          <Form>
+            <FieldGroup>
+              <Field data-invalid={roleNameInvalid} data-disabled={!database}>
+                <FieldLabel htmlFor="roleName">Username</FieldLabel>
+                <InputGroup data-disabled={!database}>
+                  <InputGroupAddon align="inline-start">
+                    {database ? `${database.name}_` : "Database unavailable"}
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    id="roleName"
+                    name="roleName"
+                    type="text"
+                    value={values.roleName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={!database}
+                    autoComplete="off"
+                    aria-required="true"
+                    aria-invalid={roleNameInvalid}
+                    aria-describedby={roleNameInvalid ? "role-name-error" : undefined}
+                  />
+                </InputGroup>
+                {roleNameInvalid && <FieldError id="role-name-error">{errors.roleName}</FieldError>}
+              </Field>
+
+              <DialogFooter>
+                <Button type="button" variant="secondary" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={!database || isSubmitting}>
+                  Create
+                </Button>
+              </DialogFooter>
+            </FieldGroup>
           </Form>
-        )}
-      </Formik>
-    </>
+        );
+      }}
+    </Formik>
   );
 };
 

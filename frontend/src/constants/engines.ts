@@ -1,21 +1,25 @@
-import { IEngineOption } from "../components/forms/EngineGroup/EngineOption";
-
 import mongodbLogo from "../img/mongodb-logo.svg";
 import postgresqlLogo from "../img/postgresql-logo.svg";
+import type { EngineTypeValues } from "../types/engine";
 
-export const engineOptions: ReadonlyArray<IEngineOption> = [
+export interface DatabaseEngineOption {
+  id: number;
+  value: EngineTypeValues;
+  label: string;
+  imageSrc: string;
+}
+
+export const engineOptions: ReadonlyArray<DatabaseEngineOption> = [
   {
     id: 1,
     label: "PostgreSQL",
     value: "P",
     imageSrc: postgresqlLogo,
-    alt: "postgresql logo",
   },
   {
     id: 2,
     label: "MongoDB",
     value: "M",
     imageSrc: mongodbLogo,
-    alt: "mongodb logo",
   },
 ];

@@ -36,13 +36,9 @@ describe("CreateRoleForm", () => {
   it("renders the form correctly", () => {
     render(<CreateRoleForm {...defaultProps} />);
 
-    expect(screen.getByText(/username/i)).toBeInTheDocument();
-
-    expect(screen.getByRole("textbox", { name: "" })).toBeInTheDocument();
-
-    expect(screen.getByText(/create/i)).toBeInTheDocument();
-
-    expect(screen.getByText(/cancel/i)).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: /username/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /create/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
   });
 
   it("shows validation errors for invalid input", async () => {
@@ -53,6 +49,11 @@ describe("CreateRoleForm", () => {
     await waitFor(() => {
       expect(screen.getByText(/name is required/i)).toBeInTheDocument();
     });
+
+    expect(screen.getByRole("textbox", { name: /username/i })).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
   });
 
   it("calls onClose when cancel button is clicked", async () => {
@@ -60,7 +61,7 @@ describe("CreateRoleForm", () => {
 
     render(<CreateRoleForm {...defaultProps} />);
 
-    await user.click(screen.getByText(/cancel/i));
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
 
     expect(mockOnClose).toHaveBeenCalled();
   });

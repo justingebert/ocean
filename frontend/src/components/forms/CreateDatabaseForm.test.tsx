@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import CreateDatabaseForm, { CreateDatabaseFormProps } from "./CreateDatabaseForm";
 import { DatabaseClient } from "../../api/databaseClient";
@@ -26,7 +27,7 @@ describe("CreateDatabaseForm", () => {
     render(<CreateDatabaseForm {...defaultProps} />);
 
     expect(screen.getByText("Create a database", { selector: "div" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Database Name")).toBeInTheDocument();
+    expect(screen.getByLabelText(/database name/i)).toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: "Create a database" })).toBeInTheDocument();
   });
@@ -44,6 +45,7 @@ describe("CreateDatabaseForm", () => {
     await waitFor(() =>
       expect(screen.getByText("Name should be of minimum 4 characters length")).toBeInTheDocument(),
     );
+    expect(nameInput).toHaveAttribute("aria-invalid", "true");
 
     fireEvent.change(nameInput, { target: { value: "valid_name" } });
     fireEvent.blur(nameInput);
@@ -52,13 +54,15 @@ describe("CreateDatabaseForm", () => {
         screen.queryByText(/Name should be of minimum 4 characters length/),
       ).not.toBeInTheDocument(),
     );
+    expect(nameInput).toHaveAttribute("aria-invalid", "false");
   });
 
   it("disables submit button when processing", () => {
     render(<CreateDatabaseForm {...defaultProps} processing={true} />);
-    const submitButton = screen.getByRole("button", { name: "Create a database" });
+    const submitButton = screen.getByRole("button", { name: /creating database/i });
 
     expect(submitButton).toBeDisabled();
+    expect(screen.getByRole("status", { name: /loading/i })).toBeInTheDocument();
   });
 
   it("validateDatabaseValues returns true when availability is true", async () => {
@@ -75,6 +79,28 @@ describe("CreateDatabaseForm", () => {
       expect(spyApi).toHaveBeenCalledWith({
         name: "valid_name",
         engine: EngineType.PostgreSQL,
+      });
+    });
+
+    spyApi.mockRestore();
+  });
+
+  it("validates the name against the selected engine", async () => {
+    const user = userEvent.setup();
+    const spyApi = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(true);
+
+    render(<CreateDatabaseForm {...defaultProps} />);
+
+    await user.click(screen.getByRole("button", { name: "MongoDB" }));
+    fireEvent.change(screen.getByLabelText(/database name/i), {
+      target: { value: "mongo_database" },
+    });
+    fireEvent.blur(screen.getByLabelText(/database name/i));
+
+    await waitFor(() => {
+      expect(spyApi).toHaveBeenCalledWith({
+        name: "mongo_database",
+        engine: EngineType.MongoDB,
       });
     });
 

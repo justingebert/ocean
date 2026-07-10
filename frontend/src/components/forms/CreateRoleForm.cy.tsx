@@ -61,4 +61,27 @@ describe("CreateRoleForm Component", () => {
 
     cy.get("@onClose").should("have.been.called");
   });
+
+  it("keeps the desktop actions together in a dialog footer", () => {
+    cy.viewport(800, 600);
+
+    cy.get("form").then(($form) => {
+      const formBounds = $form[0].getBoundingClientRect();
+
+      cy.wrap($form)
+        .find('[data-slot="dialog-footer"]')
+        .then(($footer) => {
+          const footerBounds = $footer[0].getBoundingClientRect();
+          expect(footerBounds.left).to.be.at.least(formBounds.left);
+          expect(footerBounds.right).to.be.at.most(formBounds.right);
+
+          cy.wrap($footer)
+            .find("button")
+            .should("have.length", 2)
+            .each(($button) => {
+              expect($button[0].getBoundingClientRect().width).to.be.lessThan(formBounds.width / 2);
+            });
+        });
+    });
+  });
 });
