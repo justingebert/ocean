@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import { getDetailViewTabsFor } from "@/constants/tabs.ts";
+import { getDetailViewTabsFor, type DatabaseDetailTabValue } from "@/constants/tabs.ts";
 import { useDatabaseDetail } from "@/hooks/databases/useDatabaseDetail.ts";
-import { Tabs } from "../../Navigation/Tabs/Tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx";
 import { CreateRoleDialog } from "./CreateRoleDialog";
 import { DatabaseDetailHeader } from "./DatabaseDetailHeader";
 import { DatabaseInvitationsPanel } from "./DatabaseInvitationsPanel";
@@ -16,20 +16,51 @@ interface DatabaseDetailPageProps {
 }
 
 export function DatabaseDetailPage({ databaseId, onDeleted }: DatabaseDetailPageProps) {
-  const [activeId, setActiveId] = useState<number>(1);
+  const [activeTab, setActiveTab] = useState<DatabaseDetailTabValue>("overview");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [createRoleDialogOpen, setCreateRoleDialogOpen] = useState(false);
   const detail = useDatabaseDetail(databaseId, { onDeleted });
+  const availableTabs = getDetailViewTabsFor(detail.database?.engine);
 
   return (
     <>
       <DatabaseDetailHeader database={detail.database} onDelete={() => setDeleteDialogOpen(true)} />
       <Tabs
-        tabs={getDetailViewTabsFor(detail.database?.engine)}
-        activeId={activeId}
-        onSelect={setActiveId}
-      />
-      <div className="mt-4">{renderTabContent()}</div>
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as DatabaseDetailTabValue)}
+      >
+        <TabsList variant="line" aria-label="Database details">
+          {availableTabs.map((tab) => (
+            <TabsTrigger key={tab.value} value={tab.value}>
+              {tab.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <TabsContent value="overview" className="mt-4">
+          <DatabaseOverviewPanel
+            database={detail.databaseModel}
+            user={detail.currentUser}
+            mongoUser={detail.mongoUser}
+          />
+        </TabsContent>
+        <TabsContent value="users" className="mt-4">
+          <DatabaseUsersPanel
+            roles={detail.roles}
+            isCreatingRole={detail.isCreatingRole}
+            onAddUser={() => setCreateRoleDialogOpen(true)}
+            onDeleteRole={detail.deleteRole}
+          />
+        </TabsContent>
+        <TabsContent value="invitations" className="mt-4">
+          <DatabaseInvitationsPanel
+            users={detail.otherUsers}
+            invitedUsers={detail.invitedUsers}
+            selectedUserIds={detail.selectedInvitationUserIds}
+            onSelectUser={detail.createInvitation}
+            onDeselectUser={detail.deleteInvitationForUser}
+          />
+        </TabsContent>
+      </Tabs>
       <DeleteDatabaseAlertDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
@@ -44,37 +75,4 @@ export function DatabaseDetailPage({ databaseId, onDeleted }: DatabaseDetailPage
       />
     </>
   );
-
-  function renderTabContent() {
-    if (activeId === 1) {
-      return (
-        <DatabaseOverviewPanel
-          database={detail.databaseModel}
-          user={detail.currentUser}
-          mongoUser={detail.mongoUser}
-        />
-      );
-    } else if (activeId === 2) {
-      return (
-        <DatabaseUsersPanel
-          roles={detail.roles}
-          isCreatingRole={detail.isCreatingRole}
-          onAddUser={() => setCreateRoleDialogOpen(true)}
-          onDeleteRole={detail.deleteRole}
-        />
-      );
-    } else if (activeId === 3) {
-      return (
-        <DatabaseInvitationsPanel
-          users={detail.otherUsers}
-          invitedUsers={detail.invitedUsers}
-          selectedUserIds={detail.selectedInvitationUserIds}
-          onSelectUser={detail.createInvitation}
-          onDeselectUser={detail.deleteInvitationForUser}
-        />
-      );
-    }
-
-    return null;
-  }
 }

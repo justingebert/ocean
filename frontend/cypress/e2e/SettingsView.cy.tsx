@@ -58,6 +58,7 @@ describe("Login and Navigate to Settings", () => {
     });
 
     cy.contains("Settings").should("exist");
+    cy.get('[role="tab"]').should("not.exist");
     cy.wait(5000);
 
     cy.contains("Test User").should("exist");

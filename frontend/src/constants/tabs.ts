@@ -1,26 +1,29 @@
-import { ITab } from "../components/Navigation/Tabs/Tab";
-import { EngineType, EngineTypeValues } from "../types/engine";
+import { EngineType, type EngineTypeValues } from "../types/engine";
 
-const databaseDetailTabs: ITab[] = [
-  { id: 1, name: "Overview" },
-  { id: 2, name: "Users" },
-  { id: 3, name: "Invitations" },
+export type DatabaseDetailTabValue = "overview" | "users" | "invitations";
+
+export interface DatabaseDetailTab {
+  value: DatabaseDetailTabValue;
+  name: string;
+}
+
+const databaseDetailTabs: ReadonlyArray<DatabaseDetailTab> = [
+  { value: "overview", name: "Overview" },
+  { value: "users", name: "Users" },
+  { value: "invitations", name: "Invitations" },
 ];
 
-export const getDetailViewTabsFor = (engineType: EngineTypeValues | undefined): ITab[] => {
-  const postgresqlIds = [1, 2, 3];
-  const mongodbIds = [1, 2];
-
+export const getDetailViewTabsFor = (
+  engineType: EngineTypeValues | undefined,
+): ReadonlyArray<DatabaseDetailTab> => {
   if (engineType === EngineType.PostgreSQL) {
-    return databaseDetailTabs.filter((tab) => postgresqlIds.includes(tab.id));
+    return databaseDetailTabs;
   } else if (engineType === EngineType.MongoDB) {
-    return databaseDetailTabs.filter((tab) => mongodbIds.includes(tab.id));
+    return databaseDetailTabs.filter((tab) => tab.value !== "invitations");
   } else if (engineType === undefined) {
     return [];
   } else {
-    const assertNever = (_: never): ITab[] => [];
+    const assertNever = (_: never): ReadonlyArray<DatabaseDetailTab> => [];
     return assertNever(engineType);
   }
 };
-
-export const settingsViewTabs: ITab[] = [{ id: 1, name: "Profile" }];

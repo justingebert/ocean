@@ -1,17 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { SettingsNavigation } from "../navigation/navigation.ts";
-import { settingsViewTabs } from "../constants/tabs";
 import { UserClient } from "../api/userClient";
 import AppLayout from "../layouts/AppLayout";
 import Headline from "../components/Headline";
 import ProfileCard from "../components/ProfileCard/ProfileCard";
-import { Tabs } from "../components/Navigation/Tabs/Tabs";
 
 const SettingsView: React.FC = () => {
-  const [activeId, setActiveId] = useState(settingsViewTabs[0].id);
-
   const userQuery = useQuery({
     queryKey: ["user"],
     queryFn: () => UserClient.getUser(),
@@ -21,7 +17,6 @@ const SettingsView: React.FC = () => {
     <AppLayout selectedNavigation={SettingsNavigation.name}>
       <div>
         <Headline title="Settings" size="large" />
-        <Tabs tabs={settingsViewTabs} activeId={activeId} onSelect={setActiveId} />
         <ProfileCard user={userQuery.data} loading={userQuery.isFetching} />
       </div>
     </AppLayout>

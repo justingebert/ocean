@@ -30,8 +30,6 @@ const mockStartingPoints = [
 ];
 
 const defaultProps: StartingPointsProps = {
-  title: "Getting Started",
-  description: "Explore the starting points to get familiar with the application.",
   startingPoints: mockStartingPoints,
 };
 
@@ -44,16 +42,6 @@ const renderComponent = (props = defaultProps) => {
 };
 
 describe("StartingPoints Component", () => {
-  it("renders the title and description", () => {
-    renderComponent();
-
-    expect(screen.getByText("Getting Started")).toBeInTheDocument();
-
-    expect(
-      screen.getByText("Explore the starting points to get familiar with the application."),
-    ).toBeInTheDocument();
-  });
-
   it("renders the starting points with correct data", () => {
     renderComponent();
 

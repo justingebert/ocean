@@ -167,7 +167,7 @@ describe("DatabaseDetailView Test", () => {
     cy.wait("@getDatabaseInvitations");
     cy.wait("@getUsers");
 
-    cy.contains("Invitations").click();
+    cy.contains('[role="tab"]', "Invitations").click();
     cy.get('button.relative.w-full[aria-haspopup="listbox"]').click();
     cy.get('[role="option"]').contains("O. User1").click();
 
@@ -197,7 +197,7 @@ describe("DatabaseDetailView Test", () => {
     cy.wait("@getDatabaseInvitations");
     cy.wait("@getUsers");
 
-    cy.contains("Invitations").click();
+    cy.contains('[role="tab"]', "Invitations").click();
 
     cy.contains("div", "Delete").click();
 
@@ -226,7 +226,7 @@ describe("DatabaseDetailView Test", () => {
     cy.wait("@getDatabaseInvitations");
     cy.wait("@getUsers");
 
-    cy.contains("Invitations").click();
+    cy.contains('[role="tab"]', "Invitations").click();
 
     cy.contains("div", "Delete").click();
 
@@ -256,7 +256,7 @@ describe("DatabaseDetailView Test", () => {
     cy.wait("@getDatabaseInvitations");
     cy.wait("@getUsers");
 
-    cy.contains("Users").click();
+    cy.contains('[role="tab"]', "Users").click();
 
     cy.contains("div", "Delete").click();
 
@@ -285,7 +285,7 @@ describe("DatabaseDetailView Test", () => {
     cy.wait("@getDatabaseInvitations");
     cy.wait("@getUsers");
 
-    cy.contains("Users").click();
+    cy.contains('[role="tab"]', "Users").click();
 
     cy.contains("div", "Delete").click();
 
@@ -317,7 +317,7 @@ describe("DatabaseDetailView Test", () => {
     cy.wait("@getDatabaseInvitations");
     cy.wait("@getUsers");
 
-    cy.contains("Users").click();
+    cy.contains('[role="tab"]', "Users").click();
 
     cy.contains("Add new user").click();
     cy.get('input[name="roleName"]').type("new_role");
@@ -350,17 +350,17 @@ describe("DatabaseDetailView Test", () => {
     cy.contains("Test Database 1").should("exist");
     cy.contains("PostgreSQL").should("exist");
 
-    cy.contains("Overview").should("exist");
-    cy.contains("Users").should("exist");
-    cy.contains("Invitations").should("exist");
+    cy.contains('[role="tab"]', "Overview").should("exist");
+    cy.contains('[role="tab"]', "Users").should("exist");
+    cy.contains('[role="tab"]', "Invitations").should("exist");
 
-    cy.contains("Users").click();
+    cy.contains('[role="tab"]', "Users").click();
     cy.contains("Add new user").should("exist");
 
-    cy.contains("Invitations").click();
+    cy.contains('[role="tab"]', "Invitations").click();
     cy.contains("Invite other people").should("exist");
 
-    cy.get("div.whitespace-nowrap.cursor-pointer").contains("Overview").click();
+    cy.get('[role="tab"]').contains("Overview").click();
     cy.contains("Test Database").should("exist");
 
     cy.contains("button", "Actions").click();
@@ -379,7 +379,7 @@ describe("DatabaseDetailView Test", () => {
 
     cy.contains("p", "Test Database 1").click();
 
-    cy.contains("Users").click();
+    cy.contains('[role="tab"]', "Users").click();
 
     cy.contains("Add new user").click();
 
@@ -394,7 +394,7 @@ describe("DatabaseDetailView Test", () => {
     cy.wait("@createRole").its("response.statusCode").should("eq", 200);
     cy.contains("Successfully created!").should("exist");
 
-    cy.contains("Invitations").click();
+    cy.contains('[role="tab"]', "Invitations").click();
     cy.get('button.relative.w-full[aria-haspopup="listbox"]').click();
     cy.get('[role="option"]').contains("O. User1").click();
 
