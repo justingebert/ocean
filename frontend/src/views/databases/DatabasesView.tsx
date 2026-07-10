@@ -7,7 +7,7 @@ import { routeBuilders, routePaths } from "../../navigation/routes.ts";
 import { emptyDatabaseState } from "../../constants/empty";
 import { DatabaseClient } from "../../api/databaseClient";
 import AppLayout from "../../layouts/AppLayout";
-import DatabaseList from "../../components/DatabaseList/DatabaseList";
+import DatabaseList from "@/components/databases/DatabaseList/DatabaseList";
 import EmptyState from "../../components/EmptyState";
 import Headline from "../../components/Headline";
 

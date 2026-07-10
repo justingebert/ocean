@@ -1,6 +1,6 @@
 import ActionDropdown from "../../ActionDropdown";
-import DatabaseEngineLogo from "../../DatabaseList/DatabaseEngineLogo";
-import { getDatabaseEngineTitle } from "@/components/DatabaseList/databaseListFormat.ts";
+import DatabaseEngineLogo from "@/components/databases/DatabaseList/DatabaseEngineLogo";
+import { getDatabaseEngineTitle } from "@/components/databases/DatabaseList/databaseListFormat.ts";
 import { DatabaseProperties } from "@/types/database.ts";
 
 interface DatabaseDetailHeaderProps {

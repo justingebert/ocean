@@ -1,7 +1,7 @@
 import React from "react";
 import { mount } from "cypress/react";
 import { UserAdminList, UserAdminListProps } from "./UserAdminList";
-import { UserProperties } from "../../types/user";
+import { UserProperties } from "../../../types/user";
 
 describe("UserAdminList Component", () => {
   const mockUsers: ReadonlyArray<UserProperties> = [
@@ -82,18 +82,7 @@ describe("UserAdminList Component", () => {
       });
   });
 
-  it("applies correct styles to employee type badges", () => {
-    cy.get("tbody tr")
-      .eq(0)
-      .contains("td", "Admin")
-      .within(() => {
-        cy.get("span")
-
-          .should("have.class", "bg-green-100")
-
-          .and("have.class", "text-green-800")
-
-          .and("have.class", "rounded-full");
-      });
+  it("renders the employee type as a badge", () => {
+    cy.get("tbody tr").eq(0).contains("td", "Admin").find("[data-slot=badge]").should("exist");
   });
 });

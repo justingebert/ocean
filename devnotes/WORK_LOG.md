@@ -6,6 +6,14 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-07-10 — migrate Reporting admin tables to shadcn Table
+- Rewrote `DatabaseAdminList` and `UserAdminList` on the shadcn `Table` + `Badge` primitives; the delete action is now a `Button variant="destructive"` instead of a raw clickable div. Dropped the hand-rolled `<table>`/`bg-gray-*`/green-pill markup.
+- Updated the `UserAdminList` Cypress spec: its badge test asserted the old pill's raw Tailwind classes; now checks the `Badge` renders (`data-slot=badge`).
+
+## 2026-07-09 — migrate Databases list to shadcn Table
+- Rewrote `DatabaseList` on the shadcn `Table` + `Badge` primitives; collapsed the separate desktop-table / mobile-card entry components into one responsive table (Created column hides on small screens, container scrolls), deleting `DesktopDatabaseListEntry`/`MobileDatabaseListEntry`.
+- Deleted the orphaned components the detail-panel migration left behind (CreateRoleModal, RoleList, InvitationList, UserSelector, OverviewCard). Documented the shadcn approach in `frontend/README.md`.
+
 ## 2026-07-09 — extract ProfileMenu, migrate to shadcn DropdownMenu + Avatar
 - Pulled the inline `ProfileMenu` out of `TopBar.tsx` into its own `components/ProfileMenu.tsx`; migrated it off Headless-UI to the shadcn `DropdownMenu` and replaced the hand-rolled SVG avatar with the shadcn `Avatar`/`AvatarFallback` (initials).
 - TopBar shed its Headless-UI/heroicons/cn imports as a result.

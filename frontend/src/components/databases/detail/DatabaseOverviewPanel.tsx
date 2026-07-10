@@ -1,5 +1,5 @@
 import { Card } from "../../ui/card";
-import { getDatabaseEngineTitle } from "../../DatabaseList/databaseListFormat";
+import { getDatabaseEngineTitle } from "@/components/databases/DatabaseList/databaseListFormat";
 import { Database } from "@/types/database.ts";
 import { EngineType } from "@/types/engine.ts";
 import { RoleProperties } from "@/types/role.ts";

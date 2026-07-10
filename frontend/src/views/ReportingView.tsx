@@ -10,9 +10,9 @@ import {
   useDeleteDatabaseWithPermissionMutation,
 } from "../hooks/useDatabaseQuery";
 import { IStats, Stats } from "../components/Stats/Stats";
-import { DatabaseAdminList } from "../components/DatabaseAdminList/DatabaseAdminList";
+import { DatabaseAdminList } from "@/components/reporting/DatabaseAdminList/DatabaseAdminList";
 import { useUsersQuery } from "../hooks/useUserQuery";
-import { UserAdminList } from "../components/UserAdminList/UserAdminList";
+import { UserAdminList } from "@/components/reporting/UserAdminList/UserAdminList";
 
 const ReportingView: React.FC = () => {
   const metricsQuery = useMetricsQuery();

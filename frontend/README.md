@@ -41,6 +41,18 @@ Tests are **colocated** (`foo.ts` + `foo.test.ts`); Cypress specs live in
   attempt, retries the original request, and expires the session if refresh
   fails.
 
+## UI components
+
+The UI is built with [shadcn/ui](https://ui.shadcn.com). shadcn is not a
+dependency you install. Its CLI copies each component's source into
+`src/components/ui/` (`button`, `card`, `dialog`, `table`, `badge`, …), so we own
+the code and edit it directly. The components are accessible primitives (built on
+Radix) styled with Tailwind and themed through CSS variables in `src/index.css`,
+which gives one consistent look plus light/dark theming across the whole app.
+
+Add a component with `npx shadcn@latest add <name>`, then build screens by
+composing these primitives instead of hand writing styled markup.
+
 ## Config
 
 Two layers, resolved in `config.ts`:
