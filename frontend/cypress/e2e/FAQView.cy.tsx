@@ -1,15 +1,12 @@
 describe("Login and Navigate to FAQ", () => {
-  const loginApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/auth/signin";
-  const userApiUrl = "http://databases.f4.htw-berlin.de:9000/v1/user";
-
   beforeEach(() => {
-    cy.intercept("POST", loginApiUrl, (req) => {
+    cy.intercept("POST", "**/v1/auth/signin", (req) => {
       if (req.body.username === "testuser" && req.body.password === "password123") {
         req.reply({
           statusCode: 200,
           body: {
-            token: "mocked-jwt-token",
-            user: { id: 1, name: "Test User", email: "testuser@example.com" },
+            accessToken: "mocked-access-token",
+            refreshToken: "mocked-refresh-token",
           },
         });
       } else {
@@ -20,7 +17,7 @@ describe("Login and Navigate to FAQ", () => {
       }
     }).as("signinRequest");
 
-    cy.intercept("GET", userApiUrl, {
+    cy.intercept("GET", "**/v1/user", {
       statusCode: 200,
       body: {
         id: 1,
@@ -33,7 +30,7 @@ describe("Login and Navigate to FAQ", () => {
     }).as("getUser");
   });
 
-  it("logs in and navigates to the settings page using the Open sidebar button", () => {
+  it("logs in, navigates to the FAQ, and expands its answers", () => {
     cy.visit("http://localhost:5173/login");
 
     cy.get('input[name="username"]').type("testuser");
@@ -41,25 +38,21 @@ describe("Login and Navigate to FAQ", () => {
     cy.get('button[type="submit"]').click();
 
     cy.wait("@signinRequest").its("response.statusCode").should("eq", 200);
-    cy.wait(1000);
+    cy.wait("@getUser").its("response.statusCode").should("eq", 200);
 
     cy.contains("span", "Open sidebar").click({ force: true });
-    cy.wait(1000);
-    cy.get('a[href="/faq"]').click({ multiple: true, force: true });
-    cy.wait(1000);
-    cy.contains("Frequently asked questions").should("exist");
+    cy.get('a[href="/faq"]:visible').click();
+    cy.url().should("include", "/faq");
+    cy.contains("Frequently asked questions").should("be.visible");
 
-    cy.contains("Wo finde ich die Datenschutzerklärung?").should("exist");
-    cy.contains("Wo finde ich das Impressum?").should("exist");
-    cy.contains("Wo finde ich die Datenschutzerklärung?").click();
-    cy.wait(1000);
+    cy.contains("button", "Wo finde ich die Datenschutzerklärung?").click();
 
     cy.contains("https://www.htw-berlin.de/datenschutz/").should("be.visible");
 
-    cy.contains("Wo finde ich die Datenschutzerklärung?").click();
+    cy.contains("button", "Wo finde ich die Datenschutzerklärung?").click();
+    cy.contains("https://www.htw-berlin.de/datenschutz/").should("not.be.visible");
 
-    cy.contains("Wo finde ich das Impressum?").click();
-    cy.wait(1000);
+    cy.contains("button", "Wo finde ich das Impressum?").click();
 
     cy.contains("https://www.htw-berlin.de/impressum/").should("be.visible");
   });

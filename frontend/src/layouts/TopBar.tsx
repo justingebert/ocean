@@ -1,8 +1,12 @@
 import { Bars3CenterLeftIcon } from "@heroicons/react/20/solid";
+import { Link } from "react-router-dom";
 
-import CreateDropdown from "../components/CreateDropdown.tsx";
+import { PlusIcon } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { ModeToggle } from "../components/mode-toggle.tsx";
 import { ProfileMenu } from "../components/ProfileMenu.tsx";
+import { routePaths } from "../navigation/routes.ts";
 import { UserProperties } from "../types/user.ts";
 
 type TopBarProps = {
@@ -14,22 +18,22 @@ type TopBarProps = {
 
 export function TopBar({ user, userLoading, onOpenSidebar, onLogout }: TopBarProps) {
   return (
-    <div className="relative z-10 flex-shrink-0 flex h-16 bg-card border-b border-border lg:border-none">
+    <div className="relative z-10 flex h-16 flex-shrink-0 border-b border-border bg-card lg:border-none">
       <button
         type="button"
-        className="px-4 border-r border-border text-muted-foreground focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sidebar-ring lg:hidden"
+        className="border-r border-border px-4 text-muted-foreground focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sidebar-ring lg:hidden"
         onClick={onOpenSidebar}
       >
         <span className="sr-only">Open sidebar</span>
         <Bars3CenterLeftIcon className="h-6 w-6" aria-hidden="true" />
       </button>
-      <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8 border-b-2 border-muted">
-        <div className="flex-1 flex"></div>
-        <div className="ml-4 flex items-center gap-2 md:ml-6">
-          <CreateDropdown />
-          <ModeToggle />
-          <ProfileMenu user={user} loading={userLoading} onLogout={onLogout} />
-        </div>
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-end gap-2 border-b-2 border-muted px-4 sm:px-6 lg:px-8">
+        <ModeToggle />
+        <Button render={<Link to={routePaths.createDatabase} />}>
+          <PlusIcon data-icon="inline-start" />
+          Create
+        </Button>
+        <ProfileMenu user={user} loading={userLoading} onLogout={onLogout} />
       </div>
     </div>
   );
