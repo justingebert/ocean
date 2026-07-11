@@ -1,9 +1,8 @@
 import axios, { AxiosError } from "axios";
 import { decodeJwt as joseDecodeJwt, type JWTPayload } from "jose";
 
-import { config } from "@/config";
-import { clearStoredTokens, getStoredRefreshToken, storeAccessToken } from "@/auth/tokenStorage";
-import { SessionClient } from "./sessionClient";
+import { config } from "@/lib/config";
+import { clearStoredTokens, storeAccessToken } from "@/api/tokenStorage";
 
 const headers = {
   "Content-Type": "application/json",
@@ -34,8 +33,12 @@ export const setBearerToken = (accessToken: string) => {
 };
 
 type SessionExpiredHandler = (message: string) => void;
+type RenewAccessToken = () => Promise<string>;
 
-export const setupRequestInterceptors = (onSessionExpired: SessionExpiredHandler) => {
+export const setupRequestInterceptors = (
+  onSessionExpired: SessionExpiredHandler,
+  renewAccessToken: RenewAccessToken,
+) => {
   const responseHandle = axiosInstance.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
@@ -78,25 +81,4 @@ export const setupRequestInterceptors = (onSessionExpired: SessionExpiredHandler
   return () => {
     axiosInstance.interceptors.response.eject(responseHandle);
   };
-};
-const renewAccessToken = async (): Promise<string> => {
-  const refreshToken = getStoredRefreshToken();
-
-  if (!refreshToken) {
-    throw new Error("No refresh token in storage.");
-  }
-
-  const decodedRefreshToken = decodeJwt(refreshToken);
-
-  if (!decodedRefreshToken?.exp) {
-    throw new Error("Invalid or expired refresh token.");
-  }
-
-  const now = Math.ceil(Date.now() / 1000);
-  if (decodedRefreshToken.exp < now) {
-    throw new Error("Refresh token expired.");
-  }
-
-  const response = await SessionClient.refreshToken({ refreshToken });
-  return response.accessToken;
 };

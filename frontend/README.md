@@ -12,42 +12,42 @@ Formik + Yup · axios + jose. Tests: Vitest + Cypress.
 
 Everything lives under `src/`:
 
-| Path          | What it is                                                           |
-| ------------- | -------------------------------------------------------------------- |
-| `views/`      | route-level screens (overview, databases, settings, sign-in, …)      |
-| `layouts/`    | shells the views render inside                                       |
-| `components/` | reusable UI: lists, modals, forms, navigation, stats                 |
-| `api/`        | one axios client per resource (database, role, invitation, …) + auth |
-| `auth/`       | auth context, token storage, login/logout/session restore            |
-| `hooks/`      | TanStack Query hooks wrapping the API clients                        |
-| `navigation/` | canonical route paths/builders and sidebar navigation metadata       |
-| `types/`      | shared TypeScript types                                              |
-| `config.ts`   | resolves runtime + build-time config into one `config` object        |
+| Path          | What it is                                                         |
+| ------------- | ------------------------------------------------------------------ |
+| `app/`        | composition root: providers, router, routes, shell, and navigation |
+| `features/`   | domain modules: auth, databases, overview, reporting, and users    |
+| `components/` | shared presentation: shadcn primitives and small reusable modules  |
+| `api/`        | shared axios client plus session, token, and user transport        |
+| `lib/`        | framework-independent configuration and utilities                  |
+| `types/`      | genuinely shared user contracts                                    |
 
 Tests are **colocated** (`foo.ts` + `foo.test.ts`); Cypress specs live in
 `cypress/` (component) and `cypress/e2e/`.
 
 ## The model
 
-- **Routing** lives in `views/index.tsx`, with canonical paths in
-  `navigation/routes.ts`. Visible sidebar/topbar entries live in
-  `navigation/navigation.ts`.
-- **Auth/session** is owned by `auth/AuthProvider.tsx`. It restores sessions,
+- **Routing and composition** live in `app/`. `app/router.tsx` mounts the
+  protected `app/layout/AppLayout.tsx` once and renders route modules through
+  its outlet. Cross-feature composition belongs in `app/routes/`.
+- **Auth/session** is owned by `features/auth/AuthProvider.tsx`. It restores sessions,
   logs in/out, stores tokens, sets the bearer token, and clears TanStack Query
   cache on session end.
-- **Server state** is TanStack Query. Hooks in `hooks/` and screens call the API
-  clients in `api/`, which all use the shared axios instance.
+- **Server state** is TanStack Query. Feature hooks call feature-specific or
+  shared clients, which use the shared axios instance.
 - **Token refresh** is handled by `api/client.ts`: a `401` triggers one refresh
   attempt, retries the original request, and expires the session if refresh
   fails.
+- **Dependency direction** is shared modules → features → app. ESLint prevents
+  shared modules from importing features/app and features from importing app.
+- **Feature folders stay proportional.** Subfolders are added only when file
+  density earns them; small features remain flat. Feature barrels are avoided.
 
 ## UI components
 
-The UI is built with [shadcn/ui](https://ui.shadcn.com). shadcn is not a
-dependency you install. Its CLI copies each component's source into
+The UI is built with [shadcn/ui](https://ui.shadcn.com). Its CLI copies each module's source into
 `src/components/ui/` (`button`, `card`, `dialog`, `table`, `badge`, …), so we own
-the code and edit it directly. The components are accessible primitives (built on
-Radix) styled with Tailwind and themed through CSS variables in `src/index.css`,
+the code and edit it directly. The modules use accessible Base UI primitives,
+Tailwind, and CSS variables in `src/index.css`,
 which gives one consistent look plus light/dark theming across the whole app.
 
 Add a component with `npx shadcn@latest add <name>`, then build screens by
@@ -55,7 +55,7 @@ composing these primitives instead of hand writing styled markup.
 
 ## Config
 
-Two layers, resolved in `config.ts`:
+Two layers, resolved in `lib/config.ts`:
 
 - **Build-time:** `VITE_*` vars baked in by Vite (see `.env.example`). Used for
   local dev.

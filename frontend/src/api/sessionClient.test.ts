@@ -1,14 +1,22 @@
 import { describe, it, expect, vi } from "vitest";
-import { axiosInstance } from "./client";
+import { axiosInstance, decodeJwt } from "./client";
 import { SessionClient } from "./sessionClient";
+import { getStoredRefreshToken } from "./tokenStorage";
 
 vi.mock("./client", () => ({
   axiosInstance: {
     post: vi.fn(),
   },
+  decodeJwt: vi.fn(),
+}));
+
+vi.mock("./tokenStorage", () => ({
+  getStoredRefreshToken: vi.fn(),
 }));
 
 const mockedAxiosInstance = axiosInstance as unknown as { post: ReturnType<typeof vi.fn> };
+const mockedDecodeJwt = vi.mocked(decodeJwt);
+const mockedGetStoredRefreshToken = vi.mocked(getStoredRefreshToken);
 
 describe("SessionClient", () => {
   it("sends a POST request to /auth/signin with credentials and returns tokens", async () => {
@@ -49,9 +57,9 @@ describe("SessionClient", () => {
   it("throws an error when token refresh fails", async () => {
     mockedAxiosInstance.post.mockRejectedValueOnce(new Error("Token refresh failed"));
 
-    await expect(SessionClient.refreshToken({ refreshToken: "invalidRefreshToken" })).rejects.toThrow(
-      "Token refresh failed",
-    );
+    await expect(
+      SessionClient.refreshToken({ refreshToken: "invalidRefreshToken" }),
+    ).rejects.toThrow("Token refresh failed");
   });
 
   it("uses the refreshed token for subsequent requests", async () => {
@@ -101,5 +109,24 @@ describe("SessionClient", () => {
     });
 
     expect(result).toEqual(mockRefreshResponse.data);
+  });
+
+  it("renews a stored, unexpired refresh token", async () => {
+    mockedGetStoredRefreshToken.mockReturnValue("refresh123");
+    mockedDecodeJwt.mockReturnValue({ exp: Math.ceil(Date.now() / 1000) + 60 });
+    mockedAxiosInstance.post.mockResolvedValueOnce({
+      data: { accessToken: "newAccessToken", refreshToken: "newRefreshToken" },
+    });
+
+    await expect(SessionClient.renewAccessToken()).resolves.toBe("newAccessToken");
+  });
+
+  it("rejects a missing or expired refresh token before requesting a new token", async () => {
+    mockedGetStoredRefreshToken.mockReturnValueOnce(null);
+    await expect(SessionClient.renewAccessToken()).rejects.toThrow("No refresh token");
+
+    mockedGetStoredRefreshToken.mockReturnValueOnce("expired");
+    mockedDecodeJwt.mockReturnValueOnce({ exp: Math.ceil(Date.now() / 1000) - 1 });
+    await expect(SessionClient.renewAccessToken()).rejects.toThrow("Invalid or expired");
   });
 });

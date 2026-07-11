@@ -6,6 +6,15 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-07-11 — frontend composition and feature ownership cleanup
+- Finished the feature-first restructure around a simple shared → features → app dependency direction. The app now owns routing, navigation, the protected shell, and cross-feature reporting composition; feature route modules no longer assemble app chrome themselves.
+- Kept the structure proportional: flattened the small overview feature, colocated database models/assets and administration UI with the database feature, removed the HTTP/session import cycle, and added lightweight ESLint direction checks without introducing barrels or placeholder folders.
+- Updated frontend documentation and added coverage for routed navigation selection and token renewal.
+
+## 2026-07-11 — frontend feature-first restructure (phase 2 of folder refactor)
+- Moved the frontend off the half type-first / half feature-first layout to a **feature-first** structure: `src/features/{auth,databases,reporting,users,overview}/` each colocating its own `api/components/hooks/pages/constants/types`. Shared kernel stays at top level (`api/` base client + token infra + cross-cutting `userClient`, `types/` domain models, `components/{ui,common}`, `layouts/`, `navigation/`, `lib/`, `pages/` for FAQ/404/Loading, `app/` composition root). ~85 files relocated via `git mv` (history preserved); done with two codemods (bulk move + `@/` specifier remap) plus manual fixes for broken sibling imports, `vi.mock()` paths, and the app-shell entry files.
+- Judgement calls: `roleClient`/`invitationClient`/etc. fold into the databases feature (only used there); `invitation` type stays shared because shared `types/user` references it, whereas `role` is database-only; `tokenStorage`+`sessionClient` stay in shared `api/` since the base HTTP interceptor depends on them (avoids a shared→feature import). Updated CLAUDE.md's frontend section to document the new layout + dependency rules. Verified: tsc, lint, 114 Vitest tests, production build, and Cypress typecheck all green.
+
 ## 2026-07-11 — frontend structure cleanup (phase 1 of folder refactor)
 - Low-risk consistency pass ahead of a later feature-first migration: unified all cross-directory imports to the `@/` alias (152 imports across 63 files via a one-off codemod), and added an ESLint `no-restricted-imports` gate banning parent-relative (`../`) paths so it can't regress (`./` siblings still allowed).
 - Renamed the odd-one-out `sessionApi` → `sessionClient` (file + `SessionClient` class) to match the `*Client` convention, flattened `hooks/databases/` back into `hooks/`, and deleted the empty dead `components/Feedback/` folder.

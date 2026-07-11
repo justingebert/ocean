@@ -43,5 +43,45 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ["src/features/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["../*", "../**"],
+              message: "Use the '@/' alias for cross-directory imports.",
+            },
+            {
+              group: ["@/app/*", "@/app/**"],
+              message: "Features cannot depend on the app composition module.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/{api,components,lib,types}/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["../*", "../**"],
+              message: "Use the '@/' alias for cross-directory imports.",
+            },
+            {
+              group: ["@/app/*", "@/app/**", "@/features/*", "@/features/**"],
+              message: "Shared modules cannot depend on app or feature implementation.",
+            },
+          ],
+        },
+      ],
+    },
+  },
   prettier,
 );

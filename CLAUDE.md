@@ -70,13 +70,14 @@ Adding a new managed database engine (one of the research-project targets) means
 
 ## Frontend architecture
 
-- React 19 + Vite 6 + Tailwind 4 (`@tailwindcss/vite` plugin, not PostCSS).
-- State: Redux Toolkit slices + redux-saga for side effects (`src/redux/{slices,sagas,store.ts,reducers.ts}`).
-- Data fetching: **TanStack Query v5** for server state on top of axios clients in `src/api/*Client.ts` — each resource (database, role, invitation, metric, user, session) has its own client + colocated `*.test.ts`.
-- Routing: React Router 7 (`src/views/*` are route-level screens; `src/layouts/` wraps them).
-- Forms: Formik + Yup.
-- Auth token: `jose` for JWT handling client-side.
-- Tests are **colocated** next to sources (`foo.ts` + `foo.test.ts`); Vitest setup in `vitest.setup.ts` / `vitest.config.ts`. Cypress component specs under `cypress/`, E2E under `cypress/e2e/`.
+- React 19 + Vite 6 + Tailwind 4 (`@tailwindcss/vite` plugin, not PostCSS). UI primitives are shadcn (Base UI) under `src/components/ui/`.
+- **Feature-first layout** (`src/features/<capability>/`) — domain implementation is organised by capability. Current features are `auth`, `databases`, `reporting`, `users`, and `overview`; subfolders are created only when file density earns them.
+- `src/app/` is the composition root: providers, router, route modules, protected shell, and navigation. Cross-feature composition belongs in `app/routes/`; feature modules never import `app`.
+- Shared modules stay at `src/` top level: `api/` (axios + shared session/token/user transport), `types/` (genuinely cross-feature contracts), `components/{ui,common}/`, and `lib/` (`utils.ts`, `config.ts`). Database models and assets live with the database feature.
+- Dependency direction is **shared → features → app**. ESLint prevents shared modules from importing features/app and features from importing app. Direct feature imports are preferred over `index.ts` barrels.
+- State/data: **TanStack Query v5** on top of axios clients (`*Client.ts`). Routing: React Router 7 with lazy-loaded `app/routes/`. Forms: Formik + Yup. Auth token: `jose` client-side.
+- **Imports**: always use the `@/` alias for cross-directory imports; `./` only for same-folder siblings. Parent-relative `../` paths are banned by an ESLint `no-restricted-imports` gate (note: it lints `import`/`export`, not `vi.mock()` string args — keep those on `@/` manually).
+- Tests are **colocated** next to sources (`foo.ts` + `foo.test.ts`); Vitest setup in `vitest.setup.ts` / `vitest.config.ts`. Cypress component specs (`*.cy.tsx`) live next to components, E2E under `cypress/e2e/`.
 - Backend API version prefix is `/v1` — see `backend/conf/routes` for the surface.
 
 ## Research-project context
