@@ -1,9 +1,9 @@
 import React from "react";
 
-import { AuthLoadingScreen } from "../components/AuthLoadingScreen";
+import { AppShellLoading } from "../components/AppShellLoading";
 
 const LoadingView: React.FC = () => {
-  return <AuthLoadingScreen />;
+  return <AppShellLoading label="Loading page" />;
 };
 
 export default LoadingView;

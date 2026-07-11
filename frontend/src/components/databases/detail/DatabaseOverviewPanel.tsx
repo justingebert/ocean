@@ -1,5 +1,6 @@
-import { Card } from "../../ui/card";
+import { Card, CardContent } from "../../ui/card";
 import { getDatabaseEngineTitle } from "@/components/databases/DatabaseList/databaseListFormat";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Database } from "@/types/database.ts";
 import { EngineType } from "@/types/engine.ts";
 import { RoleProperties } from "@/types/role.ts";
@@ -21,53 +22,61 @@ export function DatabaseOverviewPanel({ database, user, mongoUser }: DatabaseOve
 
   return (
     <Card className="overflow-hidden">
-      <div className="p-5 sm:px-6">
+      <CardContent className="p-5 sm:px-6">
         <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
           <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-gray-500">Database</dt>
+            <dt className="text-sm font-medium text-muted-foreground">Database</dt>
             {database ? (
-              <dd className="mt-1 text-sm text-gray-900">{database.name}</dd>
+              <dd className="mt-1 text-sm text-foreground">{database.name}</dd>
             ) : (
-              <dd className="mt-1 h-6 w-48 animate-pulse bg-gray-200" />
+              <dd className="mt-1">
+                <Skeleton className="h-6 w-48" />
+              </dd>
             )}
           </div>
           <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-gray-500">Hostname</dt>
+            <dt className="text-sm font-medium text-muted-foreground">Hostname</dt>
             {database ? (
-              <dd className="mt-1 text-sm text-gray-900">{database.hostname}</dd>
+              <dd className="mt-1 text-sm text-foreground">{database.hostname}</dd>
             ) : (
-              <dd className="mt-1 h-6 w-48 animate-pulse bg-gray-200" />
+              <dd className="mt-1">
+                <Skeleton className="h-6 w-48" />
+              </dd>
             )}
           </div>
           <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-gray-500">Port</dt>
+            <dt className="text-sm font-medium text-muted-foreground">Port</dt>
             {database ? (
-              <dd className="mt-1 text-sm text-gray-900">{database.port.toString()}</dd>
+              <dd className="mt-1 text-sm text-foreground">{database.port.toString()}</dd>
             ) : (
-              <dd className="mt-1 h-6 w-24 animate-pulse bg-gray-200" />
+              <dd className="mt-1">
+                <Skeleton className="h-6 w-24" />
+              </dd>
             )}
           </div>
           <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-gray-500">Engine</dt>
+            <dt className="text-sm font-medium text-muted-foreground">Engine</dt>
             {database ? (
-              <dd className="mt-1 text-sm text-gray-900">
+              <dd className="mt-1 text-sm text-foreground">
                 {getDatabaseEngineTitle(database.engine)}
               </dd>
             ) : (
-              <dd className="mt-1 h-6 w-32 animate-pulse bg-gray-200" />
+              <dd className="mt-1">
+                <Skeleton className="h-6 w-32" />
+              </dd>
             )}
           </div>
           <div className="sm:col-span-2">
-            <dt className="text-sm font-medium text-gray-500">Connection String</dt>
+            <dt className="text-sm font-medium text-muted-foreground">Connection String</dt>
             {database && user ? (
-              <dd className="mt-2 text-sm text-gray-900">
-                <div className="flex flex-col space-y-2">
+              <dd className="mt-2 text-sm text-foreground">
+                <div className="flex flex-col gap-2">
                   <div>
-                    <span className="rounded bg-gray-200 px-2 py-1">{connectionString}</span>
+                    <span className="rounded bg-muted px-2 py-1">{connectionString}</span>
                   </div>
                   <div>
                     <button
-                      className="mr-2 rounded border border-gray-200 px-2 font-sans text-sm font-medium text-gray-400 hover:border-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      className="mr-2 rounded border border-border px-2 font-sans text-sm font-medium text-muted-foreground hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                       onClick={() => navigator.clipboard.writeText(connectionString)}
                     >
                       Strg-C
@@ -76,17 +85,17 @@ export function DatabaseOverviewPanel({ database, user, mongoUser }: DatabaseOve
                       href={adminToolUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded border border-gray-200 px-2 font-sans text-sm font-medium text-gray-400 hover:border-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      className="rounded border border-border px-2 font-sans text-sm font-medium text-muted-foreground hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     >
                       {database.adminToolName}
                     </a>
                     {shouldShowMongoCompassDownload && (
-                      <span className="ml-2 text-sm text-gray-500">
+                      <span className="ml-2 text-sm text-muted-foreground">
                         <a
                           href={MONGODB_COMPASS_DOWNLOAD_URL}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-medium text-indigo-600 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                          className="font-medium text-primary hover:text-primary/80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                         >
                           Download Compass
                         </a>
@@ -96,11 +105,13 @@ export function DatabaseOverviewPanel({ database, user, mongoUser }: DatabaseOve
                 </div>
               </dd>
             ) : (
-              <dd className="mt-1 h-6 w-64 animate-pulse bg-gray-200" />
+              <dd className="mt-1">
+                <Skeleton className="h-6 w-64" />
+              </dd>
             )}
           </div>
         </dl>
-      </div>
+      </CardContent>
     </Card>
   );
 }

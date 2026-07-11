@@ -65,7 +65,10 @@ describe("<SignInForm />", () => {
   it("displays an error message when errorMessage is set", () => {
     render(<SignInForm errorMessage="Invalid credentials" onSubmit={vi.fn()} />);
 
-    expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument();
+    const alert = screen.getByRole("alert");
+
+    expect(alert).toHaveTextContent("Error");
+    expect(alert).toHaveTextContent("Invalid credentials");
   });
 
   it("does not throw an error if onSubmit is not provided", async () => {

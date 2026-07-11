@@ -1,8 +1,8 @@
 import React from "react";
 import { Form, Formik, FormikHelpers } from "formik";
-import { LockKeyholeIcon } from "lucide-react";
+import { CircleXIcon, LockKeyholeIcon } from "lucide-react";
 
-import { Alert } from "./Feedback/Alert/Alert";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "./ui/field";
@@ -24,7 +24,13 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <Card>
         <CardContent className="flex flex-col gap-4">
-          {errorMessage && <Alert message={errorMessage} title="Error" variant="danger" />}
+          {errorMessage && (
+            <Alert variant="destructive">
+              <CircleXIcon aria-hidden="true" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
           <Formik
             initialValues={{
               username: "",

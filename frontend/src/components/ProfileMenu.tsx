@@ -3,6 +3,7 @@ import { ChevronDownIcon } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,9 +23,9 @@ type ProfileMenuProps = {
 export function ProfileMenu({ user, loading, onLogout }: ProfileMenuProps) {
   if (loading) {
     return (
-      <div className="ml-3 flex items-center gap-3 lg:p-2">
-        <div className="size-8 animate-pulse rounded-full bg-muted" />
-        <div className="hidden h-4 w-20 animate-pulse rounded-md bg-muted lg:block" />
+      <div className="flex items-center gap-3 lg:p-2">
+        <Skeleton className="size-8 rounded-full" />
+        <Skeleton className="hidden h-4 w-20 lg:block" />
       </div>
     );
   }
@@ -32,7 +33,7 @@ export function ProfileMenu({ user, loading, onLogout }: ProfileMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={<Button variant="ghost" className="ml-3 h-auto gap-2 lg:px-2 lg:py-1.5" />}
+        render={<Button variant="ghost" className="h-auto gap-2 lg:px-2 lg:py-1.5" />}
       >
         <Avatar>
           <AvatarFallback>{getUserInitials(user)}</AvatarFallback>

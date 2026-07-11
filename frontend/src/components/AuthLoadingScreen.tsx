@@ -1,8 +1,21 @@
+import { useEffect, useState } from "react";
+
+import { AppShellLoading } from "./AppShellLoading";
+
+const INDICATOR_DELAY_MS = 200;
+
 export function AuthLoadingScreen() {
-  return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      {/* TODO: replace this with the final skeleton/loading screen. */}
-      <div className="text-sm font-medium text-muted-foreground">Loading...</div>
-    </div>
-  );
+  const [showIndicator, setShowIndicator] = useState(false);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setShowIndicator(true), INDICATOR_DELAY_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  if (!showIndicator) {
+    return <div className="min-h-screen bg-background" />;
+  }
+
+  return <AppShellLoading label="Checking session" />;
 }

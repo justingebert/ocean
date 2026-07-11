@@ -22,7 +22,10 @@ function getErrorMessage(error: unknown): string {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const queryClient = useQueryClient();
-  const [status, setStatus] = useState<AuthStatus>("checking");
+  const [initialAccessToken] = useState<string | null>(() => getStoredAccessToken());
+  const [status, setStatus] = useState<AuthStatus>(() =>
+    initialAccessToken ? "checking" : "unauthenticated",
+  );
   const [loginPending, setLoginPending] = useState(false);
   const [loginError, setLoginError] = useState<string>();
 
@@ -47,16 +50,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     let cancelled = false;
 
     const restoreSession = async () => {
-      const accessToken = getStoredAccessToken();
-
-      if (!accessToken) {
-        if (!cancelled) {
-          endSession();
-        }
+      if (!initialAccessToken) {
         return;
       }
 
-      setBearerToken(accessToken);
+      setBearerToken(initialAccessToken);
 
       try {
         const user = await UserClient.getUser();
@@ -77,7 +75,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       cancelled = true;
     };
-  }, [endSession, queryClient]);
+  }, [endSession, initialAccessToken, queryClient]);
 
   const login = useCallback(
     async (credentials: CredentialProperties) => {

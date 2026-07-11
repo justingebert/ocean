@@ -5,25 +5,26 @@ import ProfileCard from "./ProfileCard";
 describe("ProfileCard Component", () => {
   const mockUser = {
     id: 1,
-    username: "string",
-    firstName: "string",
-    lastName: "string",
-    mail: "string",
-    employeeType: "string",
+    username: "ada.lovelace",
+    firstName: "Ada",
+    lastName: "Lovelace",
+    mail: "ada@example.com",
+    employeeType: "Engineer",
   };
 
   it("renders loading state correctly", () => {
     const { container } = render(<ProfileCard loading={true} />);
 
-    expect(container.querySelector(".animate-pulse.h-4.w-32.bg-gray-200")).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-slot="skeleton"]')).toHaveLength(4);
   });
 
   it("renders the user details correctly", () => {
-    const { container } = render(<ProfileCard user={mockUser} loading={false} />);
+    render(<ProfileCard user={mockUser} loading={false} />);
 
-    const fullNameElement = container.querySelector(".mt-1.text-sm.text-gray-900");
-
-    expect(fullNameElement).toHaveTextContent("string string");
+    expect(screen.getByText("Ada Lovelace")).toBeInTheDocument();
+    expect(screen.getByText("Engineer")).toBeInTheDocument();
+    expect(screen.getByText("ada@example.com")).toBeInTheDocument();
+    expect(screen.getByText("ada.lovelace")).toBeInTheDocument();
   });
 
   it("renders fallback text for missing user data", () => {

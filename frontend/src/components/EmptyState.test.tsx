@@ -34,12 +34,12 @@ describe("EmptyState Component", () => {
     expect(mockOnClick).toHaveBeenCalledTimes(1);
   });
 
-  it("renders icons with correct attributes", () => {
-    render(<EmptyState {...props} />);
+  it("uses the shared empty-state composition with decorative icons", () => {
+    const { container } = render(<EmptyState {...props} />);
 
-    const databaseIcon = document.querySelector("svg.mx-auto.h-12.w-12.text-gray-400");
+    expect(container.querySelector('[data-slot="empty"]')).toBeInTheDocument();
 
-    expect(databaseIcon).toBeInTheDocument();
-    expect(databaseIcon).toHaveAttribute("aria-hidden", "true");
+    const icons = container.querySelectorAll('svg[aria-hidden="true"]');
+    expect(icons).toHaveLength(2);
   });
 });

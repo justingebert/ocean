@@ -7,7 +7,7 @@ import { engineOptions } from "@/constants/engines.ts";
 import { UpstreamDatabaseProperties } from "@/types/database.ts";
 import { DatabaseClient } from "@/api/databaseClient.ts";
 import type { EngineTypeValues } from "@/types/engine.ts";
-import { Alert } from "../Feedback/Alert/Alert";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import Headline from "../Headline";
 import { Button } from "../ui/button";
 import {
@@ -165,7 +165,13 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
                   {nameInvalid && <FieldError id="database-name-error">{errors.name}</FieldError>}
                 </Field>
 
-                {errorMessage && <Alert message={errorMessage} title="Error" variant="danger" />}
+                {errorMessage && (
+                  <Alert variant="destructive">
+                    <CircleXIcon aria-hidden="true" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{errorMessage}</AlertDescription>
+                  </Alert>
+                )}
 
                 <Field>
                   <Button

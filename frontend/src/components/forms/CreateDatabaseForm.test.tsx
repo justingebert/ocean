@@ -35,7 +35,7 @@ describe("CreateDatabaseForm", () => {
   it("validates the name field and shows error messages", async () => {
     render(<CreateDatabaseForm {...defaultProps} />);
 
-    const nameInput = screen.getByPlaceholderText("abcd_1234");
+    const nameInput = screen.getByLabelText(/database name/i);
     const submitButton = screen.getByRole("button", { name: "Create a database" });
 
     expect(submitButton).toBeDisabled();
@@ -65,12 +65,21 @@ describe("CreateDatabaseForm", () => {
     expect(screen.getByRole("status", { name: /loading/i })).toBeInTheDocument();
   });
 
+  it("displays a submission error as an alert", () => {
+    render(<CreateDatabaseForm {...defaultProps} errorMessage="Database creation failed" />);
+
+    const alert = screen.getByRole("alert");
+
+    expect(alert).toHaveTextContent("Error");
+    expect(alert).toHaveTextContent("Database creation failed");
+  });
+
   it("validateDatabaseValues returns true when availability is true", async () => {
     const spyApi = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(true);
 
     render(<CreateDatabaseForm {...defaultProps} />);
 
-    const nameInput = screen.getByPlaceholderText("abcd_1234");
+    const nameInput = screen.getByLabelText(/database name/i);
 
     fireEvent.change(nameInput, { target: { value: "valid_name" } });
     fireEvent.blur(nameInput);
