@@ -1,8 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { ArrowRightIcon } from "lucide-react";
 
 import { StartingPoint } from "../constants/starting";
-import { cn } from "../lib/utils.ts";
+import { Card } from "./ui/card";
 
 export interface StartingPointsProps {
   startingPoints: StartingPoint[];
@@ -10,33 +11,30 @@ export interface StartingPointsProps {
 
 const StartingPoints: React.FC<StartingPointsProps> = ({ startingPoints }) => {
   return (
-    <div>
-      <div className="mt-6 py-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-        {startingPoints.map((item, itemIdx) => (
-          <div key={itemIdx} className="flow-root">
-            <div className="relative -m-2 p-2 flex items-center space-x-4 rounded-xl hover:bg-muted focus-within:ring-2 focus-within:ring-ring">
-              <div
-                className={cn(
-                  item.background,
-                  "flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-lg",
-                )}
-              >
-                <item.icon className="h-6 w-6 text-white" aria-hidden="true" />
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-foreground">
-                  <Link to={item.to} className="focus:outline-none">
-                    <span className="absolute inset-0" aria-hidden="true" />
-                    {item.title}
-                    <span aria-hidden="true"> &rarr;</span>
-                  </Link>
-                </h3>
-                <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
-              </div>
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      {startingPoints.map(({ title, description, icon: Icon, to }) => (
+        <Link
+          key={to}
+          to={to}
+          className="group rounded-4xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        >
+          <Card className="h-full border border-border px-6 shadow-xs ring-0 transition duration-200 group-hover:-translate-y-1 group-hover:border-primary/50 group-hover:shadow-lg motion-reduce:transition-none motion-reduce:group-hover:translate-y-0">
+            <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-inset ring-primary/10 transition-colors duration-200 group-hover:bg-primary/15">
+              <Icon className="size-6" aria-hidden="true" />
             </div>
-          </div>
-        ))}
-      </div>
+            <div className="flex items-end justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="font-heading text-base font-medium text-foreground">{title}</h3>
+                <p className="mt-1.5 text-sm text-muted-foreground">{description}</p>
+              </div>
+              <ArrowRightIcon
+                className="mb-0.5 size-4 shrink-0 text-muted-foreground transition-all duration-200 group-hover:translate-x-1 group-hover:text-primary motion-reduce:transition-none"
+                aria-hidden="true"
+              />
+            </div>
+          </Card>
+        </Link>
+      ))}
     </div>
   );
 };
