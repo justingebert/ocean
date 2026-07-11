@@ -1,4 +1,4 @@
-import ActionDropdown from "../../ActionDropdown";
+import ActionDropdown from "./ActionDropdown.tsx";
 import DatabaseEngineLogo from "@/components/databases/DatabaseList/DatabaseEngineLogo";
 import { getDatabaseEngineTitle } from "@/components/databases/DatabaseList/databaseListFormat.ts";
 import { Skeleton } from "@/components/ui/skeleton";

@@ -6,6 +6,12 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-07-11: improve database user password ux/ui
+
+## 2026-07-11 — refactor Overview (starting points) view
+- Rebuilt the post-login Overview page: `StartingPoints` now renders the quick actions as vertical shadcn `Card` links (icon-tile on top, keyboard-focusable whole-card link) instead of hand-rolled divs with the `absolute inset-0` overlay-link hack and semantic-token icon backgrounds. Restrained "premium" styling: flat at rest (hairline border + `shadow-xs`), on hover the card lifts, gains `shadow-lg`, the border tints to primary and the arrow slides.
+- Switched `constants/starting.ts` from heroicons to lucide (the project standard) and tightened the copy; `OverviewView` gained a real theme-aware header + subtitle in place of the shared `Headline` (which hardcodes `text-gray-600` and can't do subtitles — migrating that shared component is a good next step).
+
 ## 2026-07-10 — migrate Reporting admin tables to shadcn Table
 - Rewrote `DatabaseAdminList` and `UserAdminList` on the shadcn `Table` + `Badge` primitives; the delete action is now a `Button variant="destructive"` instead of a raw clickable div. Dropped the hand-rolled `<table>`/`bg-gray-*`/green-pill markup.
 - Updated the `UserAdminList` Cypress spec: its badge test asserted the old pill's raw Tailwind classes; now checks the `Badge` renders (`data-slot=badge`).

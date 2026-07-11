@@ -53,12 +53,11 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
                 <Form>
                   <FieldGroup>
                     <Field data-invalid={usernameInvalid}>
-                      <FieldLabel htmlFor="username">
-                        Username<span aria-hidden="true">*</span>
-                      </FieldLabel>
+                      <FieldLabel htmlFor="username">Username</FieldLabel>
                       <Input
                         id="username"
                         name="username"
+                        placeholder="s0123456"
                         value={values.username}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -73,9 +72,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, errorMessage, onSubmit
                     </Field>
 
                     <Field data-invalid={passwordInvalid}>
-                      <FieldLabel htmlFor="password">
-                        Password<span aria-hidden="true">*</span>
-                      </FieldLabel>
+                      <FieldLabel htmlFor="password">Password</FieldLabel>
                       <Input
                         id="password"
                         name="password"

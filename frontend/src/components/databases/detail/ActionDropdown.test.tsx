@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { describe, it, expect, vi } from "vitest";
-import ActionDropdown from "./ActionDropdown";
+import ActionDropdown from "./ActionDropdown.tsx";
 
 describe("ActionDropdown", () => {
   it("calls onDelete when Delete is selected", async () => {

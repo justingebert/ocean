@@ -1,7 +1,16 @@
-import { useState } from "react";
+import { useId, useState } from "react";
+import { CopyIcon, EyeIcon, EyeOffIcon } from "lucide-react";
+import { toast } from "sonner";
 
 import Headline from "../../Headline";
 import { Button } from "../../ui/button";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "../../ui/input-group";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../ui/table";
 import { RoleProperties } from "@/types/role.ts";
 
 interface DatabaseUsersPanelProps {
@@ -30,40 +39,22 @@ export function DatabaseUsersPanel({
           </Button>
         </div>
       </div>
-      <div className="flex flex-col">
-        <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div className="overflow-hidden border-b border-gray-200 shadow sm:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                    >
-                      Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                    >
-                      Password
-                    </th>
-                    <th scope="col" className="relative px-6 py-3">
-                      <span className="sr-only">Action</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
-                  {roles.map((role) => (
-                    <RoleTableRow key={role.id} role={role} onDelete={onDeleteRole} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Table className="min-w-160 table-fixed">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead className="w-80">Password</TableHead>
+            <TableHead className="w-24">
+              <span className="sr-only">Action</span>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {roles.map((role) => (
+            <RoleTableRow key={role.id} role={role} onDelete={onDeleteRole} />
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }
@@ -76,38 +67,58 @@ function RoleTableRow({
   onDelete: (roleId: number) => void;
 }) {
   const [showPassword, setShowPassword] = useState(false);
+  const passwordId = useId();
+
+  const copyPassword = async () => {
+    try {
+      await navigator.clipboard.writeText(role.password);
+      toast.success("Password copied");
+    } catch {
+      toast.error("Could not copy password");
+    }
+  };
 
   return (
-    <tr>
-      <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{role.name}</td>
-      <td className="whitespace-nowrap px-6 py-4">
-        {showPassword ? (
-          <div className="text-sm">
-            <span className="text-gray-500">{role.password}</span>
-            <span
-              className="ml-2 cursor-pointer text-blue-500"
-              onClick={() => setShowPassword(false)}
+    <TableRow>
+      <TableCell className="font-medium">{role.name}</TableCell>
+      <TableCell>
+        <InputGroup>
+          <InputGroupInput
+            id={passwordId}
+            aria-label={`Password for ${role.name}`}
+            type={showPassword ? "text" : "password"}
+            value={role.password}
+            readOnly
+            spellCheck={false}
+            autoComplete="off"
+          />
+          <InputGroupAddon align="inline-end">
+            <InputGroupButton
+              size="icon-xs"
+              aria-label={`${showPassword ? "Hide" : "Show"} password for ${role.name}`}
+              aria-controls={passwordId}
+              aria-pressed={showPassword}
+              title={`${showPassword ? "Hide" : "Show"} password`}
+              onClick={() => setShowPassword((isShown) => !isShown)}
             >
-              hide
-            </span>
-          </div>
-        ) : (
-          <div
-            className="cursor-pointer text-sm text-blue-500"
-            onClick={() => setShowPassword(true)}
-          >
-            show
-          </div>
-        )}
-      </td>
-      <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-        <div
-          className="cursor-pointer text-red-600 hover:text-red-900"
-          onClick={() => onDelete(role.id)}
-        >
+              {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+            </InputGroupButton>
+            <InputGroupButton
+              size="icon-xs"
+              aria-label={`Copy password for ${role.name}`}
+              title="Copy password"
+              onClick={copyPassword}
+            >
+              <CopyIcon />
+            </InputGroupButton>
+          </InputGroupAddon>
+        </InputGroup>
+      </TableCell>
+      <TableCell className="text-right">
+        <Button variant="destructive" size="sm" onClick={() => onDelete(role.id)}>
           Delete
-        </div>
-      </td>
-    </tr>
+        </Button>
+      </TableCell>
+    </TableRow>
   );
 }
