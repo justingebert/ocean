@@ -1,5 +1,5 @@
-import { Navigation, navigation } from "../navigation/navigation.ts";
-import { UserProperties } from "../types/user.ts";
+import { Navigation, navigation } from "@/navigation/navigation.ts";
+import { UserProperties } from "@/types/user.ts";
 
 export function getNavigationForUser(user: UserProperties | undefined): Navigation[] {
   if (!user) {

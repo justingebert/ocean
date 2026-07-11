@@ -13,7 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge.tsx";
 import { getDatabaseCreatedAt, getDatabaseEngineTitle } from "./databaseListFormat.ts";
 import DatabaseEngineLogo from "./DatabaseEngineLogo.tsx";
-import { DatabaseProperties } from "../../../types/database.ts";
+import { DatabaseProperties } from "@/types/database.ts";
 
 export interface DatabaseListProps {
   databases: ReadonlyArray<DatabaseProperties>;

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { axiosInstance } from "./client";
-import { SessionApi } from "./sessionApi";
+import { SessionClient } from "./sessionClient";
 
 vi.mock("./client", () => ({
   axiosInstance: {
@@ -10,13 +10,13 @@ vi.mock("./client", () => ({
 
 const mockedAxiosInstance = axiosInstance as unknown as { post: ReturnType<typeof vi.fn> };
 
-describe("SessionApi", () => {
+describe("SessionClient", () => {
   it("sends a POST request to /auth/signin with credentials and returns tokens", async () => {
     const mockResponse = { data: { accessToken: "access123", refreshToken: "refresh123" } };
 
     mockedAxiosInstance.post.mockResolvedValueOnce(mockResponse);
 
-    const result = await SessionApi.login({ username: "testuser", password: "password123" });
+    const result = await SessionClient.login({ username: "testuser", password: "password123" });
 
     expect(mockedAxiosInstance.post).toHaveBeenCalledWith("/auth/signin", {
       username: "testuser",
@@ -29,7 +29,7 @@ describe("SessionApi", () => {
     mockedAxiosInstance.post.mockRejectedValueOnce(new Error("Invalid credentials"));
 
     await expect(
-      SessionApi.login({ username: "wronguser", password: "wrongpassword" }),
+      SessionClient.login({ username: "wronguser", password: "wrongpassword" }),
     ).rejects.toThrow("Invalid credentials");
   });
 
@@ -38,7 +38,7 @@ describe("SessionApi", () => {
 
     mockedAxiosInstance.post.mockResolvedValueOnce(mockResponse);
 
-    const result = await SessionApi.refreshToken({ refreshToken: "refresh123" });
+    const result = await SessionClient.refreshToken({ refreshToken: "refresh123" });
 
     expect(mockedAxiosInstance.post).toHaveBeenCalledWith("/auth/refresh-token", {
       refreshToken: "refresh123",
@@ -49,7 +49,7 @@ describe("SessionApi", () => {
   it("throws an error when token refresh fails", async () => {
     mockedAxiosInstance.post.mockRejectedValueOnce(new Error("Token refresh failed"));
 
-    await expect(SessionApi.refreshToken({ refreshToken: "invalidRefreshToken" })).rejects.toThrow(
+    await expect(SessionClient.refreshToken({ refreshToken: "invalidRefreshToken" })).rejects.toThrow(
       "Token refresh failed",
     );
   });
@@ -60,7 +60,7 @@ describe("SessionApi", () => {
     };
     mockedAxiosInstance.post.mockResolvedValueOnce(mockRefreshResponse);
 
-    const result = await SessionApi.refreshToken({ refreshToken: "refresh123" });
+    const result = await SessionClient.refreshToken({ refreshToken: "refresh123" });
 
     mockedAxiosInstance.post.mockResolvedValueOnce({ data: { success: true } });
 
@@ -91,7 +91,7 @@ describe("SessionApi", () => {
     };
     mockedAxiosInstance.post.mockResolvedValueOnce(mockRefreshResponse);
 
-    const result = await SessionApi.refreshToken({ refreshToken: oldRefreshToken });
+    const result = await SessionClient.refreshToken({ refreshToken: oldRefreshToken });
 
     expect(result.accessToken).not.toBe(oldAccessToken);
     expect(result.refreshToken).not.toBe(oldRefreshToken);

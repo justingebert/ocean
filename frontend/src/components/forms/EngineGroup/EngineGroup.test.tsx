@@ -3,8 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { EngineGroup } from "./EngineGroup";
-import { engineOptions } from "../../../constants/engines";
-import { EngineType } from "../../../types/engine";
+import { engineOptions } from "@/constants/engines";
+import { EngineType } from "@/types/engine";
 
 describe("<EngineGroup />", () => {
   it("renders the engines as an accessible single-selection toggle group", () => {

@@ -2,15 +2,15 @@ import { useId, useState } from "react";
 import { CopyIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import Headline from "../../Headline";
-import { Button } from "../../ui/button";
+import Headline from "@/components/Headline";
+import { Button } from "@/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from "../../ui/input-group";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../ui/table";
+} from "@/components/ui/input-group";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { RoleProperties } from "@/types/role.ts";
 
 interface DatabaseUsersPanelProps {

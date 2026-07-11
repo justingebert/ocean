@@ -1,4 +1,4 @@
-import { Card, CardContent } from "../../ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { getDatabaseEngineTitle } from "@/components/databases/DatabaseList/databaseListFormat";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Database } from "@/types/database.ts";

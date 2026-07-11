@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-import { CredentialProperties } from "../types/models";
+import { CredentialProperties } from "@/types/models";
 
 import { axiosInstance } from "./client";
 
@@ -9,7 +9,7 @@ export interface TokensReturn {
   readonly refreshToken: string;
 }
 
-export class SessionApi {
+export class SessionClient {
   private static tokensSchema = yup.object().shape({
     accessToken: yup.string().required(),
     refreshToken: yup.string().required(),

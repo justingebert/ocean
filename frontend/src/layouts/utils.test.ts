@@ -4,8 +4,8 @@ import {
   FAQNavigation,
   ReportingNavigation,
   SettingsNavigation,
-} from "../navigation/navigation.ts";
-import { UserProperties } from "../types/user.ts";
+} from "@/navigation/navigation.ts";
+import { UserProperties } from "@/types/user.ts";
 import { getNavigationForUser, getNavigationSection, getUserInitials } from "./utils.ts";
 
 const baseUser: UserProperties = {

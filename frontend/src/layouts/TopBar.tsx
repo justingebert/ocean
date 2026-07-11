@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import { PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "../components/mode-toggle.tsx";
-import { ProfileMenu } from "../components/ProfileMenu.tsx";
-import { routePaths } from "../navigation/routes.ts";
-import { UserProperties } from "../types/user.ts";
+import { ModeToggle } from "@/components/mode-toggle.tsx";
+import { ProfileMenu } from "@/components/ProfileMenu.tsx";
+import { routePaths } from "@/navigation/routes.ts";
+import { UserProperties } from "@/types/user.ts";
 
 type TopBarProps = {
   user: UserProperties | undefined;

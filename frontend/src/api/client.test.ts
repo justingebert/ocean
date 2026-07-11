@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { axiosInstance, decodeJwt, setBearerToken } from "./client";
-import { config } from "../config";
+import { config } from "@/config";
 import MockAdapter from "axios-mock-adapter";
 
 Object.defineProperty(global, "localStorage", {

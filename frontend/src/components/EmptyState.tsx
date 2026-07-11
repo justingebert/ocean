@@ -1,7 +1,7 @@
 import React from "react";
 import { DatabaseIcon, PlusIcon } from "lucide-react";
 
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Empty,
   EmptyContent,
@@ -9,7 +9,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "./ui/empty";
+} from "@/components/ui/empty";
 
 export interface EmptyStateProps {
   title: string;

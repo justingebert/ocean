@@ -1,9 +1,9 @@
 import axios, { AxiosError } from "axios";
 import { decodeJwt as joseDecodeJwt, type JWTPayload } from "jose";
 
-import { config } from "../config";
-import { clearStoredTokens, getStoredRefreshToken, storeAccessToken } from "../auth/tokenStorage";
-import { SessionApi } from "./sessionApi";
+import { config } from "@/config";
+import { clearStoredTokens, getStoredRefreshToken, storeAccessToken } from "@/auth/tokenStorage";
+import { SessionClient } from "./sessionClient";
 
 const headers = {
   "Content-Type": "application/json",
@@ -97,6 +97,6 @@ const renewAccessToken = async (): Promise<string> => {
     throw new Error("Refresh token expired.");
   }
 
-  const response = await SessionApi.refreshToken({ refreshToken });
+  const response = await SessionClient.refreshToken({ refreshToken });
   return response.accessToken;
 };

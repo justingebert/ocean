@@ -2,14 +2,14 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import { DatabasesNavigation } from "../../navigation/navigation.ts";
-import { routeBuilders, routePaths } from "../../navigation/routes.ts";
-import { emptyDatabaseState } from "../../constants/empty";
-import { DatabaseClient } from "../../api/databaseClient";
-import AppLayout from "../../layouts/AppLayout";
+import { DatabasesNavigation } from "@/navigation/navigation.ts";
+import { routeBuilders, routePaths } from "@/navigation/routes.ts";
+import { emptyDatabaseState } from "@/constants/empty";
+import { DatabaseClient } from "@/api/databaseClient";
+import AppLayout from "@/layouts/AppLayout";
 import DatabaseList from "@/components/databases/DatabaseList/DatabaseList";
-import EmptyState from "../../components/EmptyState";
-import Headline from "../../components/Headline";
+import EmptyState from "@/components/EmptyState";
+import Headline from "@/components/Headline";
 
 const DatabasesView: React.FC = () => {
   const navigate = useNavigate();

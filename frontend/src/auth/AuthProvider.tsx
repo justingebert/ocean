@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { setBearerToken, setupRequestInterceptors } from "../api/client";
-import { SessionApi } from "../api/sessionApi";
-import { UserClient } from "../api/userClient";
-import { CredentialProperties } from "../types/models";
+import { setBearerToken, setupRequestInterceptors } from "@/api/client";
+import { SessionClient } from "@/api/sessionClient";
+import { UserClient } from "@/api/userClient";
+import { CredentialProperties } from "@/types/models";
 import { AuthContext, AuthStatus } from "./authContext";
 import { clearStoredTokens, getStoredAccessToken, storeTokens } from "./tokenStorage";
 
@@ -83,7 +83,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setLoginError(undefined);
 
       try {
-        const tokens = await SessionApi.login(credentials);
+        const tokens = await SessionClient.login(credentials);
         storeTokens(tokens);
         setBearerToken(tokens.accessToken);
         queryClient.clear();

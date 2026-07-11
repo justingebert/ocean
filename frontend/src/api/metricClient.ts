@@ -1,5 +1,5 @@
 import { axiosInstance } from "./client";
-import { MetricProperties } from "../types/metrics";
+import { MetricProperties } from "@/types/metrics";
 
 export class MetricClient {
   public static getMetrics = async (): Promise<MetricProperties> => {

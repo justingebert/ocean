@@ -6,8 +6,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import AppLayout from "../layouts/AppLayout";
-import { FAQNavigation } from "../navigation/navigation.ts";
+import AppLayout from "@/layouts/AppLayout";
+import { FAQNavigation } from "@/navigation/navigation.ts";
 
 const faqs = [
   {

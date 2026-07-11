@@ -2,8 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRightIcon } from "lucide-react";
 
-import { StartingPoint } from "../constants/starting";
-import { Card } from "./ui/card";
+import { StartingPoint } from "@/constants/starting";
+import { Card } from "@/components/ui/card";
 
 export interface StartingPointsProps {
   startingPoints: StartingPoint[];

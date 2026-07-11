@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQuery, UseQueryOptions } from "@tanstack/react-query";
 
-import { DatabaseClient } from "../api/databaseClient";
-import { Database } from "../types/database";
+import { DatabaseClient } from "@/api/databaseClient";
+import { Database } from "@/types/database";
 
 export const useDatabasesQuery = (options?: UseQueryOptions<ReadonlyArray<Database>>) => {
   return useQuery({

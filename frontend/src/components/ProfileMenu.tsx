@@ -10,9 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SettingsNavigation } from "../navigation/navigation.ts";
-import { UserProperties } from "../types/user.ts";
-import { getUserInitials } from "../layouts/utils.ts";
+import { SettingsNavigation } from "@/navigation/navigation.ts";
+import { UserProperties } from "@/types/user.ts";
+import { getUserInitials } from "@/layouts/utils.ts";
 
 type ProfileMenuProps = {
   user: UserProperties | undefined;

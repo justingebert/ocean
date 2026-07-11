@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { UserProperties } from "../../types/user";
+import type { UserProperties } from "@/types/user";
 
 export interface ProfileCardProps {
   user?: UserProperties;

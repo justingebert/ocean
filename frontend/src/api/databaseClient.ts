@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-import { DatabaseProperties, UpstreamDatabaseProperties } from "../types/database";
+import { DatabaseProperties, UpstreamDatabaseProperties } from "@/types/database";
 import { axiosInstance } from "./client";
 
 interface AvailabilityResponse {

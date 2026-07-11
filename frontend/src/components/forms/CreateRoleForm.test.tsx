@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import CreateRoleForm, { CreateRoleFormProps } from "./CreateRoleForm";
-import { EngineType } from "../../types/engine";
+import { EngineType } from "@/types/engine";
 
 vi.mock("../../api/roleClient", () => ({
   RoleClient: {

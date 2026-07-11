@@ -7,9 +7,9 @@ import { engineOptions } from "@/constants/engines.ts";
 import { UpstreamDatabaseProperties } from "@/types/database.ts";
 import { DatabaseClient } from "@/api/databaseClient.ts";
 import type { EngineTypeValues } from "@/types/engine.ts";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import Headline from "../Headline";
-import { Button } from "../ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import Headline from "@/components/Headline";
+import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldDescription,
@@ -18,10 +18,10 @@ import {
   FieldLabel,
   FieldLegend,
   FieldSet,
-} from "../ui/field";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "../ui/input-group";
-import { Spinner } from "../ui/spinner";
-import { EngineGroup } from "./EngineGroup/EngineGroup";
+} from "@/components/ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { Spinner } from "@/components/ui/spinner";
+import { EngineGroup } from "@/components/forms/EngineGroup/EngineGroup";
 
 export interface CreateDatabaseFormProps {
   processing: boolean;

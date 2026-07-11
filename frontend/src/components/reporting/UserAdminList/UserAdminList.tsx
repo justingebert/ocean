@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
-import { UserProperties } from "../../../types/user.ts";
+import { UserProperties } from "@/types/user.ts";
 
 export interface UserAdminListProps {
   users: ReadonlyArray<UserProperties>;

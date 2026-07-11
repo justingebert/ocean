@@ -1,7 +1,7 @@
 import React from "react";
 import { mount } from "cypress/react";
 import { UserAdminList, UserAdminListProps } from "./UserAdminList";
-import { UserProperties } from "../../../types/user";
+import { UserProperties } from "@/types/user";
 
 describe("UserAdminList Component", () => {
   const mockUsers: ReadonlyArray<UserProperties> = [

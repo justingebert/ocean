@@ -1,17 +1,17 @@
 import React from "react";
 
-import AppLayout from "../layouts/AppLayout";
-import Headline from "../components/Headline";
-import { ReportingNavigation } from "../navigation/navigation.ts";
-import { Database, DatabaseProperties } from "../types/database";
-import { useMetricsQuery } from "../hooks/useMetricsQuery";
+import AppLayout from "@/layouts/AppLayout";
+import Headline from "@/components/Headline";
+import { ReportingNavigation } from "@/navigation/navigation.ts";
+import { Database, DatabaseProperties } from "@/types/database";
+import { useMetricsQuery } from "@/hooks/useMetricsQuery";
 import {
   useDatabasesQuery,
   useDeleteDatabaseWithPermissionMutation,
-} from "../hooks/useDatabaseQuery";
-import { IStats, Stats } from "../components/Stats/Stats";
+} from "@/hooks/useDatabaseQuery";
+import { IStats, Stats } from "@/components/Stats/Stats";
 import { DatabaseAdminList } from "@/components/reporting/DatabaseAdminList/DatabaseAdminList";
-import { useUsersQuery } from "../hooks/useUserQuery";
+import { useUsersQuery } from "@/hooks/useUserQuery";
 import { UserAdminList } from "@/components/reporting/UserAdminList/UserAdminList";
 
 const ReportingView: React.FC = () => {

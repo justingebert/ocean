@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { useAuth } from "../auth/authContext";
-import { UserClient } from "../api/userClient";
+import { useAuth } from "@/auth/authContext";
+import { UserClient } from "@/api/userClient";
 import { getNavigationForUser, getNavigationSection } from "./utils.ts";
 import { DesktopSidebar, MobileSidebar } from "./Sidebar.tsx";
 import { TopBar } from "./TopBar.tsx";

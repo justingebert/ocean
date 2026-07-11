@@ -2,14 +2,14 @@ import React from "react";
 import { Form, Formik, FormikHelpers } from "formik";
 import { CircleXIcon, LockKeyholeIcon } from "lucide-react";
 
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
-import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
-import { Field, FieldError, FieldGroup, FieldLabel } from "./ui/field";
-import { Input } from "./ui/input";
-import { Spinner } from "./ui/spinner";
-import { CredentialProperties } from "../types/models";
-import { UserValidation } from "../api/userClient";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
+import { CredentialProperties } from "@/types/models";
+import { UserValidation } from "@/api/userClient";
 
 export interface SignInFormProps {
   loading?: boolean;

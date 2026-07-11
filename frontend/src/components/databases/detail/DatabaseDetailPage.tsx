@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { getDetailViewTabsFor, type DatabaseDetailTabValue } from "@/constants/tabs.ts";
-import { useDatabaseDetail } from "@/hooks/databases/useDatabaseDetail.ts";
+import { useDatabaseDetail } from "@/hooks/useDatabaseDetail.ts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx";
 import { CreateRoleDialog } from "./CreateRoleDialog";
 import { DatabaseDetailHeader } from "./DatabaseDetailHeader";

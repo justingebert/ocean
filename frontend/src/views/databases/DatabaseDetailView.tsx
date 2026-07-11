@@ -1,9 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { DatabasesNavigation } from "@/navigation/navigation.ts";
 import { routePaths } from "@/navigation/routes.ts";
-import { DatabaseDetailPage } from "../../components/databases/detail/DatabaseDetailPage";
-import AppLayout from "../../layouts/AppLayout";
-import Headline from "../../components/Headline";
+import { DatabaseDetailPage } from "@/components/databases/detail/DatabaseDetailPage";
+import AppLayout from "@/layouts/AppLayout";
+import Headline from "@/components/Headline";
 
 const DatabaseDetailView: React.FC = () => {
   const { id } = useParams<{ id: string }>();

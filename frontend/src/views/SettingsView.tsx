@@ -1,11 +1,11 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { SettingsNavigation } from "../navigation/navigation.ts";
-import { UserClient } from "../api/userClient";
-import AppLayout from "../layouts/AppLayout";
-import Headline from "../components/Headline";
-import ProfileCard from "../components/ProfileCard/ProfileCard";
+import { SettingsNavigation } from "@/navigation/navigation.ts";
+import { UserClient } from "@/api/userClient";
+import AppLayout from "@/layouts/AppLayout";
+import Headline from "@/components/Headline";
+import ProfileCard from "@/components/ProfileCard/ProfileCard";
 
 const SettingsView: React.FC = () => {
   const userQuery = useQuery({

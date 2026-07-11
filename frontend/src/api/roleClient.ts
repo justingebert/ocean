@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-import { RoleProperties, UpstreamCreateRoleProperties } from "../types/role";
+import { RoleProperties, UpstreamCreateRoleProperties } from "@/types/role";
 import { axiosInstance } from "./client";
 
 interface AvailabilityResponse {

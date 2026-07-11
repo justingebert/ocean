@@ -1,4 +1,4 @@
-import { InvitationProperties, UpstreamCreateInvitationProperties } from "../types/invitation";
+import { InvitationProperties, UpstreamCreateInvitationProperties } from "@/types/invitation";
 import { axiosInstance } from "./client";
 
 export class InvitationClient {

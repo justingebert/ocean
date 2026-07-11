@@ -1,7 +1,7 @@
 import { DatabaseIcon, LayersIcon, SettingsIcon } from "lucide-react";
 import React from "react";
 
-import { routePaths } from "../navigation/routes.ts";
+import { routePaths } from "@/navigation/routes.ts";
 
 export interface StartingPoint {
   title: string;

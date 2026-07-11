@@ -2,8 +2,8 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import CreateDatabaseForm, { CreateDatabaseFormProps } from "./CreateDatabaseForm";
-import { DatabaseClient } from "../../api/databaseClient";
-import { EngineType } from "../../types/engine";
+import { DatabaseClient } from "@/api/databaseClient";
+import { EngineType } from "@/types/engine";
 
 vi.mock("../../api/databaseClient", () => ({
   DatabaseClient: {

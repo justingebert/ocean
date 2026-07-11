@@ -1,8 +1,8 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { DatabaseClient } from "./databaseClient";
 import { axiosInstance } from "./client";
-import { UpstreamDatabaseProperties } from "../types/database";
-import { EngineType } from "../types/engine";
+import { UpstreamDatabaseProperties } from "@/types/database";
+import { EngineType } from "@/types/engine";
 
 vi.mock("./client", () => ({
   axiosInstance: {

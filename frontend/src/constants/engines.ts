@@ -1,6 +1,6 @@
-import mongodbLogo from "../img/mongodb-logo.svg";
-import postgresqlLogo from "../img/postgresql-logo.svg";
-import type { EngineTypeValues } from "../types/engine";
+import mongodbLogo from "@/img/mongodb-logo.svg";
+import postgresqlLogo from "@/img/postgresql-logo.svg";
+import type { EngineTypeValues } from "@/types/engine";
 
 export interface DatabaseEngineOption {
   id: number;

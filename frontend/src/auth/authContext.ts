@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-import { CredentialProperties } from "../types/models";
+import { CredentialProperties } from "@/types/models";
 
 export type AuthStatus = "checking" | "authenticated" | "unauthenticated";
 

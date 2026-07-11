@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { EngineType } from "../types/engine";
+import { EngineType } from "@/types/engine";
 import { getDetailViewTabsFor } from "./tabs";
 
 describe("getDetailViewTabsFor", () => {

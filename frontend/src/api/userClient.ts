@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 import { axiosInstance } from "./client";
-import { UserProperties } from "../types/user";
+import { UserProperties } from "@/types/user";
 
 export class UserClient {
   public static getUser = async (): Promise<UserProperties> => {

@@ -1,9 +1,9 @@
 import React from "react";
 
-import AppLayout from "../layouts/AppLayout";
-import { OverviewNavigation } from "../navigation/navigation.ts";
-import { startingPoints } from "../constants/starting";
-import StartingPoints from "../components/StartingPoints";
+import AppLayout from "@/layouts/AppLayout";
+import { OverviewNavigation } from "@/navigation/navigation.ts";
+import { startingPoints } from "@/constants/starting";
+import StartingPoints from "@/components/StartingPoints";
 
 const OverviewView: React.FC = () => {
   return (

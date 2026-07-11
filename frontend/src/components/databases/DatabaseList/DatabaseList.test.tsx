@@ -3,9 +3,9 @@ import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import DatabaseList from "./DatabaseList.tsx";
-import { DatabaseProperties } from "../../../types/database.ts";
-import { engineOptions } from "../../../constants/engines.ts";
-import { EngineTypeValues } from "../../../types/engine.ts";
+import { DatabaseProperties } from "@/types/database.ts";
+import { engineOptions } from "@/constants/engines.ts";
+import { EngineTypeValues } from "@/types/engine.ts";
 
 const mockData: readonly DatabaseProperties[] = [
   {

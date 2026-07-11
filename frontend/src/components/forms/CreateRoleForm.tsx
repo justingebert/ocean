@@ -5,10 +5,10 @@ import * as yup from "yup";
 import { DatabaseProperties } from "@/types/database.ts";
 import { UpstreamCreateRoleProperties } from "@/types/role.ts";
 import { RoleClient } from "@/api/roleClient.ts";
-import { Button } from "../ui/button";
-import { DialogFooter } from "../ui/dialog";
-import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "../ui/input-group";
+import { Button } from "@/components/ui/button";
+import { DialogFooter } from "@/components/ui/dialog";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 
 export interface CreateRoleFormProps {
   database?: DatabaseProperties;

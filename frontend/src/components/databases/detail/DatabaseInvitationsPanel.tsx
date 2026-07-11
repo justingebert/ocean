@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/combobox.tsx";
 import { Field, FieldLabel } from "@/components/ui/field.tsx";
 
-import Headline from "../../Headline";
-import { Button } from "../../ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../ui/table";
+import Headline from "@/components/Headline";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { InvitedUserProperties, User, UserProperties } from "@/types/user.ts";
 
 interface DatabaseInvitationsPanelProps {

@@ -6,6 +6,11 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-07-11 — frontend structure cleanup (phase 1 of folder refactor)
+- Low-risk consistency pass ahead of a later feature-first migration: unified all cross-directory imports to the `@/` alias (152 imports across 63 files via a one-off codemod), and added an ESLint `no-restricted-imports` gate banning parent-relative (`../`) paths so it can't regress (`./` siblings still allowed).
+- Renamed the odd-one-out `sessionApi` → `sessionClient` (file + `SessionClient` class) to match the `*Client` convention, flattened `hooks/databases/` back into `hooks/`, and deleted the empty dead `components/Feedback/` folder.
+- Deferred (phase 2): the actual type-first → feature-first move (`features/<capability>/…`). Verified: tsc, lint, 114 Vitest tests all green.
+
 ## 2026-07-11: improve database user password ux/ui
 
 ## 2026-07-11 — refactor Overview (starting points) view

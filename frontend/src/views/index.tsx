@@ -1,16 +1,16 @@
 import React, { Suspense } from "react";
 import { BrowserRouter as Router, Route, Navigate, Routes, Outlet } from "react-router-dom";
 
-import { useAuth } from "../auth/authContext";
-import { AuthLoadingScreen } from "../components/AuthLoadingScreen";
-import { routePaths } from "../navigation/routes.ts";
+import { useAuth } from "@/auth/authContext";
+import { AuthLoadingScreen } from "@/components/AuthLoadingScreen";
+import { routePaths } from "@/navigation/routes.ts";
 import SignInView from "./SignInView";
 import LoadingView from "./LoadingView";
 
 const OverviewView = React.lazy(() => import("./OverviewView"));
-const DatabasesView = React.lazy(() => import("./databases/DatabasesView"));
-const CreateDatabaseView = React.lazy(() => import("./databases/CreateDatabaseView"));
-const DatabaseDetailView = React.lazy(() => import("./databases/DatabaseDetailView"));
+const DatabasesView = React.lazy(() => import("@/views/databases/DatabasesView"));
+const CreateDatabaseView = React.lazy(() => import("@/views/databases/CreateDatabaseView"));
+const DatabaseDetailView = React.lazy(() => import("@/views/databases/DatabaseDetailView"));
 const ReportingView = React.lazy(() => import("./ReportingView"));
 const SettingsView = React.lazy(() => import("./SettingsView"));
 const FAQView = React.lazy(() => import("./FAQView"));

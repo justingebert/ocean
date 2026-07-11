@@ -1,6 +1,6 @@
 import { mount } from "cypress/react";
 
-import "../../../index.css";
+import "@/index.css";
 import { DatabaseUsersPanel } from "./DatabaseUsersPanel";
 import { RoleProperties } from "@/types/role";
 

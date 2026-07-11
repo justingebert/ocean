@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-import { routePaths } from "../navigation/routes.ts";
+import { routePaths } from "@/navigation/routes.ts";
 
 const PageNotFoundView: React.FC = () => {
   return (

@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { MetricClient } from "./metricClient";
 import { axiosInstance } from "./client";
-import { MetricProperties } from "../types/metrics";
+import { MetricProperties } from "@/types/metrics";
 
 vi.mock("./client", () => ({
   axiosInstance: {

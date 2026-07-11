@@ -2,8 +2,8 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { DatabaseAdminList } from "./DatabaseAdminList.tsx";
-import { Database } from "../../../types/database.ts";
-import { EngineType } from "../../../types/engine.ts";
+import { Database } from "@/types/database.ts";
+import { EngineType } from "@/types/engine.ts";
 
 const mockData: ReadonlyArray<Database> = [
   new Database({

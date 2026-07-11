@@ -1,10 +1,10 @@
 import React from "react";
 import { CircleStackIcon } from "@heroicons/react/24/outline";
 
-import mongodbLogo from "../../../img/mongodb-logo.svg";
-import postgresqlLogo from "../../../img/postgresql-logo.svg";
-import { EngineType } from "../../../types/engine.ts";
-import { cn } from "../../../lib/utils.ts";
+import mongodbLogo from "@/img/mongodb-logo.svg";
+import postgresqlLogo from "@/img/postgresql-logo.svg";
+import { EngineType } from "@/types/engine.ts";
+import { cn } from "@/lib/utils.ts";
 
 interface DatabaseEngineLogoProps {
   engine: string;

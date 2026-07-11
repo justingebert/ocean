@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/table.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { Database } from "../../../types/database.ts";
+import { Database } from "@/types/database.ts";
 import {
   getDatabaseCreatedAt,
   getDatabaseEngineTitle,
-} from "../../databases/DatabaseList/databaseListFormat.ts";
+} from "@/components/databases/DatabaseList/databaseListFormat.ts";
 
 export interface DatabaseAdminListProps {
   databases: ReadonlyArray<Database>;

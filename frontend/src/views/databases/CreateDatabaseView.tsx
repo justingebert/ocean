@@ -2,11 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { UpstreamDatabaseProperties } from "../../types/database";
-import { DatabaseClient } from "../../api/databaseClient";
-import { DatabasesNavigation } from "../../navigation/navigation.ts";
-import AppLayout from "../../layouts/AppLayout";
-import CreateDatabaseForm from "../../components/forms/CreateDatabaseForm";
+import { UpstreamDatabaseProperties } from "@/types/database";
+import { DatabaseClient } from "@/api/databaseClient";
+import { DatabasesNavigation } from "@/navigation/navigation.ts";
+import AppLayout from "@/layouts/AppLayout";
+import CreateDatabaseForm from "@/components/forms/CreateDatabaseForm";
 
 const CreateDatabaseView: React.FC = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import { BaseModel } from "./models";
 import { EngineType, EngineTypeValues } from "./engine";
-import { config } from "../config";
+import { config } from "@/config";
 
 export interface DatabaseProperties {
   id: number;

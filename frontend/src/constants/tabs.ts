@@ -1,4 +1,4 @@
-import { EngineType, type EngineTypeValues } from "../types/engine";
+import { EngineType, type EngineTypeValues } from "@/types/engine";
 
 export type DatabaseDetailTabValue = "overview" | "users" | "invitations";
 

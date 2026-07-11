@@ -1,5 +1,5 @@
-import CreateRoleForm from "../../forms/CreateRoleForm";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../ui/dialog";
+import CreateRoleForm from "@/components/forms/CreateRoleForm";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DatabaseProperties } from "@/types/database.ts";
 import { UpstreamCreateRoleProperties } from "@/types/role.ts";
 
