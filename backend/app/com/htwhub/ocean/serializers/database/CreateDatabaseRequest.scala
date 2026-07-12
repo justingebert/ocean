@@ -17,7 +17,7 @@ object CreateDatabaseRequest {
 object CreateDatabaseSerializer {
   val constraints: Form[CreateDatabaseRequest] = Form(
     mapping(
-      "name" -> nonEmptyText.verifying(CustomConstraints.nameCheckConstraint),
+      "name" -> nonEmptyText(maxLength = 32).verifying(CustomConstraints.nameCheckConstraint),
       "engine" -> nonEmptyText.verifying(CustomConstraints.engineCheckConstraint)
     )(CreateDatabaseRequest.apply)(CreateDatabaseRequest.unapply)
   )

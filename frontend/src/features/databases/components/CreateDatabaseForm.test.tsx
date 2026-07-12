@@ -47,19 +47,15 @@ describe("CreateDatabaseForm", () => {
 
     expect(submitButton).toBeDisabled();
 
-    fireEvent.change(nameInput, { target: { value: "ab" } });
-    fireEvent.blur(nameInput);
+    fireEvent.change(nameInput, { target: { value: "1invalid" } });
     await waitFor(() =>
-      expect(screen.getByText("Name should be of minimum 4 characters length")).toBeInTheDocument(),
+      expect(screen.getByText(/Name must begin with a letter/)).toBeInTheDocument(),
     );
     expect(nameInput).toHaveAttribute("aria-invalid", "true");
 
     fireEvent.change(nameInput, { target: { value: "valid_name" } });
-    fireEvent.blur(nameInput);
     await waitFor(() =>
-      expect(
-        screen.queryByText(/Name should be of minimum 4 characters length/),
-      ).not.toBeInTheDocument(),
+      expect(screen.queryByText(/Name must begin with a letter/)).not.toBeInTheDocument(),
     );
     expect(nameInput).toHaveAttribute("aria-invalid", "false");
   });
@@ -72,7 +68,7 @@ describe("CreateDatabaseForm", () => {
     expect(screen.getByRole("status", { name: /loading/i })).toBeInTheDocument();
   });
 
-  it("surfaces a distinct message and toast when the availability check fails", async () => {
+  it("surfaces an inline message without a toast when the availability check fails", async () => {
     const spyApi = vi
       .spyOn(DatabaseClient, "availabilityDatabase")
       .mockRejectedValue(new Error("network"));
@@ -87,12 +83,60 @@ describe("CreateDatabaseForm", () => {
       expect(screen.getByText("Couldn't verify availability — try again")).toBeInTheDocument(),
     );
     expect(screen.queryByText("Name is already registered")).not.toBeInTheDocument();
-    expect(toast.error).toHaveBeenCalledWith("Couldn't verify name availability");
+    expect(toast.error).not.toHaveBeenCalled();
 
     spyApi.mockRestore();
   });
 
-  it("validateDatabaseValues returns true when availability is true", async () => {
+  it("does not check availability or toast for a locally invalid name", async () => {
+    const user = userEvent.setup();
+    const spyApi = vi
+      .spyOn(DatabaseClient, "availabilityDatabase")
+      .mockRejectedValue(new Error("backend rejected invalid name"));
+
+    render(<CreateDatabaseForm {...defaultProps} />);
+
+    const nameInput = screen.getByLabelText(/database name/i);
+    await user.type(nameInput, "Bad-name");
+
+    await waitFor(() =>
+      expect(screen.getByText(/Name must begin with a letter/)).toBeInTheDocument(),
+    );
+    expect(spyApi).not.toHaveBeenCalled();
+    expect(toast.error).not.toHaveBeenCalled();
+
+    spyApi.mockRestore();
+  });
+
+  it("accepts a one-character database name", async () => {
+    const spyApi = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(true);
+
+    render(<CreateDatabaseForm {...defaultProps} />);
+
+    const nameInput = screen.getByLabelText(/database name/i);
+    fireEvent.change(nameInput, { target: { value: "a" } });
+
+    await waitFor(() => expect(spyApi).toHaveBeenCalledWith({ name: "a", engine: "P" }));
+    expect(nameInput).toHaveAttribute("aria-invalid", "false");
+
+    spyApi.mockRestore();
+  });
+
+  it("debounces availability checks while typing", async () => {
+    const user = userEvent.setup();
+    const spyApi = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(true);
+
+    render(<CreateDatabaseForm {...defaultProps} />);
+
+    await user.type(screen.getByLabelText(/database name/i), "valid_name");
+
+    await waitFor(() => expect(spyApi).toHaveBeenCalledWith({ name: "valid_name", engine: "P" }));
+    expect(spyApi).toHaveBeenCalledTimes(1);
+
+    spyApi.mockRestore();
+  });
+
+  it("marks a valid name as available", async () => {
     const spyApi = vi.spyOn(DatabaseClient, "availabilityDatabase").mockResolvedValue(true);
 
     render(<CreateDatabaseForm {...defaultProps} />);

@@ -1,13 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as yup from "yup";
-import { Form, Formik } from "formik";
-import { toast } from "sonner";
+import { Form, Formik, useFormikContext } from "formik";
 import { CircleCheckIcon, CircleXIcon } from "lucide-react";
 
 import { engineOptions } from "@/features/databases/constants/engines";
 import { UpstreamDatabaseProperties } from "@/features/databases/model/database.ts";
 import { DatabaseClient } from "@/features/databases/api/databaseClient";
-import type { EngineTypeValues } from "@/features/databases/model/engine.ts";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,47 +26,177 @@ export interface CreateDatabaseFormProps {
   onSubmit: (database: UpstreamDatabaseProperties) => void;
 }
 
-const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onSubmit }) => {
-  const createDatabaseSchema = yup.object().shape({
-    name: yup
-      .string()
-      .required("Name is required")
-      .min(4, "Name should be of minimum 4 characters length")
-      .matches(
-        /^[a-z][a-z0-9_]*$/,
-        "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.",
-      )
-      .test("unique_test", "Name is already registered", (value, ctx) =>
-        validateDatabaseValues(value, ctx),
-      ),
-    engine: yup.string().required("Engine is required"),
-  });
+const databaseNamePattern = /^[a-z][a-z0-9_]*$/;
+const availabilityDebounceMs = 250;
 
-  const validateDatabaseValues = async (
-    name: string | undefined,
-    context: yup.TestContext<Record<string, unknown>>,
-  ): Promise<boolean | yup.ValidationError> => {
-    const engine = context.parent.engine as string | undefined;
-    if (name !== undefined && engine !== undefined) {
-      if (name.length < 4) {
-        return false;
-      }
-      const payload: UpstreamDatabaseProperties = {
-        name: name,
-        engine: engine as EngineTypeValues,
-      };
-      try {
-        const availability = await DatabaseClient.availabilityDatabase(payload);
-        if (availability) {
-          return true;
-        }
-      } catch {
-        toast.error("Couldn't verify name availability");
-        return context.createError({ message: "Couldn't verify availability, try again" });
-      }
+type AvailabilityStatus = "idle" | "checking" | "available" | "unavailable" | "error";
+
+interface AvailabilityState {
+  key: string;
+  status: AvailabilityStatus;
+}
+
+interface CreateDatabaseFieldsProps {
+  availability: AvailabilityState;
+  processing: boolean;
+  setAvailability: React.Dispatch<React.SetStateAction<AvailabilityState>>;
+}
+
+const createDatabaseSchema = yup.object().shape({
+  name: yup
+    .string()
+    .required("Name is required")
+    .max(32, "Name must be at most 32 characters long")
+    .matches(
+      databaseNamePattern,
+      "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.",
+    ),
+  engine: yup.string().required("Engine is required"),
+});
+
+const availabilityKey = (name: string, engine: string): string => `${engine}:${name}`;
+
+const isLocallyValidName = (name: string): boolean =>
+  name.length > 0 && name.length <= 32 && databaseNamePattern.test(name);
+
+const useDatabaseNameAvailability = (
+  values: UpstreamDatabaseProperties,
+  setAvailability: React.Dispatch<React.SetStateAction<AvailabilityState>>,
+): void => {
+  useEffect(() => {
+    const key = availabilityKey(values.name, values.engine);
+
+    if (!isLocallyValidName(values.name)) {
+      setAvailability({ key, status: "idle" });
+      return;
     }
-    return false;
-  };
+
+    let active = true;
+    setAvailability({ key, status: "checking" });
+
+    const timeout = window.setTimeout(() => {
+      void DatabaseClient.availabilityDatabase({ name: values.name, engine: values.engine })
+        .then((available) => {
+          if (active) {
+            setAvailability({ key, status: available ? "available" : "unavailable" });
+          }
+        })
+        .catch(() => {
+          if (active) {
+            setAvailability({ key, status: "error" });
+          }
+        });
+    }, availabilityDebounceMs);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timeout);
+    };
+  }, [setAvailability, values.engine, values.name]);
+};
+
+const CreateDatabaseFields: React.FC<CreateDatabaseFieldsProps> = ({
+  availability,
+  processing,
+  setAvailability,
+}) => {
+  const { errors, touched, values, setFieldValue, isValid, handleBlur, handleChange } =
+    useFormikContext<UpstreamDatabaseProperties>();
+  useDatabaseNameAvailability(values, setAvailability);
+
+  const key = availabilityKey(values.name, values.engine);
+  const availabilityStatus = availability.key === key ? availability.status : "idle";
+  const localNameError = errors.name;
+  const availabilityError =
+    availabilityStatus === "unavailable"
+      ? "Name is already registered"
+      : availabilityStatus === "error"
+        ? "Couldn't verify availability — try again"
+        : undefined;
+  const displayedNameError = localNameError ?? availabilityError;
+  const nameInvalid = Boolean(displayedNameError && (touched.name || values.name.length > 0));
+  const nameAvailable = availabilityStatus === "available" && !localNameError;
+
+  return (
+    <Form>
+      <FieldGroup>
+        <FieldSet>
+          <FieldLegend>Choose a database engine</FieldLegend>
+          <FieldDescription>
+            A database runs a single database engine that powers one or more individual databases.
+          </FieldDescription>
+          <Field>
+            <EngineGroup
+              engineOptions={engineOptions}
+              selectedValue={values.engine}
+              onSelect={(value) => setFieldValue("engine", value)}
+            />
+          </Field>
+        </FieldSet>
+
+        <Field data-invalid={nameInvalid}>
+          <FieldLabel htmlFor="name">Database name</FieldLabel>
+          <FieldDescription id="database-name-description">
+            Names must be lowercase and start with a letter. They can be up to 32 characters long
+            and may contain digits and underscores.
+          </FieldDescription>
+          <InputGroup>
+            <InputGroupInput
+              id="name"
+              name="name"
+              type="text"
+              value={values.name}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder="database_123"
+              maxLength={32}
+              autoComplete="off"
+              aria-required="true"
+              aria-invalid={nameInvalid}
+              aria-describedby={
+                nameInvalid
+                  ? "database-name-description database-name-error"
+                  : "database-name-description"
+              }
+            />
+            {(availabilityStatus === "checking" || nameAvailable || nameInvalid) && (
+              <InputGroupAddon align="inline-end" aria-live="polite">
+                {availabilityStatus === "checking" ? (
+                  <Spinner aria-label="Checking name availability" />
+                ) : nameAvailable ? (
+                  <>
+                    <CircleCheckIcon className="text-success" aria-hidden="true" />
+                    <span className="sr-only">Name is available</span>
+                  </>
+                ) : (
+                  <CircleXIcon className="text-destructive" aria-hidden="true" />
+                )}
+              </InputGroupAddon>
+            )}
+          </InputGroup>
+          {nameInvalid && <FieldError id="database-name-error">{displayedNameError}</FieldError>}
+        </Field>
+
+        <Field>
+          <Button
+            type="submit"
+            disabled={!isValid || availabilityStatus !== "available" || processing}
+            className="w-full"
+          >
+            {processing && <Spinner data-icon="inline-start" />}
+            {processing ? "Creating database..." : "Create a database"}
+          </Button>
+        </Field>
+      </FieldGroup>
+    </Form>
+  );
+};
+
+const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onSubmit }) => {
+  const [availability, setAvailability] = useState<AvailabilityState>({
+    key: "",
+    status: "idle",
+  });
 
   return (
     <>
@@ -80,98 +208,19 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onS
         }}
         validationSchema={createDatabaseSchema}
         onSubmit={(values: UpstreamDatabaseProperties) => {
-          onSubmit(values);
+          if (
+            availability.key === availabilityKey(values.name, values.engine) &&
+            availability.status === "available"
+          ) {
+            onSubmit(values);
+          }
         }}
       >
-        {({
-          errors,
-          touched,
-          values,
-          setFieldValue,
-          isValidating,
-          isValid,
-          handleBlur,
-          handleChange,
-        }) => {
-          const nameInvalid = Boolean(touched.name && errors.name);
-          const nameAvailable = Boolean(
-            values.name && touched.name && !isValidating && isValid && !errors.name,
-          );
-
-          return (
-            <Form>
-              <FieldGroup>
-                <FieldSet>
-                  <FieldLegend>Choose a database engine</FieldLegend>
-                  <FieldDescription>
-                    A database runs a single database engine that powers one or more individual
-                    databases.
-                  </FieldDescription>
-                  <Field>
-                    <EngineGroup
-                      engineOptions={engineOptions}
-                      selectedValue={values.engine}
-                      onSelect={(value) => setFieldValue("engine", value)}
-                    />
-                  </Field>
-                </FieldSet>
-
-                <Field data-invalid={nameInvalid}>
-                  <FieldLabel htmlFor="name">Database name</FieldLabel>
-                  <FieldDescription id="database-name-description">
-                    Names must be lowercase and start with a letter. They can be between 4 and 32
-                    characters long and may contain underscores.
-                  </FieldDescription>
-                  <InputGroup>
-                    <InputGroupInput
-                      id="name"
-                      name="name"
-                      type="text"
-                      value={values.name}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      placeholder="database_123"
-                      autoComplete="off"
-                      aria-required="true"
-                      aria-invalid={nameInvalid}
-                      aria-describedby={
-                        nameInvalid
-                          ? "database-name-description database-name-error"
-                          : "database-name-description"
-                      }
-                    />
-                    {(isValidating || nameAvailable || nameInvalid) && (
-                      <InputGroupAddon align="inline-end" aria-live="polite">
-                        {isValidating ? (
-                          <Spinner aria-label="Checking name availability" />
-                        ) : nameAvailable ? (
-                          <>
-                            <CircleCheckIcon className="text-success" aria-hidden="true" />
-                            <span className="sr-only">Name is available</span>
-                          </>
-                        ) : (
-                          <CircleXIcon className="text-destructive" aria-hidden="true" />
-                        )}
-                      </InputGroupAddon>
-                    )}
-                  </InputGroup>
-                  {nameInvalid && <FieldError id="database-name-error">{errors.name}</FieldError>}
-                </Field>
-
-                <Field>
-                  <Button
-                    type="submit"
-                    disabled={values.name === "" || !isValid || processing || isValidating}
-                    className="w-full"
-                  >
-                    {processing && <Spinner data-icon="inline-start" />}
-                    {processing ? "Creating database..." : "Create a database"}
-                  </Button>
-                </Field>
-              </FieldGroup>
-            </Form>
-          );
-        }}
+        <CreateDatabaseFields
+          availability={availability}
+          processing={processing}
+          setAvailability={setAvailability}
+        />
       </Formik>
     </>
   );
