@@ -6,6 +6,11 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-07-12 — frontend legacy dependency cleanup
+- Removed three unused UI deps: `@headlessui/react` (zero usages left post-shadcn migration), `@tailwindcss/forms` and its `tailwind.config.js` (dead in the Tailwind 4 CSS-first setup — `index.css` never `@config`s it), and `@heroicons/react` after migrating its last two icons to lucide (the project standard).
+- Also fixed 3 pre-existing `Headline.test.tsx` failures on `main` (asserted a `text-gray-600` class already removed from the component); trimmed the assertions to match the source.
+- Verified: lint, production build, and full Vitest suite (114) all green.
+
 ## 2026-07-12 — reporting stats card refactor
 - Rebuilt the administration/reporting `Stats` tile on the shadcn `Card` primitives (theme-aware tokens) instead of hardcoded light-only Tailwind, and dropped the `React.FC`/`render()` boilerplate.
 - Trimmed the tests to the one behavioural check (renders name + value); removed the brittle class-assertion and stale snapshot that were pinned to the old markup.

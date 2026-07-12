@@ -17,7 +17,7 @@ describe("Headline Component", () => {
     renderHeadline(props);
     const element = screen.getByText("Small Title");
 
-    expect(element).toHaveClass("text-l text-gray-600 sm:text-xl mb-1");
+    expect(element).toHaveClass("text-l sm:text-xl mb-1");
   });
 
   it("renders the medium headline with the correct class", () => {
@@ -25,7 +25,7 @@ describe("Headline Component", () => {
     renderHeadline(props);
 
     const element = screen.getByText("Medium Title");
-    expect(element).toHaveClass("text-xl text-gray-600 sm:text-2xl mb-3");
+    expect(element).toHaveClass("text-xl sm:text-2xl mb-3");
   });
 
   it("renders the large headline with the correct class", () => {
@@ -33,6 +33,6 @@ describe("Headline Component", () => {
     renderHeadline(props);
 
     const element = screen.getByText("Large Title");
-    expect(element).toHaveClass("text-3xl text-gray-600 sm:text-4xl mb-5");
+    expect(element).toHaveClass("text-3xl sm:text-4xl mb-5");
   });
 });

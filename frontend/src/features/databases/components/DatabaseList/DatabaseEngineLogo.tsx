@@ -1,5 +1,5 @@
 import React from "react";
-import { CircleStackIcon } from "@heroicons/react/24/outline";
+import { DatabaseIcon } from "lucide-react";
 
 import mongodbLogo from "@/features/databases/assets/mongodb-logo.svg";
 import postgresqlLogo from "@/features/databases/assets/postgresql-logo.svg";
@@ -39,7 +39,7 @@ const DatabaseEngineLogo: React.FC<DatabaseEngineLogoProps> = ({ engine, classNa
 
   if (!logo) {
     return (
-      <CircleStackIcon
+      <DatabaseIcon
         className={cn("flex-shrink-0 text-gray-400", className)}
         aria-hidden="true"
       />

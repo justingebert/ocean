@@ -1,4 +1,4 @@
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { TriangleAlertIcon } from "lucide-react";
 
 import { deleteModalContent } from "@/features/databases/constants/modals";
 import {
@@ -31,7 +31,7 @@ export function DeleteDatabaseAlertDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogMedia className="bg-destructive/10 text-destructive">
-            <ExclamationTriangleIcon aria-hidden="true" />
+            <TriangleAlertIcon aria-hidden="true" />
           </AlertDialogMedia>
           <AlertDialogTitle>{deleteModalContent.title}</AlertDialogTitle>
           <AlertDialogDescription>{deleteModalContent.description}</AlertDialogDescription>
