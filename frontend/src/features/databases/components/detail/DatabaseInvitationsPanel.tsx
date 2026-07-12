@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/combobox.tsx";
 import { Field, FieldLabel } from "@/components/ui/field.tsx";
 
-import Headline from "@/components/common/Headline";
+import { SectionHeading } from "@/components/common/SectionHeading";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -45,8 +45,8 @@ export function DatabaseInvitationsPanel({
         onDeselect={onDeselectUser}
       />
       <div className="my-5">
-        <Headline title="Invitations" size="medium" />
-        <p className="mt-1 text-sm text-gray-500">Invite other people</p>
+        <SectionHeading>Invitations</SectionHeading>
+        <p className="mt-1 text-sm text-muted-foreground">Invite other people</p>
       </div>
       <Table>
         <TableHeader>

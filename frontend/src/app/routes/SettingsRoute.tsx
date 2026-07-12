@@ -2,7 +2,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { UserClient } from "@/api/userClient";
-import Headline from "@/components/common/Headline";
+import { PageHeader } from "@/components/common/PageHeader";
 import ProfileCard from "@/features/users/components/ProfileCard";
 
 const SettingsRoute: React.FC = () => {
@@ -13,7 +13,7 @@ const SettingsRoute: React.FC = () => {
 
   return (
     <div>
-      <Headline title="Profile" size="large" />
+      <PageHeader title="Profile" />
       <ProfileCard user={userQuery.data} loading={userQuery.isFetching} />
     </div>
   );

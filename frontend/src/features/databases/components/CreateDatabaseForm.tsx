@@ -8,7 +8,7 @@ import { UpstreamDatabaseProperties } from "@/features/databases/model/database.
 import { DatabaseClient } from "@/features/databases/api/databaseClient";
 import type { EngineTypeValues } from "@/features/databases/model/engine.ts";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import Headline from "@/components/common/Headline";
+import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -77,9 +77,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
 
   return (
     <>
-      <div className="mb-5">
-        <Headline title="Create a database" size="large" />
-      </div>
+      <PageHeader title="Create a database" />
       <Formik
         initialValues={{
           name: "",

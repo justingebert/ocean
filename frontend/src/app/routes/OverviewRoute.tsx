@@ -2,6 +2,7 @@ import React from "react";
 import { DatabaseIcon, LayersIcon, SettingsIcon } from "lucide-react";
 
 import { routePaths } from "@/app/navigation/routes";
+import { PageHeader } from "@/components/common/PageHeader";
 import StartingPoints, { type StartingPoint } from "@/features/overview/StartingPoints";
 
 const startingPoints: StartingPoint[] = [
@@ -28,14 +29,10 @@ const startingPoints: StartingPoint[] = [
 const OverviewRoute: React.FC = () => {
   return (
     <>
-      <header className="mb-8">
-        <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-          Overview
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          Provision and manage your databases in one place.
-        </p>
-      </header>
+      <PageHeader
+        title="Overview"
+        description="Provision and manage your databases in one place."
+      />
       <StartingPoints startingPoints={startingPoints} />
     </>
   );

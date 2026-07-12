@@ -6,6 +6,17 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-07-12 — align route layout to one pattern
+- Established a single page pattern: `AppLayout` owns the content container (width, horizontal padding, top margin) and each route just renders `<PageHeader>` + content. Removed per-route wrappers that fought it.
+- Fixed the two visible offenders: `DatabasesRoute` re-wrapped only its heading in a second `max-w-6xl mx-auto mt-8 px-…` container (double padding/margin, heading misaligned from the list below it), and `FAQRoute` rolled its own `max-w-3xl` centered column with a `text-center font-extrabold` `<h2>`. Both now use the standard left-aligned `PageHeader` inside the shared container.
+- Verified: lint, build, full Vitest suite (113) green.
+
+## 2026-07-12 — typography: replace Headline with semantic PageHeader/SectionHeading
+- Replaced the non-semantic `Headline` (`<div>`s, no subtitle, `React.FC`/render boilerplate) with two theme-aware components: `PageHeader` (`<h1>` + optional muted subtitle) and `SectionHeading` (`<h2>`), standardizing on one type scale (`font-heading`, `font-semibold`, `tracking-tight`, `text-foreground`) in place of the old `extrabold`/`bold`/`medium` mix.
+- Migrated all 7 `Headline` call sites plus the hand-rolled Overview header and Reporting's ad-hoc section `<h2>`s onto the new components; deleted `Headline`. Also fixed a real dark-mode bug on the sign-in heading (hardcoded `text-gray-900` on a themed `bg-muted`) and switched panel subtitles to `text-muted-foreground`.
+- Tests use role-based queries (`getByRole("heading")`) instead of brittle class assertions. Verified: lint, build, full Vitest suite (113) green.
+- Deferred: `NotFoundRoute` is a fully light-only legacy page (`bg-white` + indigo), and `DatabaseDetailHeader` still renders its title as a `<div>` — both left for a later theming pass.
+
 ## 2026-07-12 — frontend legacy dependency cleanup
 - Removed three unused UI deps: `@headlessui/react` (zero usages left post-shadcn migration), `@tailwindcss/forms` and its `tailwind.config.js` (dead in the Tailwind 4 CSS-first setup — `index.css` never `@config`s it), and `@heroicons/react` after migrating its last two icons to lucide (the project standard).
 - Also fixed 3 pre-existing `Headline.test.tsx` failures on `main` (asserted a `text-gray-600` class already removed from the component); trimmed the assertions to match the source.

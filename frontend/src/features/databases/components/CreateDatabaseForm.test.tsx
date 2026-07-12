@@ -26,7 +26,9 @@ describe("CreateDatabaseForm", () => {
   it("renders the form and input fields", () => {
     render(<CreateDatabaseForm {...defaultProps} />);
 
-    expect(screen.getByText("Create a database", { selector: "div" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Create a database", level: 1 }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/database name/i)).toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: "Create a database" })).toBeInTheDocument();

@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { routePaths } from "@/app/navigation/routes.ts";
 import { DatabaseDetailPage } from "@/features/databases/components/detail/DatabaseDetailPage";
-import Headline from "@/components/common/Headline";
+import { PageHeader } from "@/components/common/PageHeader";
 
 const DatabaseDetailRoute: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -11,10 +11,10 @@ const DatabaseDetailRoute: React.FC = () => {
   return (
     <>
       {databaseId === undefined ? (
-        <div>
-          <Headline title="Database not found" size="large" />
-          <p className="text-sm">The requested database id is invalid.</p>
-        </div>
+        <PageHeader
+          title="Database not found"
+          description="The requested database id is invalid."
+        />
       ) : (
         <DatabaseDetailPage
           databaseId={databaseId}

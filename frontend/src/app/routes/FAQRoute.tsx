@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { PageHeader } from "@/components/common/PageHeader";
 
 const faqs = [
   {
@@ -30,21 +31,17 @@ const faqs = [
 
 const FAQRoute: React.FC = () => {
   return (
-    <div className="max-w-7xl mx-auto py-12 px-4 sm:py-16 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <h2 className="text-center text-3xl font-extrabold sm:text-4xl">
-          Frequently asked questions
-        </h2>
-        <Accordion className="mt-6" multiple>
-          {faqs.map((faq) => (
-            <AccordionItem key={faq.question} value={faq.question}>
-              <AccordionTrigger>{faq.question}</AccordionTrigger>
-              <AccordionContent>{faq.answer}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </div>
-    </div>
+    <>
+      <PageHeader title="Frequently asked questions" />
+      <Accordion multiple>
+        {faqs.map((faq) => (
+          <AccordionItem key={faq.question} value={faq.question}>
+            <AccordionTrigger>{faq.question}</AccordionTrigger>
+            <AccordionContent>{faq.answer}</AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </>
   );
 };
 

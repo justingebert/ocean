@@ -1,4 +1,5 @@
-import Headline from "@/components/common/Headline";
+import { PageHeader } from "@/components/common/PageHeader";
+import { SectionHeading } from "@/components/common/SectionHeading";
 import { useMetricsQuery } from "@/features/reporting/hooks/useMetricsQuery";
 import {
   useDatabasesQuery,
@@ -35,21 +36,21 @@ const ReportingRoute = () => {
 
   return (
     <div>
-      <Headline title="Administration" size="large" />
+      <PageHeader title="Administration" />
       <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
         {stats.map((item) => (
           <Stats key={item.name} name={item.name} value={item.value} />
         ))}
       </div>
       <section>
-        <h2 className="mt-10 text-2xl leading-6 font-medium">Databases</h2>
+        <SectionHeading className="mt-10">Databases</SectionHeading>
         <DatabaseAdminList
           databases={databasesQuery.data ?? []}
           onDelete={(database) => deleteDatabaseWithPermissionMutation.mutate(database.id)}
         />
       </section>
       <section>
-        <h2 className="mt-10 text-2xl leading-6 font-medium">Users</h2>
+        <SectionHeading className="mt-10">Users</SectionHeading>
         <UserAdminList users={usersQuery.data ?? []} />
       </section>
     </div>

@@ -2,7 +2,7 @@ import { useId, useState } from "react";
 import { CopyIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import Headline from "@/components/common/Headline";
+import { SectionHeading } from "@/components/common/SectionHeading";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,
@@ -37,8 +37,8 @@ export function DatabaseUsersPanel({
     <div className="mt-6">
       <div className="flex flex-wrap items-center justify-between pb-8 sm:flex-nowrap">
         <div>
-          <Headline title="Users" size="medium" />
-          <p className="mt-1 text-sm text-gray-500">Only for this database</p>
+          <SectionHeading>Users</SectionHeading>
+          <p className="mt-1 text-sm text-muted-foreground">Only for this database</p>
         </div>
         <div className="flex-shrink-0">
           <Button className="relative" disabled={isCreatingRole} onClick={onAddUser}>
