@@ -6,6 +6,10 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-07-12 — reporting stats card refactor
+- Rebuilt the administration/reporting `Stats` tile on the shadcn `Card` primitives (theme-aware tokens) instead of hardcoded light-only Tailwind, and dropped the `React.FC`/`render()` boilerplate.
+- Trimmed the tests to the one behavioural check (renders name + value); removed the brittle class-assertion and stale snapshot that were pinned to the old markup.
+
 ## 2026-07-11 — frontend composition and feature ownership cleanup
 - Finished the feature-first restructure around a simple shared → features → app dependency direction. The app now owns routing, navigation, the protected shell, and cross-feature reporting composition; feature route modules no longer assemble app chrome themselves.
 - Kept the structure proportional: flattened the small overview feature, colocated database models/assets and administration UI with the database feature, removed the HTTP/session import cycle, and added lightweight ESLint direction checks without introducing barrels or placeholder folders.

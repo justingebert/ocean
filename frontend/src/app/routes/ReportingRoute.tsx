@@ -36,11 +36,11 @@ const ReportingRoute = () => {
   return (
     <div>
       <Headline title="Administration" size="large" />
-      <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
         {stats.map((item) => (
           <Stats key={item.name} name={item.name} value={item.value} />
         ))}
-      </dl>
+      </div>
       <section>
         <h2 className="mt-10 text-2xl leading-6 font-medium">Databases</h2>
         <DatabaseAdminList
