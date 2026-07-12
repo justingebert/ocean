@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { toast } from "sonner";
 import CreateDatabaseForm, { CreateDatabaseFormProps } from "./CreateDatabaseForm";
 import { DatabaseClient } from "@/features/databases/api/databaseClient";
 import { EngineType } from "@/features/databases/model/engine";
@@ -9,6 +10,10 @@ vi.mock("@/features/databases/api/databaseClient", () => ({
   DatabaseClient: {
     availabilityDatabase: vi.fn(() => Promise.resolve(true)),
   },
+}));
+
+vi.mock("sonner", () => ({
+  toast: { error: vi.fn(), success: vi.fn() },
 }));
 
 describe("CreateDatabaseForm", () => {
@@ -67,13 +72,24 @@ describe("CreateDatabaseForm", () => {
     expect(screen.getByRole("status", { name: /loading/i })).toBeInTheDocument();
   });
 
-  it("displays a submission error as an alert", () => {
-    render(<CreateDatabaseForm {...defaultProps} errorMessage="Database creation failed" />);
+  it("surfaces a distinct message and toast when the availability check fails", async () => {
+    const spyApi = vi
+      .spyOn(DatabaseClient, "availabilityDatabase")
+      .mockRejectedValue(new Error("network"));
 
-    const alert = screen.getByRole("alert");
+    render(<CreateDatabaseForm {...defaultProps} />);
 
-    expect(alert).toHaveTextContent("Error");
-    expect(alert).toHaveTextContent("Database creation failed");
+    const nameInput = screen.getByLabelText(/database name/i);
+    fireEvent.change(nameInput, { target: { value: "valid_name" } });
+    fireEvent.blur(nameInput);
+
+    await waitFor(() =>
+      expect(screen.getByText("Couldn't verify availability — try again")).toBeInTheDocument(),
+    );
+    expect(screen.queryByText("Name is already registered")).not.toBeInTheDocument();
+    expect(toast.error).toHaveBeenCalledWith("Couldn't verify name availability");
+
+    spyApi.mockRestore();
   });
 
   it("validateDatabaseValues returns true when availability is true", async () => {

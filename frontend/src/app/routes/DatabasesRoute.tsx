@@ -7,24 +7,36 @@ import { emptyDatabaseState } from "@/features/databases/constants/empty";
 import { DatabaseClient } from "@/features/databases/api/databaseClient";
 import DatabaseList from "@/features/databases/components/DatabaseList/DatabaseList";
 import EmptyState from "@/components/common/EmptyState";
+import ErrorState from "@/components/common/ErrorState";
+import ListSkeleton from "@/components/common/ListSkeleton";
 import { PageHeader } from "@/components/common/PageHeader";
 
 const DatabasesRoute: React.FC = () => {
   const navigate = useNavigate();
 
-  const { data: databases } = useQuery({
+  const databasesQuery = useQuery({
     queryKey: ["databases"],
     queryFn: () => DatabaseClient.getUserDatabases(),
+    meta: { errorMessage: "Couldn't load databases" },
   });
+
+  const databases = databasesQuery.data ?? [];
 
   return (
     <>
       <PageHeader title="Databases" />
-      {(databases || []).length === 0 ? (
+      {databasesQuery.isPending ? (
+        <ListSkeleton rows={4} />
+      ) : databasesQuery.isError ? (
+        <ErrorState
+          title="Couldn't load databases"
+          onRetry={() => databasesQuery.refetch()}
+        />
+      ) : databases.length === 0 ? (
         <EmptyState {...emptyDatabaseState} onClick={() => navigate(routePaths.createDatabase)} />
       ) : (
         <DatabaseList
-          databases={databases || []}
+          databases={databases}
           onClick={(id) => navigate(routeBuilders.databaseDetail(id))}
         />
       )}

@@ -5,6 +5,7 @@ import {
   type DatabaseDetailTabValue,
 } from "@/features/databases/constants/tabs";
 import { useDatabaseDetail } from "@/features/databases/hooks/useDatabaseDetail";
+import ErrorState from "@/components/common/ErrorState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx";
 import { CreateRoleDialog } from "./CreateRoleDialog";
 import { DatabaseDetailHeader } from "./DatabaseDetailHeader";
@@ -24,6 +25,12 @@ export function DatabaseDetailPage({ databaseId, onDeleted }: DatabaseDetailPage
   const [createRoleDialogOpen, setCreateRoleDialogOpen] = useState(false);
   const detail = useDatabaseDetail(databaseId, { onDeleted });
   const availableTabs = getDetailViewTabsFor(detail.database?.engine);
+
+  if (detail.isError) {
+    return (
+      <ErrorState title="Couldn't load database" onRetry={() => detail.refetch()} />
+    );
+  }
 
   return (
     <>

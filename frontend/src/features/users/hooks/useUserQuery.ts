@@ -7,9 +7,9 @@ export const useUsersQuery = (options?: UseQueryOptions<ReadonlyArray<UserProper
   return useQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      const data = await UserClient.getUsers();
-      return data;
+      return await UserClient.getUsers();
     },
+    meta: { errorMessage: "Couldn't load users" },
     ...options,
   });
 };

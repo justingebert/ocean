@@ -10,6 +10,7 @@ export const useDatabasesQuery = (options?: UseQueryOptions<ReadonlyArray<Databa
       const data = await DatabaseClient.getAllDatabases();
       return data.map((database) => new Database(database));
     },
+    meta: { errorMessage: "Couldn't load databases" },
     ...options,
   });
 };

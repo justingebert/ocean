@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { UpstreamDatabaseProperties } from "@/features/databases/model/database";
 import { DatabaseClient } from "@/features/databases/api/databaseClient";
@@ -18,12 +19,14 @@ const CreateDatabaseRoute: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ["databases"] });
       navigate(routePaths.databases);
     },
+    onError: () => {
+      toast.error("Couldn't create database");
+    },
   });
 
   return (
     <CreateDatabaseForm
       processing={createDatabaseMutation.isPending}
-      errorMessage={createDatabaseMutation.isError ? "Ein Fehler is aufgetreten" : undefined}
       onSubmit={(value) => createDatabaseMutation.mutate(value)}
     />
   );

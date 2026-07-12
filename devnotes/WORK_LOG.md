@@ -6,6 +6,12 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-07-12 — standardize async UI states across query views
+- Introduced a lightweight convention (no wrapper abstraction — shared pieces wired inline): `ListSkeleton` while loading, existing `EmptyState` when empty, new `ErrorState` (icon + Retry) on failure, plus a single global `QueryCache.onError` on the `QueryClient` that toasts every query failure (copy per-query via `query.meta.errorMessage`).
+- Applied to all four TanStack Query views: Databases (also fixes the "No databases" EmptyState flashing during load), Reporting (per-section loading/error for its 3 independent queries), Settings, and DatabaseDetail (error gated on the primary database query only).
+- Fixed two genuinely-wrong behaviors: the create-database submit error rendered a hardcoded German alert (now a toast, matching every other mutation), and the two availability-check validators (`CreateDatabaseForm`/`CreateRoleForm`) swallowed network errors and showed the misleading "Name is already registered" — now a distinct field error + toast.
+- Verified: tsc, lint, full Vitest suite (113) green.
+
 ## 2026-07-12 — align route layout to one pattern
 - Established a single page pattern: `AppLayout` owns the content container (width, horizontal padding, top margin) and each route just renders `<PageHeader>` + content. Removed per-route wrappers that fought it.
 - Fixed the two visible offenders: `DatabasesRoute` re-wrapped only its heading in a second `max-w-6xl mx-auto mt-8 px-…` container (double padding/margin, heading misaligned from the list below it), and `FAQRoute` rolled its own `max-w-3xl` centered column with a `text-center font-extrabold` `<h2>`. Both now use the standard left-aligned `PageHeader` inside the shared container.

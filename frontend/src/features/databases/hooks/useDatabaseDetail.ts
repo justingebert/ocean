@@ -22,6 +22,7 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
   const databaseQuery = useQuery({
     queryKey: ["database", databaseId],
     queryFn: () => DatabaseClient.getDatabase(databaseId),
+    meta: { errorMessage: "Couldn't load database" },
   });
 
   const rolesQuery = useQuery({
@@ -142,6 +143,9 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
   };
 
   return {
+    isLoading: databaseQuery.isPending,
+    isError: databaseQuery.isError,
+    refetch: () => databaseQuery.refetch(),
     database,
     databaseModel,
     currentUser,

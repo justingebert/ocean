@@ -1,5 +1,6 @@
 import React from "react";
 import { Form, Formik } from "formik";
+import { toast } from "sonner";
 import * as yup from "yup";
 
 import { DatabaseProperties } from "@/features/databases/model/database.ts";
@@ -26,10 +27,15 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
         /^[a-z][a-z0-9_]*$/,
         "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.",
       )
-      .test("unique_test", "Name is already registered", (value) => validateDatabaseValues(value)),
+      .test("unique_test", "Name is already registered", (value, ctx) =>
+        validateDatabaseValues(value, ctx),
+      ),
   });
 
-  const validateDatabaseValues = async (roleName: string | undefined): Promise<boolean> => {
+  const validateDatabaseValues = async (
+    roleName: string | undefined,
+    context: yup.TestContext<Record<string, unknown>>,
+  ): Promise<boolean | yup.ValidationError> => {
     if (roleName !== undefined && database !== undefined) {
       const payload: UpstreamCreateRoleProperties = {
         roleName: `${database.name}_${roleName}`,
@@ -41,8 +47,8 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
           return true;
         }
       } catch {
-        // TODO: user should know what happend
-        return false;
+        toast.error("Couldn't verify name availability");
+        return context.createError({ message: "Couldn't verify availability, try again" });
       }
     }
     return false;

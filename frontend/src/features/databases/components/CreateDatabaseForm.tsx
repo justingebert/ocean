@@ -1,13 +1,13 @@
 import React from "react";
 import * as yup from "yup";
 import { Form, Formik } from "formik";
+import { toast } from "sonner";
 import { CircleCheckIcon, CircleXIcon } from "lucide-react";
 
 import { engineOptions } from "@/features/databases/constants/engines";
 import { UpstreamDatabaseProperties } from "@/features/databases/model/database.ts";
 import { DatabaseClient } from "@/features/databases/api/databaseClient";
 import type { EngineTypeValues } from "@/features/databases/model/engine.ts";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,15 +25,10 @@ import { EngineGroup } from "@/features/databases/components/EngineGroup/EngineG
 
 export interface CreateDatabaseFormProps {
   processing: boolean;
-  errorMessage?: string;
   onSubmit: (database: UpstreamDatabaseProperties) => void;
 }
 
-const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
-  processing,
-  errorMessage,
-  onSubmit,
-}) => {
+const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onSubmit }) => {
   const createDatabaseSchema = yup.object().shape({
     name: yup
       .string()
@@ -52,7 +47,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
   const validateDatabaseValues = async (
     name: string | undefined,
     context: yup.TestContext<Record<string, unknown>>,
-  ): Promise<boolean> => {
+  ): Promise<boolean | yup.ValidationError> => {
     const engine = context.parent.engine as string | undefined;
     if (name !== undefined && engine !== undefined) {
       if (name.length < 4) {
@@ -68,8 +63,8 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
           return true;
         }
       } catch {
-        // TODO: user should know what happend
-        return false;
+        toast.error("Couldn't verify name availability");
+        return context.createError({ message: "Couldn't verify availability, try again" });
       }
     }
     return false;
@@ -162,14 +157,6 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({
                   </InputGroup>
                   {nameInvalid && <FieldError id="database-name-error">{errors.name}</FieldError>}
                 </Field>
-
-                {errorMessage && (
-                  <Alert variant="destructive">
-                    <CircleXIcon aria-hidden="true" />
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{errorMessage}</AlertDescription>
-                  </Alert>
-                )}
 
                 <Field>
                   <Button
