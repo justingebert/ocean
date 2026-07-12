@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SettingsNavigation } from "@/app/navigation/navigation.ts";
+import { ProfileNavigation } from "@/app/navigation/navigation.ts";
 import { UserProperties } from "@/types/user.ts";
 import { getUserInitials } from "@/app/layout/utils.ts";
 
@@ -45,8 +45,10 @@ export function ProfileMenu({ user, loading, onLogout }: ProfileMenuProps) {
         <ChevronDownIcon data-icon="inline-end" className="hidden text-muted-foreground lg:block" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem render={<Link to={SettingsNavigation.to} />}>Settings</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onLogout()}>Logout</DropdownMenuItem>
+        <DropdownMenuItem render={<Link to={ProfileNavigation.to} />}>Profile</DropdownMenuItem>
+        <DropdownMenuItem variant={"destructive"} onClick={() => onLogout()}>
+          Logout
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

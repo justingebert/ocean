@@ -1,167 +1,76 @@
-import { Fragment } from "react";
-import { NavLink } from "react-router-dom";
-import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/20/solid";
+import { Link, NavLink, useLocation } from "react-router-dom";
 
-import { Navigation } from "@/app/navigation/navigation.ts";
-import { cn } from "@/lib/utils.ts";
-import { getNavigationSection } from "./utils.ts";
+import type { Navigation } from "@/app/navigation/navigation";
+import { HomeNavigation } from "@/app/navigation/navigation";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import { getNavigationSection } from "./utils";
 
-type SidebarNavigationProps = {
-  primaryNavigationItems: Navigation[];
-  secondaryNavigationItems: Navigation[];
-  navClassName: string;
-  linkClassName: string;
-};
-
-type MobileSidebarProps = {
-  open: boolean;
+type AppSidebarProps = {
   navigationItems: Navigation[];
-  onClose: () => void;
 };
 
-type DesktopSidebarProps = {
-  primaryNavigationItems: Navigation[];
-  secondaryNavigationItems: Navigation[];
-};
+export function AppSidebar({ navigationItems }: AppSidebarProps) {
+  const location = useLocation();
+  const { setOpenMobile } = useSidebar();
+  const primaryItems = getNavigationSection(navigationItems, "primary");
+  const secondaryItems = getNavigationSection(navigationItems, "secondary");
 
-function SidebarNavigation({
-  primaryNavigationItems,
-  secondaryNavigationItems,
-  navClassName,
-  linkClassName,
-}: SidebarNavigationProps) {
-  const renderLink = (item: Navigation) => (
-    <NavLink
-      key={item.name}
-      to={item.to}
-      className={({ isActive }) =>
-        cn(
-          isActive
-            ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
-            : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-accent-foreground",
-          linkClassName,
-        )
-      }
-    >
-      {({ isActive }) => (
-        <>
-          <item.icon
-            className={cn(
-              "mr-4 flex-shrink-0 h-6 w-6",
-              isActive ? "text-sidebar-primary-foreground" : "text-sidebar-icon",
-            )}
-            aria-hidden="true"
-          />
-          {item.name}
-        </>
-      )}
-    </NavLink>
-  );
+  const closeMobileSidebar = () => setOpenMobile(false);
+
+  const renderNavigationItems = (items: Navigation[]) =>
+    items.map((item) => {
+      const isActive = location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
+
+      return (
+        <SidebarMenuItem key={item.to}>
+          <SidebarMenuButton
+            render={<NavLink to={item.to} onClick={closeMobileSidebar} />}
+            isActive={isActive}
+          >
+            <item.icon aria-hidden="true" />
+            <span>{item.name}</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      );
+    });
 
   return (
-    <nav className={navClassName} aria-label="Sidebar">
-      <div className="px-2 space-y-1">{primaryNavigationItems.map(renderLink)}</div>
-      <div className="mt-6 pt-6">
-        <div className="px-2 space-y-1">{secondaryNavigationItems.map(renderLink)}</div>
-      </div>
-    </nav>
-  );
-}
+    <Sidebar>
+      <nav className="flex min-h-0 flex-1 flex-col" aria-label="Sidebar">
+        <SidebarHeader>
+          <Link
+            to={HomeNavigation.to}
+            className="flex h-12 items-center px-3"
+            onClick={closeMobileSidebar}
+          >
+            <img className="h-8 w-auto" src="/ocean-logo.png" alt="Ocean logo" />
+          </Link>
+        </SidebarHeader>
 
-export function MobileSidebar({ open, navigationItems, onClose }: MobileSidebarProps) {
-  return (
-    <Transition show={open} as={Fragment}>
-      <Dialog
-        as="div"
-        static
-        className="fixed inset-0 flex z-40 lg:hidden"
-        open={open}
-        onClose={onClose}
-      >
-        <TransitionChild
-          as={Fragment}
-          enter="transition-opacity ease-linear duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="transition-opacity ease-linear duration-300"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
-        </TransitionChild>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>{renderNavigationItems(primaryItems)}</SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
 
-        <TransitionChild
-          as={Fragment}
-          enter="transition ease-in-out duration-300 transform"
-          enterFrom="-translate-x-full"
-          enterTo="translate-x-0"
-          leave="transition ease-in-out duration-300 transform"
-          leaveFrom="translate-x-0"
-          leaveTo="-translate-x-full"
-        >
-          <DialogPanel className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-sidebar">
-            <TransitionChild
-              as={Fragment}
-              enter="ease-in-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in-out duration-300"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <div className="absolute top-0 right-0 -mr-12 pt-2">
-                <button
-                  type="button"
-                  className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sidebar-accent-foreground"
-                  onClick={onClose}
-                >
-                  <span className="sr-only">Close sidebar</span>
-                  <XMarkIcon
-                    className="h-6 w-6 text-sidebar-accent-foreground"
-                    aria-hidden="true"
-                  />
-                </button>
-              </div>
-            </TransitionChild>
-
-            <div className="flex-shrink-0 flex items-center px-4">
-              <img className="h-8 w-auto" src="/ocean-logo.png" alt="Ocean logo" />
-            </div>
-            <SidebarNavigation
-              primaryNavigationItems={getNavigationSection(navigationItems, "primary")}
-              secondaryNavigationItems={getNavigationSection(navigationItems, "secondary")}
-              navClassName="mt-5 flex-shrink-0 h-full divide-y divide-sidebar-border overflow-y-auto"
-              linkClassName="group flex items-center px-2 py-2 text-base font-medium rounded-md"
-            />
-          </DialogPanel>
-        </TransitionChild>
-
-        <div className="flex-shrink-0 w-14" aria-hidden="true" />
-      </Dialog>
-    </Transition>
-  );
-}
-
-export function DesktopSidebar({
-  primaryNavigationItems,
-  secondaryNavigationItems,
-}: DesktopSidebarProps) {
-  return (
-    <div className="hidden lg:flex lg:flex-shrink-0">
-      <div className="flex flex-col w-64">
-        <div className="flex flex-col flex-grow bg-sidebar pt-5 pb-4 overflow-y-auto">
-          <div className="flex items-center flex-shrink-0 px-4">
-            <img className="h-8 w-auto self" src="/ocean-logo.png" alt="HTW logo" />
-          </div>
-          <SidebarNavigation
-            primaryNavigationItems={primaryNavigationItems}
-            secondaryNavigationItems={secondaryNavigationItems}
-            navClassName="mt-5 flex-1 flex flex-col divide-y divide-sidebar-border overflow-y-auto"
-            linkClassName="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md"
-          />
-        </div>
-      </div>
-    </div>
+          <SidebarGroup className="mt-auto">
+            <SidebarGroupContent>
+              <SidebarMenu>{renderNavigationItems(secondaryItems)}</SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </nav>
+    </Sidebar>
   );
 }

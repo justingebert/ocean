@@ -12,7 +12,7 @@ export function AppShellLoading({ label }: AppShellLoadingProps) {
       aria-label={label}
       aria-busy="true"
     >
-      <aside className="hidden w-64 shrink-0 flex-col gap-8 bg-sidebar p-4 lg:flex">
+      <aside className="hidden w-64 shrink-0 flex-col gap-8 bg-sidebar p-4 md:flex">
         <img className="h-8 w-auto self-start" src="/ocean-logo.png" alt="" />
         <div className="flex flex-col gap-3">
           <Skeleton className="h-9 w-full" />

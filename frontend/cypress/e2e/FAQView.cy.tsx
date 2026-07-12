@@ -40,7 +40,7 @@ describe("Login and Navigate to FAQ", () => {
     cy.wait("@signinRequest").its("response.statusCode").should("eq", 200);
     cy.wait("@getUser").its("response.statusCode").should("eq", 200);
 
-    cy.contains("span", "Open sidebar").click({ force: true });
+    cy.get("button[aria-label='Open sidebar']").click({ force: true });
     cy.get('a[href="/faq"]:visible').click();
     cy.url().should("include", "/faq");
     cy.contains("Frequently asked questions").should("be.visible");

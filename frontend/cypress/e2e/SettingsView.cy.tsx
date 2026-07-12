@@ -57,7 +57,7 @@ describe("Login and Navigate to Settings", () => {
       employeeType: "Admin",
     });
 
-    cy.contains("Settings").should("exist");
+    cy.contains("Profile").should("exist");
     cy.get('[role="tab"]').should("not.exist");
     cy.wait(5000);
 

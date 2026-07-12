@@ -4,7 +4,7 @@ import AppLayout from "./AppLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "@/features/auth/AuthProvider";
-import { navigation, SettingsNavigation } from "@/app/navigation/navigation";
+import { navigation, ProfileNavigation } from "@/app/navigation/navigation";
 import { routePaths } from "@/app/navigation/routes";
 
 const queryClient = new QueryClient();
@@ -58,14 +58,10 @@ describe("AppLayout Tests", () => {
     cy.wait("@getUser");
 
     cy.get("nav[aria-label='Sidebar'] a[aria-current='page']")
-      .should("contain.text", "Overview")
-      .and("have.class", "bg-sidebar-primary")
-      .and("have.class", "text-sidebar-primary-foreground");
+      .should("contain.text", "Home")
+      .and("have.attr", "data-active");
 
-    cy.get("nav[aria-label='Sidebar'] a[aria-current='page'] svg").should(
-      "have.class",
-      "text-sidebar-primary-foreground",
-    );
+    cy.get("nav[aria-label='Sidebar'] a[aria-current='page'] svg").should("exist");
   });
 
   [routePaths.createDatabase, "/databases/42"].forEach((path) => {
@@ -91,10 +87,10 @@ describe("AppLayout Tests", () => {
   it("handles profile dropdown actions", () => {
     cy.get("button").contains("Open user menu").click();
 
-    cy.contains("Settings").should("exist").and("have.attr", "href", SettingsNavigation.to);
+    cy.contains("Profile").should("exist").and("have.attr", "href", ProfileNavigation.to);
 
-    cy.contains("Settings").click({ force: true });
-    cy.url().should("include", SettingsNavigation.to);
+    cy.contains("Profile").click({ force: true });
+    cy.url().should("include", ProfileNavigation.to);
     cy.get("button").contains("Open user menu").click();
 
     cy.contains("Logout").should("exist").click();

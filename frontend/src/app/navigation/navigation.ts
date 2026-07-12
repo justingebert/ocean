@@ -1,11 +1,11 @@
-import React from "react";
 import {
-  HomeIcon,
-  CircleStackIcon,
-  Cog8ToothIcon,
-  QuestionMarkCircleIcon,
-  ChartBarIcon,
-} from "@heroicons/react/24/outline";
+  CircleHelpIcon,
+  DatabaseIcon,
+  HouseIcon,
+  ShieldCheckIcon,
+  UserRoundIcon,
+  type LucideIcon,
+} from "lucide-react";
 
 import { routePaths } from "./routes.ts";
 
@@ -17,49 +17,49 @@ export type LinkProps = {
 export type Navigation = LinkProps & {
   section: "primary" | "secondary";
   requiredPermission?: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
 };
 
-export const OverviewNavigation: Navigation = {
-  name: "Overview",
+export const HomeNavigation: Navigation = {
+  name: "Home",
   to: routePaths.overview,
   section: "primary",
-  icon: HomeIcon,
+  icon: HouseIcon,
 };
 
 export const DatabasesNavigation: Navigation = {
   name: "Databases",
   to: routePaths.databases,
   section: "primary",
-  icon: CircleStackIcon,
+  icon: DatabaseIcon,
 };
 
-export const SettingsNavigation: Navigation = {
-  name: "Settings",
+export const ProfileNavigation: Navigation = {
+  name: "Profile",
   to: routePaths.settings,
   section: "secondary",
-  icon: Cog8ToothIcon,
+  icon: UserRoundIcon,
 };
 
-export const FAQNavigation: Navigation = {
-  name: "FAQ",
+export const HelpNavigation: Navigation = {
+  name: "Help",
   to: routePaths.faq,
   section: "secondary",
-  icon: QuestionMarkCircleIcon,
+  icon: CircleHelpIcon,
 };
 
-export const ReportingNavigation: Navigation = {
-  name: "Reporting",
+export const AdministrationNavigation: Navigation = {
+  name: "Administration",
   to: routePaths.reporting,
   section: "secondary",
   requiredPermission: "Staff",
-  icon: ChartBarIcon,
+  icon: ShieldCheckIcon,
 };
 
 export const navigation: Navigation[] = [
-  OverviewNavigation,
+  HomeNavigation,
   DatabasesNavigation,
-  SettingsNavigation,
-  ReportingNavigation,
-  FAQNavigation,
+  ProfileNavigation,
+  AdministrationNavigation,
+  HelpNavigation,
 ];

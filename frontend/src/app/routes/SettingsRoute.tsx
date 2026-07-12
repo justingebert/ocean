@@ -13,7 +13,7 @@ const SettingsRoute: React.FC = () => {
 
   return (
     <div>
-      <Headline title="Settings" size="large" />
+      <Headline title="Profile" size="large" />
       <ProfileCard user={userQuery.data} loading={userQuery.isFetching} />
     </div>
   );
