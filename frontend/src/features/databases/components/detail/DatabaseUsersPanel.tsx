@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   InputGroup,
   InputGroupAddon,
@@ -34,35 +35,37 @@ export function DatabaseUsersPanel({
   onDeleteRole,
 }: DatabaseUsersPanelProps) {
   return (
-    <div className="mt-6">
-      <div className="flex flex-wrap items-center justify-between pb-8 sm:flex-nowrap">
-        <div>
-          <SectionHeading>Users</SectionHeading>
-          <p className="mt-1 text-sm text-muted-foreground">Only for this database</p>
+    <Card>
+      <CardContent className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap">
+          <div>
+            <SectionHeading>Users</SectionHeading>
+            <p className="mt-1 text-sm text-muted-foreground">Only for this database</p>
+          </div>
+          <div className="flex-shrink-0">
+            <Button className="relative" disabled={isCreatingRole} onClick={onAddUser}>
+              Add new user
+            </Button>
+          </div>
         </div>
-        <div className="flex-shrink-0">
-          <Button className="relative" disabled={isCreatingRole} onClick={onAddUser}>
-            Add new user
-          </Button>
-        </div>
-      </div>
-      <Table className="min-w-160 table-fixed">
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead className="w-80">Password</TableHead>
-            <TableHead className="w-24">
-              <span className="sr-only">Action</span>
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {roles.map((role) => (
-            <RoleTableRow key={role.id} role={role} onDelete={onDeleteRole} />
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+        <Table className="min-w-160 table-fixed">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead className="w-80">Password</TableHead>
+              <TableHead className="w-24">
+                <span className="sr-only">Action</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {roles.map((role) => (
+              <RoleTableRow key={role.id} role={role} onDelete={onDeleteRole} />
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }
 

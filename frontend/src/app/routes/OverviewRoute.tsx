@@ -1,9 +1,9 @@
 import React from "react";
-import { DatabaseIcon, LayersIcon, SettingsIcon } from "lucide-react";
+import { DatabaseIcon, LayersIcon, UserRound } from "lucide-react";
 
 import { routePaths } from "@/app/navigation/routes";
 import { PageHeader } from "@/components/common/PageHeader";
-import StartingPoints, { type StartingPoint } from "@/features/overview/StartingPoints";
+import StartingPoints, { type StartingPoint } from "@/components/common/StartingPoints";
 
 const startingPoints: StartingPoint[] = [
   {
@@ -19,9 +19,9 @@ const startingPoints: StartingPoint[] = [
     to: routePaths.databases,
   },
   {
-    title: "Manage your profile",
-    description: "Update your account settings and preferences.",
-    icon: SettingsIcon,
+    title: "View your profile",
+    description: "View your account settings and preferences.",
+    icon: UserRound,
     to: routePaths.settings,
   },
 ];

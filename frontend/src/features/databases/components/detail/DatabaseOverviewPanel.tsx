@@ -1,5 +1,15 @@
+import { useState } from "react";
+import { CopyIcon, DownloadIcon, ExternalLinkIcon, EyeIcon, EyeOffIcon } from "lucide-react";
+import { toast } from "sonner";
+
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getDatabaseEngineTitle } from "@/features/databases/components/DatabaseList/databaseListFormat";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Database } from "@/features/databases/model/database.ts";
 import { EngineType } from "@/features/databases/model/engine.ts";
@@ -15,104 +25,133 @@ interface DatabaseOverviewPanelProps {
 }
 
 export function DatabaseOverviewPanel({ database, user, mongoUser }: DatabaseOverviewPanelProps) {
+  const [revealed, setRevealed] = useState(false);
+
   const connectionString = getEngineConnectionString(database, user, mongoUser);
-  const adminToolUrl =
-    database?.engine === EngineType.MongoDB ? connectionString : database?.adminUrl || "#";
-  const shouldShowMongoCompassDownload = database?.engine === EngineType.MongoDB;
+  const isMongo = database?.engine === EngineType.MongoDB;
+  const encodedPassword =
+    isMongo && mongoUser?.password ? encodeURIComponent(mongoUser.password) : "";
+  const hasSecret = encodedPassword.length > 0;
+  const displayedConnectionString =
+    hasSecret && !revealed
+      ? connectionString.replace(encodedPassword, "•".repeat(12))
+      : connectionString;
+
+  const adminToolUrl = isMongo ? connectionString : database?.adminUrl || "#";
+
+  const copyConnectionString = async () => {
+    try {
+      await navigator.clipboard.writeText(connectionString);
+      toast.success("Copied to clipboard");
+    } catch {
+      toast.error("Could not copy connection string");
+    }
+  };
 
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-5 sm:px-6">
-        <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
-          <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-muted-foreground">Database</dt>
-            {database ? (
-              <dd className="mt-1 text-sm text-foreground">{database.name}</dd>
-            ) : (
-              <dd className="mt-1">
-                <Skeleton className="h-6 w-48" />
-              </dd>
-            )}
-          </div>
-          <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-muted-foreground">Hostname</dt>
-            {database ? (
-              <dd className="mt-1 text-sm text-foreground">{database.hostname}</dd>
-            ) : (
-              <dd className="mt-1">
-                <Skeleton className="h-6 w-48" />
-              </dd>
-            )}
-          </div>
-          <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-muted-foreground">Port</dt>
-            {database ? (
-              <dd className="mt-1 text-sm text-foreground">{database.port.toString()}</dd>
-            ) : (
-              <dd className="mt-1">
-                <Skeleton className="h-6 w-24" />
-              </dd>
-            )}
-          </div>
-          <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-muted-foreground">Engine</dt>
-            {database ? (
-              <dd className="mt-1 text-sm text-foreground">
-                {getDatabaseEngineTitle(database.engine)}
-              </dd>
-            ) : (
-              <dd className="mt-1">
-                <Skeleton className="h-6 w-32" />
-              </dd>
-            )}
-          </div>
-          <div className="sm:col-span-2">
-            <dt className="text-sm font-medium text-muted-foreground">Connection String</dt>
-            {database && user ? (
-              <dd className="mt-2 text-sm text-foreground">
-                <div className="flex flex-col gap-2">
-                  <div>
-                    <span className="rounded bg-muted px-2 py-1">{connectionString}</span>
-                  </div>
-                  <div>
-                    <button
-                      className="mr-2 rounded border border-border px-2 font-sans text-sm font-medium text-muted-foreground hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                      onClick={() => navigator.clipboard.writeText(connectionString)}
-                    >
-                      Strg-C
-                    </button>
-                    <a
-                      href={adminToolUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded border border-border px-2 font-sans text-sm font-medium text-muted-foreground hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                    >
-                      {database.adminToolName}
-                    </a>
-                    {shouldShowMongoCompassDownload && (
-                      <span className="ml-2 text-sm text-muted-foreground">
-                        <a
-                          href={MONGODB_COMPASS_DOWNLOAD_URL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-medium text-primary hover:text-primary/80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                        >
-                          Download Compass
-                        </a>
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </dd>
-            ) : (
-              <dd className="mt-1">
-                <Skeleton className="h-6 w-64" />
-              </dd>
-            )}
-          </div>
+    <Card>
+      <CardContent className="flex flex-col gap-6">
+        <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+          <DetailField label="Host" value={database?.hostname} skeletonWidth="w-40" />
+          <DetailField
+            label="Port"
+            value={database ? database.port.toString() : undefined}
+            skeletonWidth="w-16"
+          />
         </dl>
+
+        <div>
+          <div className="mb-1.5 text-sm font-medium text-muted-foreground">Connection string</div>
+          {database && user ? (
+            <InputGroup>
+              <InputGroupInput
+                aria-label="Connection string"
+                className="font-mono text-xs"
+                value={displayedConnectionString}
+                readOnly
+                spellCheck={false}
+                autoComplete="off"
+              />
+              <InputGroupAddon align="inline-end">
+                {hasSecret ? (
+                  <InputGroupButton
+                    size="icon-xs"
+                    aria-label={revealed ? "Hide password" : "Reveal password"}
+                    aria-pressed={revealed}
+                    title={revealed ? "Hide password" : "Reveal password"}
+                    onClick={() => setRevealed((shown) => !shown)}
+                  >
+                    {revealed ? <EyeOffIcon /> : <EyeIcon />}
+                  </InputGroupButton>
+                ) : null}
+                <InputGroupButton
+                  size="icon-xs"
+                  aria-label="Copy connection string"
+                  title="Copy connection string"
+                  onClick={copyConnectionString}
+                >
+                  <CopyIcon />
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
+          ) : (
+            <Skeleton className="h-9 w-full" />
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {database ? (
+            <>
+              <a
+                href={adminToolUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+              >
+                <ExternalLinkIcon />
+                Open {database.adminToolName}
+              </a>
+              {isMongo ? (
+                <a
+                  href={MONGODB_COMPASS_DOWNLOAD_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={buttonVariants({ variant: "ghost", size: "sm" })}
+                >
+                  <DownloadIcon />
+                  Download Compass
+                </a>
+              ) : null}
+            </>
+          ) : (
+            <Skeleton className="h-8 w-32" />
+          )}
+        </div>
       </CardContent>
     </Card>
+  );
+}
+
+function DetailField({
+  label,
+  value,
+  skeletonWidth,
+}: {
+  label: string;
+  value?: string;
+  skeletonWidth: string;
+}) {
+  return (
+    <div>
+      <dt className="text-sm font-medium text-muted-foreground">{label}</dt>
+      {value !== undefined ? (
+        <dd className="mt-1 text-sm text-foreground">{value}</dd>
+      ) : (
+        <dd className="mt-1">
+          <Skeleton className={`h-5 ${skeletonWidth}`} />
+        </dd>
+      )}
+    </div>
   );
 }
 

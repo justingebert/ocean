@@ -6,6 +6,11 @@ Short, append-only log of work on the research project. Newest entry at the top.
 
 One section per discrete unit of work. Heading: `## YYYY-MM-DD: topic`. Then a few bullets, no file lists, no diff replay — that's what `git log` is for. Keep it high level and dont go into details. 
 
+## 2026-07-12 — refactor DB detail Overview panel + fix table alignment
+- `DatabaseList` still carried its own `max-w-6xl mx-auto px-…` container (a leftover the earlier layout pass missed on the table itself), double-padding the table so it sat inset from the `PageHeader`. Removed it — `AppLayout` already owns the container, so the table now aligns with the heading.
+- Reworked the database detail Overview tab (`DatabaseOverviewPanel`) from a raw definition list into a clean connection card: trimmed the grid to Host + Port (name/engine already in the detail header), moved the connection string into a monospace `InputGroup` with a copy button (toast feedback) and a Mongo-only password reveal toggle, and replaced the hand-rolled `Strg-C`/anchor buttons with shadcn button-styled actions (Open Adminer/Compass, Download Compass). Connection-string generation and engine-conditional logic unchanged.
+- Made the three detail tabs consistent: the Overview tab was a `Card` (content inset) while Users/Invitations were bare `div`s flush at the container edge, so their headings/tables jutted left of the Overview content. Wrapped Users and Invitations in the same `Card`/`CardContent` so all three tabs align at the same inset.
+
 ## 2026-07-12 — standardize async UI states across query views
 - Introduced a lightweight convention (no wrapper abstraction — shared pieces wired inline): `ListSkeleton` while loading, existing `EmptyState` when empty, new `ErrorState` (icon + Retry) on failure, plus a single global `QueryCache.onError` on the `QueryClient` that toasts every query failure (copy per-query via `query.meta.errorMessage`).
 - Applied to all four TanStack Query views: Databases (also fixes the "No databases" EmptyState flashing during load), Reporting (per-section loading/error for its 3 independent queries), Settings, and DatabaseDetail (error gated on the primary database query only).

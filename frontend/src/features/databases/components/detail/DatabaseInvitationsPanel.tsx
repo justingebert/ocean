@@ -10,6 +10,7 @@ import { Field, FieldLabel } from "@/components/ui/field.tsx";
 
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -37,48 +38,50 @@ export function DatabaseInvitationsPanel({
   onDeselectUser,
 }: DatabaseInvitationsPanelProps) {
   return (
-    <div>
-      <InvitationUserSelector
-        users={users}
-        selectedUserIds={selectedUserIds}
-        onSelect={onSelectUser}
-        onDeselect={onDeselectUser}
-      />
-      <div className="my-5">
-        <SectionHeading>Invitations</SectionHeading>
-        <p className="mt-1 text-sm text-muted-foreground">Invite other people</p>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Username</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead className="w-0">
-              <span className="sr-only">Action</span>
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {invitedUsers.map((invitedUser) => (
-            <TableRow key={invitedUser.invitationId}>
-              <TableCell className="font-medium">{invitedUser.username}</TableCell>
-              <TableCell className="text-muted-foreground">
-                {User.getDisplayName({ ...invitedUser, mail: "", employeeType: "" })}
-              </TableCell>
-              <TableCell className="text-right">
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => onDeselectUser(invitedUser.id)}
-                >
-                  Delete
-                </Button>
-              </TableCell>
+    <Card>
+      <CardContent className="flex flex-col gap-6">
+        <InvitationUserSelector
+          users={users}
+          selectedUserIds={selectedUserIds}
+          onSelect={onSelectUser}
+          onDeselect={onDeselectUser}
+        />
+        <div>
+          <SectionHeading>Invitations</SectionHeading>
+          <p className="mt-1 text-sm text-muted-foreground">Invite other people</p>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Username</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead className="w-0">
+                <span className="sr-only">Action</span>
+              </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {invitedUsers.map((invitedUser) => (
+              <TableRow key={invitedUser.invitationId}>
+                <TableCell className="font-medium">{invitedUser.username}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  {User.getDisplayName({ ...invitedUser, mail: "", employeeType: "" })}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => onDeselectUser(invitedUser.id)}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }
 
