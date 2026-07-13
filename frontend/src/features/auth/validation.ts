@@ -1,12 +1,14 @@
-import * as yup from "yup";
+import { z } from "zod";
 
-export const loginSchema = yup.object({
-  username: yup
+export const loginSchema = z.object({
+  username: z
     .string()
-    .required("Username is required")
-    .matches(/^[a-z0-9]*$/, "Username must contain small letters or digits."),
-  password: yup
+    .min(1, "Username is required")
+    .regex(/^[a-z0-9]*$/, "Username must contain small letters or digits."),
+  password: z
     .string()
-    .min(4, "Password should be of minimum 4 characters length")
-    .required("Password is required"),
+    .min(1, "Password is required")
+    .min(4, "Password should be of minimum 4 characters length"),
 });
+
+export type LoginValues = z.infer<typeof loginSchema>;

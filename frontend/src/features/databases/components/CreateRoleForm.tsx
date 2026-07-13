@@ -1,15 +1,16 @@
-import React from "react";
-import { Form, Formik } from "formik";
-import { toast } from "sonner";
-import * as yup from "yup";
+import React, { useCallback, useMemo } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import { z } from "zod";
 
-import { DatabaseProperties } from "@/features/databases/model/database.ts";
-import { UpstreamCreateRoleProperties } from "@/features/databases/model/role";
-import { RoleClient } from "@/features/databases/api/roleClient";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { RoleClient } from "@/features/databases/api/roleClient";
+import type { DatabaseProperties } from "@/features/databases/model/database";
+import type { UpstreamCreateRoleProperties } from "@/features/databases/model/role";
+import { useDebouncedAvailability } from "@/hooks/useDebouncedAvailability";
 
 export interface CreateRoleFormProps {
   database?: DatabaseProperties;
@@ -17,98 +18,109 @@ export interface CreateRoleFormProps {
   onClose?: () => void;
 }
 
-const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onClose }) => {
-  const schema = yup.object().shape({
-    roleName: yup
-      .string()
-      .required("Name is required")
-      .min(4, "Name should be of minimum 4 characters length")
-      .matches(
-        /^[a-z][a-z0-9_]*$/,
-        "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.",
-      )
-      .test("unique_test", "Name is already registered", (value, ctx) =>
-        validateDatabaseValues(value, ctx),
-      ),
-  });
+const roleNameSchema = z
+  .string()
+  .min(1, "Name is required")
+  .min(4, "Name should be of minimum 4 characters length")
+  .regex(
+    /^[a-z][a-z0-9_]*$/,
+    "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.",
+  );
 
-  const validateDatabaseValues = async (
-    roleName: string | undefined,
-    context: yup.TestContext<Record<string, unknown>>,
-  ): Promise<boolean | yup.ValidationError> => {
-    if (roleName !== undefined && database !== undefined) {
-      const payload: UpstreamCreateRoleProperties = {
-        roleName: `${database.name}_${roleName}`,
-        instanceId: database.id,
-      };
-      try {
-        const availability = await RoleClient.availabilityRoleForDatabase(payload);
-        if (availability) {
-          return true;
-        }
-      } catch {
-        toast.error("Couldn't verify name availability");
-        return context.createError({ message: "Couldn't verify availability, try again" });
-      }
-    }
-    return false;
-  };
+const createRoleSchema = z.object({ roleName: roleNameSchema });
+type CreateRoleValues = z.infer<typeof createRoleSchema>;
+
+const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onClose }) => {
+  const form = useForm<CreateRoleValues>({
+    defaultValues: { roleName: "" },
+    mode: "onChange",
+    resolver: zodResolver(createRoleSchema),
+  });
+  const roleName = useWatch({ control: form.control, name: "roleName" });
+  const fullRoleName = database ? `${database.name}_${roleName}` : roleName;
+  const availabilityPayload = useMemo(
+    () => (database ? { roleName: fullRoleName, instanceId: database.id } : undefined),
+    [database, fullRoleName],
+  );
+  const checkAvailability = useCallback(
+    () =>
+      availabilityPayload
+        ? RoleClient.availabilityRoleForDatabase(availabilityPayload)
+        : Promise.resolve(false),
+    [availabilityPayload],
+  );
+  const availabilityStatus = useDebouncedAvailability({
+    key: database ? `${database.id}:${fullRoleName}` : `unavailable:${roleName}`,
+    enabled: database !== undefined && roleNameSchema.safeParse(roleName).success,
+    check: checkAvailability,
+  });
+  const availabilityError =
+    availabilityStatus === "unavailable"
+      ? "Name is already registered"
+      : availabilityStatus === "error"
+        ? "Couldn't verify availability — try again"
+        : undefined;
 
   return (
-    <Formik
-      initialValues={{
-        roleName: "",
-      }}
-      validationSchema={schema}
-      onSubmit={(values, { setSubmitting }) => {
-        if (database) {
-          onSubmit({ roleName: `${database.name}_${values.roleName}`, instanceId: database.id });
+    <form
+      onSubmit={form.handleSubmit(() => {
+        if (availabilityPayload && availabilityStatus === "available") {
+          onSubmit(availabilityPayload);
         }
-        setSubmitting(false);
-      }}
+      })}
     >
-      {({ errors, touched, values, handleBlur, handleChange, isSubmitting }) => {
-        const roleNameInvalid = Boolean(touched.roleName && errors.roleName);
+      <FieldGroup>
+        <Controller
+          name="roleName"
+          control={form.control}
+          render={({ field, fieldState }) => {
+            const invalid = fieldState.invalid || availabilityError !== undefined;
 
-        return (
-          <Form>
-            <FieldGroup>
-              <Field data-invalid={roleNameInvalid} data-disabled={!database}>
-                <FieldLabel htmlFor="roleName">Username</FieldLabel>
+            return (
+              <Field data-invalid={invalid} data-disabled={!database}>
+                <FieldLabel htmlFor={field.name}>Username</FieldLabel>
                 <InputGroup data-disabled={!database}>
                   <InputGroupAddon align="inline-start">
                     {database ? `${database.name}_` : "Database unavailable"}
                   </InputGroupAddon>
                   <InputGroupInput
-                    id="roleName"
-                    name="roleName"
+                    {...field}
+                    id={field.name}
                     type="text"
-                    value={values.roleName}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
                     disabled={!database}
                     autoComplete="off"
                     aria-required="true"
-                    aria-invalid={roleNameInvalid}
-                    aria-describedby={roleNameInvalid ? "role-name-error" : undefined}
+                    aria-invalid={invalid}
+                    aria-describedby={invalid ? "role-name-error" : undefined}
                   />
                 </InputGroup>
-                {roleNameInvalid && <FieldError id="role-name-error">{errors.roleName}</FieldError>}
+                {invalid && (
+                  <FieldError
+                    id="role-name-error"
+                    errors={[
+                      fieldState.error,
+                      availabilityError ? { message: availabilityError } : undefined,
+                    ]}
+                  />
+                )}
               </Field>
+            );
+          }}
+        />
 
-              <DialogFooter>
-                <Button type="button" variant="secondary" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={!database || isSubmitting}>
-                  Create
-                </Button>
-              </DialogFooter>
-            </FieldGroup>
-          </Form>
-        );
-      }}
-    </Formik>
+        <DialogFooter>
+          <Button type="button" variant="secondary" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={!database || (form.formState.isValid && availabilityStatus !== "available")}
+          >
+            Create
+          </Button>
+        </DialogFooter>
+      </FieldGroup>
+    </form>
   );
 };
 

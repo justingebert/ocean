@@ -1,4 +1,5 @@
-import * as yup from "yup";
+import axios from "axios";
+import { z } from "zod";
 
 import { getStoredRefreshToken } from "./tokenStorage";
 import { axiosInstance, decodeJwt } from "./client";
@@ -13,21 +14,43 @@ export interface TokensReturn {
   readonly refreshToken: string;
 }
 
+export class InvalidCredentialsError extends Error {
+  constructor() {
+    super("Incorrect username or password.");
+    this.name = "InvalidCredentialsError";
+  }
+}
+
 export class SessionClient {
-  private static tokensSchema = yup.object().shape({
-    accessToken: yup.string().required(),
-    refreshToken: yup.string().required(),
+  private static tokensSchema = z.object({
+    accessToken: z.string().min(1),
+    refreshToken: z.string().min(1),
   });
 
   public static async login(credentials: CredentialProperties): Promise<TokensReturn> {
-    const { data } = await axiosInstance.post("/auth/signin", credentials);
-    return data;
+    try {
+      const { data } = await axiosInstance.post("/auth/signin", credentials);
+      return data;
+    } catch (error) {
+      if (
+        axios.isAxiosError(error) &&
+        (error.response?.status === 401 || error.response?.status === 403)
+      ) {
+        throw new InvalidCredentialsError();
+      }
+
+      if (axios.isAxiosError(error)) {
+        throw new Error("Unable to sign in right now. Please try again.");
+      }
+
+      throw error;
+    }
   }
 
   public static async refreshToken(params: { refreshToken: string }): Promise<TokensReturn> {
     const { data } = await axiosInstance.post("/auth/refresh-token", params);
 
-    return this.tokensSchema.validateSync(data);
+    return this.tokensSchema.parse(data);
   }
 
   public static async renewAccessToken(): Promise<string> {

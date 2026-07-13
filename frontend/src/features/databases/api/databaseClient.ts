@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { z } from "zod";
 
 import {
   DatabaseProperties,
@@ -10,8 +10,8 @@ interface AvailabilityResponse {
   availability: boolean;
 }
 
-const availabilityDatabaseSchema: yup.ObjectSchema<AvailabilityResponse> = yup.object({
-  availability: yup.boolean().required(),
+const availabilityDatabaseSchema: z.ZodType<AvailabilityResponse> = z.object({
+  availability: z.boolean(),
 });
 
 export class DatabaseClient {
@@ -45,7 +45,7 @@ export class DatabaseClient {
       database,
     );
 
-    return availabilityDatabaseSchema.validateSync(data).availability;
+    return availabilityDatabaseSchema.parse(data).availability;
   };
 
   public static deleteDatabase = async (id: number): Promise<void> => {

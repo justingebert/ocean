@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import { z } from "zod";
 
 import { RoleProperties, UpstreamCreateRoleProperties } from "@/features/databases/model/role";
 import { axiosInstance } from "@/api/client";
@@ -7,8 +7,8 @@ interface AvailabilityResponse {
   availability: boolean;
 }
 
-const existsRoleForDatabaseSchema: yup.ObjectSchema<AvailabilityResponse> = yup.object({
-  availability: yup.boolean().required(),
+const existsRoleForDatabaseSchema: z.ZodType<AvailabilityResponse> = z.object({
+  availability: z.boolean(),
 });
 
 export class RoleClient {
@@ -31,7 +31,7 @@ export class RoleClient {
   ): Promise<boolean> => {
     const { data } = await axiosInstance.post<AvailabilityResponse>("/roles/_availability_", role);
 
-    return existsRoleForDatabaseSchema.validateSync(data).availability;
+    return existsRoleForDatabaseSchema.parse(data).availability;
   };
 
   public static deleteRoleForDatabase = async (id: number): Promise<void> => {

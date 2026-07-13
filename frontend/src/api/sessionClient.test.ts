@@ -41,6 +41,30 @@ describe("SessionClient", () => {
     ).rejects.toThrow("Invalid credentials");
   });
 
+  it("translates a forbidden sign-in response into a credential error", async () => {
+    mockedAxiosInstance.post.mockRejectedValueOnce({
+      isAxiosError: true,
+      message: "Request failed with status code 403",
+      response: { status: 403 },
+    });
+
+    await expect(
+      SessionClient.login({ username: "wronguser", password: "wrongpassword" }),
+    ).rejects.toThrow("Incorrect username or password.");
+  });
+
+  it("does not expose transport details for other sign-in failures", async () => {
+    mockedAxiosInstance.post.mockRejectedValueOnce({
+      isAxiosError: true,
+      message: "Request failed with status code 500",
+      response: { status: 500 },
+    });
+
+    await expect(
+      SessionClient.login({ username: "testuser", password: "password123" }),
+    ).rejects.toThrow("Unable to sign in right now. Please try again.");
+  });
+
   it("refreshes tokens successfully and validates the response schema", async () => {
     const mockResponse = { data: { accessToken: "access123", refreshToken: "refresh123" } };
 

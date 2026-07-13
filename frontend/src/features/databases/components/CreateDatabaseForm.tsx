@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
-import * as yup from "yup";
-import { Form, Formik, useFormikContext } from "formik";
+import React, { useCallback } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleCheckIcon, CircleXIcon } from "lucide-react";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import { z } from "zod";
 
-import { engineOptions } from "@/features/databases/constants/engines";
-import { UpstreamDatabaseProperties } from "@/features/databases/model/database.ts";
-import { DatabaseClient } from "@/features/databases/api/databaseClient";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,209 +17,161 @@ import {
 } from "@/components/ui/field";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
+import { DatabaseClient } from "@/features/databases/api/databaseClient";
 import { EngineGroup } from "@/features/databases/components/EngineGroup/EngineGroup";
+import { engineOptions } from "@/features/databases/constants/engines";
+import type { UpstreamDatabaseProperties } from "@/features/databases/model/database";
+import { EngineType } from "@/features/databases/model/engine";
+import { useDebouncedAvailability } from "@/hooks/useDebouncedAvailability";
 
 export interface CreateDatabaseFormProps {
   processing: boolean;
   onSubmit: (database: UpstreamDatabaseProperties) => void;
 }
 
-const databaseNamePattern = /^[a-z][a-z0-9_]*$/;
-const availabilityDebounceMs = 250;
+const databaseNameSchema = z
+  .string()
+  .min(1, "Name is required")
+  .max(32, "Name must be at most 32 characters long")
+  .regex(
+    /^[a-z][a-z0-9_]*$/,
+    "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.",
+  );
 
-type AvailabilityStatus = "idle" | "checking" | "available" | "unavailable" | "error";
-
-interface AvailabilityState {
-  key: string;
-  status: AvailabilityStatus;
-}
-
-interface CreateDatabaseFieldsProps {
-  availability: AvailabilityState;
-  processing: boolean;
-  setAvailability: React.Dispatch<React.SetStateAction<AvailabilityState>>;
-}
-
-const createDatabaseSchema = yup.object().shape({
-  name: yup
-    .string()
-    .required("Name is required")
-    .max(32, "Name must be at most 32 characters long")
-    .matches(
-      databaseNamePattern,
-      "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.",
-    ),
-  engine: yup.string().required("Engine is required"),
+const createDatabaseSchema = z.object({
+  name: databaseNameSchema,
+  engine: z.enum([EngineType.PostgreSQL, EngineType.MongoDB]),
 });
 
-const availabilityKey = (name: string, engine: string): string => `${engine}:${name}`;
-
-const isLocallyValidName = (name: string): boolean =>
-  name.length > 0 && name.length <= 32 && databaseNamePattern.test(name);
-
-const useDatabaseNameAvailability = (
-  values: UpstreamDatabaseProperties,
-  setAvailability: React.Dispatch<React.SetStateAction<AvailabilityState>>,
-): void => {
-  useEffect(() => {
-    const key = availabilityKey(values.name, values.engine);
-
-    if (!isLocallyValidName(values.name)) {
-      setAvailability({ key, status: "idle" });
-      return;
-    }
-
-    let active = true;
-    setAvailability({ key, status: "checking" });
-
-    const timeout = window.setTimeout(() => {
-      void DatabaseClient.availabilityDatabase({ name: values.name, engine: values.engine })
-        .then((available) => {
-          if (active) {
-            setAvailability({ key, status: available ? "available" : "unavailable" });
-          }
-        })
-        .catch(() => {
-          if (active) {
-            setAvailability({ key, status: "error" });
-          }
-        });
-    }, availabilityDebounceMs);
-
-    return () => {
-      active = false;
-      window.clearTimeout(timeout);
-    };
-  }, [setAvailability, values.engine, values.name]);
-};
-
-const CreateDatabaseFields: React.FC<CreateDatabaseFieldsProps> = ({
-  availability,
-  processing,
-  setAvailability,
-}) => {
-  const { errors, touched, values, setFieldValue, isValid, handleBlur, handleChange } =
-    useFormikContext<UpstreamDatabaseProperties>();
-  useDatabaseNameAvailability(values, setAvailability);
-
-  const key = availabilityKey(values.name, values.engine);
-  const availabilityStatus = availability.key === key ? availability.status : "idle";
-  const localNameError = errors.name;
+const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onSubmit }) => {
+  const form = useForm<UpstreamDatabaseProperties>({
+    defaultValues: {
+      name: "",
+      engine: EngineType.PostgreSQL,
+    },
+    mode: "onChange",
+    resolver: zodResolver(createDatabaseSchema),
+  });
+  const name = useWatch({ control: form.control, name: "name" });
+  const engine = useWatch({ control: form.control, name: "engine" });
+  const checkAvailability = useCallback(
+    () => DatabaseClient.availabilityDatabase({ name, engine }),
+    [engine, name],
+  );
+  const availabilityStatus = useDebouncedAvailability({
+    key: `${engine}:${name}`,
+    enabled: databaseNameSchema.safeParse(name).success,
+    check: checkAvailability,
+  });
   const availabilityError =
     availabilityStatus === "unavailable"
       ? "Name is already registered"
       : availabilityStatus === "error"
         ? "Couldn't verify availability — try again"
         : undefined;
-  const displayedNameError = localNameError ?? availabilityError;
-  const nameInvalid = Boolean(displayedNameError && (touched.name || values.name.length > 0));
-  const nameAvailable = availabilityStatus === "available" && !localNameError;
-
-  return (
-    <Form>
-      <FieldGroup>
-        <FieldSet>
-          <FieldLegend>Choose a database engine</FieldLegend>
-          <FieldDescription>
-            A database runs a single database engine that powers one or more individual databases.
-          </FieldDescription>
-          <Field>
-            <EngineGroup
-              engineOptions={engineOptions}
-              selectedValue={values.engine}
-              onSelect={(value) => setFieldValue("engine", value)}
-            />
-          </Field>
-        </FieldSet>
-
-        <Field data-invalid={nameInvalid}>
-          <FieldLabel htmlFor="name">Database name</FieldLabel>
-          <FieldDescription id="database-name-description">
-            Names must be lowercase and start with a letter. They can be up to 32 characters long
-            and may contain digits and underscores.
-          </FieldDescription>
-          <InputGroup>
-            <InputGroupInput
-              id="name"
-              name="name"
-              type="text"
-              value={values.name}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="database_123"
-              maxLength={32}
-              autoComplete="off"
-              aria-required="true"
-              aria-invalid={nameInvalid}
-              aria-describedby={
-                nameInvalid
-                  ? "database-name-description database-name-error"
-                  : "database-name-description"
-              }
-            />
-            {(availabilityStatus === "checking" || nameAvailable || nameInvalid) && (
-              <InputGroupAddon align="inline-end" aria-live="polite">
-                {availabilityStatus === "checking" ? (
-                  <Spinner aria-label="Checking name availability" />
-                ) : nameAvailable ? (
-                  <>
-                    <CircleCheckIcon className="text-success" aria-hidden="true" />
-                    <span className="sr-only">Name is available</span>
-                  </>
-                ) : (
-                  <CircleXIcon className="text-destructive" aria-hidden="true" />
-                )}
-              </InputGroupAddon>
-            )}
-          </InputGroup>
-          {nameInvalid && <FieldError id="database-name-error">{displayedNameError}</FieldError>}
-        </Field>
-
-        <Field>
-          <Button
-            type="submit"
-            disabled={!isValid || availabilityStatus !== "available" || processing}
-            className="w-full"
-          >
-            {processing && <Spinner data-icon="inline-start" />}
-            {processing ? "Creating database..." : "Create a database"}
-          </Button>
-        </Field>
-      </FieldGroup>
-    </Form>
-  );
-};
-
-const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onSubmit }) => {
-  const [availability, setAvailability] = useState<AvailabilityState>({
-    key: "",
-    status: "idle",
-  });
 
   return (
     <>
       <PageHeader title="Create a database" />
-      <Formik
-        initialValues={{
-          name: "",
-          engine: "P",
-        }}
-        validationSchema={createDatabaseSchema}
-        onSubmit={(values: UpstreamDatabaseProperties) => {
-          if (
-            availability.key === availabilityKey(values.name, values.engine) &&
-            availability.status === "available"
-          ) {
+      <form
+        onSubmit={form.handleSubmit((values) => {
+          if (availabilityStatus === "available") {
             onSubmit(values);
           }
-        }}
+        })}
       >
-        <CreateDatabaseFields
-          availability={availability}
-          processing={processing}
-          setAvailability={setAvailability}
-        />
-      </Formik>
+        <FieldGroup>
+          <FieldSet>
+            <FieldLegend>Choose a database engine</FieldLegend>
+            <FieldDescription>
+              A database runs a single database engine that powers one or more individual databases.
+            </FieldDescription>
+            <Controller
+              name="engine"
+              control={form.control}
+              render={({ field }) => (
+                <Field>
+                  <EngineGroup
+                    engineOptions={engineOptions}
+                    selectedValue={field.value}
+                    onSelect={field.onChange}
+                  />
+                </Field>
+              )}
+            />
+          </FieldSet>
+
+          <Controller
+            name="name"
+            control={form.control}
+            render={({ field, fieldState }) => {
+              const invalid = fieldState.invalid || availabilityError !== undefined;
+              const available = availabilityStatus === "available" && !fieldState.invalid;
+
+              return (
+                <Field data-invalid={invalid}>
+                  <FieldLabel htmlFor={field.name}>Database name</FieldLabel>
+                  <FieldDescription id="database-name-description">
+                    Names must be lowercase and start with a letter. They can be up to 32 characters
+                    long and may contain digits and underscores.
+                  </FieldDescription>
+                  <InputGroup>
+                    <InputGroupInput
+                      {...field}
+                      id={field.name}
+                      type="text"
+                      placeholder="database_123"
+                      maxLength={32}
+                      autoComplete="off"
+                      aria-required="true"
+                      aria-invalid={invalid}
+                      aria-describedby={
+                        invalid
+                          ? "database-name-description database-name-error"
+                          : "database-name-description"
+                      }
+                    />
+                    {(availabilityStatus === "checking" || available || invalid) && (
+                      <InputGroupAddon align="inline-end" aria-live="polite">
+                        {availabilityStatus === "checking" ? (
+                          <Spinner aria-label="Checking name availability" />
+                        ) : available ? (
+                          <>
+                            <CircleCheckIcon className="text-success" aria-hidden="true" />
+                            <span className="sr-only">Name is available</span>
+                          </>
+                        ) : (
+                          <CircleXIcon className="text-destructive" aria-hidden="true" />
+                        )}
+                      </InputGroupAddon>
+                    )}
+                  </InputGroup>
+                  {invalid && (
+                    <FieldError
+                      id="database-name-error"
+                      errors={[
+                        fieldState.error,
+                        availabilityError ? { message: availabilityError } : undefined,
+                      ]}
+                    />
+                  )}
+                </Field>
+              );
+            }}
+          />
+
+          <Field>
+            <Button
+              type="submit"
+              disabled={!form.formState.isValid || availabilityStatus !== "available" || processing}
+              className="w-full"
+            >
+              {processing && <Spinner data-icon="inline-start" />}
+              {processing ? "Creating database..." : "Create a database"}
+            </Button>
+          </Field>
+        </FieldGroup>
+      </form>
     </>
   );
 };

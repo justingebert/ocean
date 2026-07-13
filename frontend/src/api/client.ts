@@ -49,6 +49,11 @@ export const setupRequestInterceptors = (
         return Promise.reject(error);
       }
 
+      const isSignInRequest = originalRequest.url?.endsWith("/auth/signin");
+      if (isSignInRequest) {
+        return Promise.reject(error);
+      }
+
       const isRefreshRequest = originalRequest.url?.endsWith("/auth/refresh-token");
       if (isRefreshRequest) {
         delete originalRequest.headers.Authorization;

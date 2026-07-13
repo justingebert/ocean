@@ -14,7 +14,7 @@ describe("SignInView E2E Test", () => {
         });
       } else {
         req.reply({
-          statusCode: 401,
+          statusCode: 403,
           body: { message: "Invalid username or password" },
         });
       }
@@ -43,8 +43,9 @@ describe("SignInView E2E Test", () => {
     cy.get('input[name="password"]').type("wrongpassword");
     cy.get('button[type="submit"]').click();
 
-    cy.wait("@signinRequest").its("response.statusCode").should("eq", 401);
+    cy.wait("@signinRequest").its("response.statusCode").should("eq", 403);
 
-    cy.contains("Error").should("exist");
+    cy.contains("Sign-in failed").should("exist");
+    cy.contains("Incorrect username or password.").should("exist");
   });
 });
