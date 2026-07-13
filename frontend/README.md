@@ -6,7 +6,7 @@ SPA (Vite + Tailwind 4) that talks to the Play backend over `/v1`.
 ## Stack
 
 React 19 · Vite 6 · Tailwind 4 · TanStack Query v5 · React Router 7 ·
-Formik + Yup · axios + jose. Tests: Vitest + Cypress.
+React Hook Form + Zod · axios + jose. Tests: Vitest + Cypress.
 
 ## Layout
 

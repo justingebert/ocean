@@ -75,7 +75,7 @@ Adding a new managed database engine (one of the research-project targets) means
 - `src/app/` is the composition root: providers, router, route modules, protected shell, and navigation. Cross-feature composition belongs in `app/routes/`; feature modules never import `app`.
 - Shared modules stay at `src/` top level: `api/` (axios + shared session/token/user transport), `types/` (genuinely cross-feature contracts), `components/{ui,common}/`, and `lib/` (`utils.ts`, `config.ts`). Database models and assets live with the database feature.
 - Dependency direction is **shared → features → app**. ESLint prevents shared modules from importing features/app and features from importing app. Direct feature imports are preferred over `index.ts` barrels.
-- State/data: **TanStack Query v5** on top of axios clients (`*Client.ts`). Routing: React Router 7 with lazy-loaded `app/routes/`. Forms: Formik + Yup. Auth token: `jose` client-side.
+- State/data: **TanStack Query v5** on top of axios clients (`*Client.ts`). Routing: React Router 7 with lazy-loaded `app/routes/`. Forms: React Hook Form + Zod. Auth token: `jose` client-side.
 - **Imports**: always use the `@/` alias for cross-directory imports; `./` only for same-folder siblings. Parent-relative `../` paths are banned by an ESLint `no-restricted-imports` gate (note: it lints `import`/`export`, not `vi.mock()` string args — keep those on `@/` manually).
 - Tests are **colocated** next to sources (`foo.ts` + `foo.test.ts`); Vitest setup in `vitest.setup.ts` / `vitest.config.ts`. Cypress component specs (`*.cy.tsx`) live next to components, E2E under `cypress/e2e/`.
 - Backend API version prefix is `/v1` — see `backend/conf/routes` for the surface.
