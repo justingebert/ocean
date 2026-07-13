@@ -6,8 +6,8 @@ import scala.concurrent.Future
 
 /** Saga helper for operations that span the internal ORM DB and a managed cluster.
   *
-  * These two systems cannot share a single transaction, so we approximate atomicity with compensation:
-  * if `step` fails, run a best-effort `compensate` that undoes what earlier steps created, then rethrow the original error.
+  * These two systems cannot share a single transaction, so we approximate atomicity with compensation: if `step` fails,
+  * run a best-effort `compensate` that undoes what earlier steps created, then rethrow the original error.
   * Compensations must be idempotent!
   */
 object Saga {

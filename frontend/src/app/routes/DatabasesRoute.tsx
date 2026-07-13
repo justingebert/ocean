@@ -28,10 +28,7 @@ const DatabasesRoute: React.FC = () => {
       {databasesQuery.isPending ? (
         <ListSkeleton rows={4} />
       ) : databasesQuery.isError ? (
-        <ErrorState
-          title="Couldn't load databases"
-          onRetry={() => databasesQuery.refetch()}
-        />
+        <ErrorState title="Couldn't load databases" onRetry={() => databasesQuery.refetch()} />
       ) : databases.length === 0 ? (
         <EmptyState {...emptyDatabaseState} onClick={() => navigate(routePaths.createDatabase)} />
       ) : (

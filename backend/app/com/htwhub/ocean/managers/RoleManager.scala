@@ -68,7 +68,8 @@ class RoleManager @Inject() (
     } yield role
   }
 
-  /** Undo a failed role provisioning: drop the (possibly created) cluster role/user and remove the orphaned metadat row.
+  /** Undo a failed role provisioning: drop the (possibly created) cluster role/user and remove the orphaned metadat
+    * row.
     */
   private def compensateAddRole(role: Role, instance: Instance, user: User): Future[Any] =
     for {

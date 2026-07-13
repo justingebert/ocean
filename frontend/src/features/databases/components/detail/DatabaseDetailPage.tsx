@@ -27,9 +27,7 @@ export function DatabaseDetailPage({ databaseId, onDeleted }: DatabaseDetailPage
   const availableTabs = getDetailViewTabsFor(detail.database?.engine);
 
   if (detail.isError) {
-    return (
-      <ErrorState title="Couldn't load database" onRetry={() => detail.refetch()} />
-    );
+    return <ErrorState title="Couldn't load database" onRetry={() => detail.refetch()} />;
   }
 
   return (
