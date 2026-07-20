@@ -3,14 +3,14 @@
   cache:
     key:
       files:
-        - ops/ansible/requirements.yml
+        - deployment/ansible/requirements.yml
     paths:
       - .ansible/collections/
   before_script:
     - apk add --no-cache ansible bash curl openssh-client
     - install -m 700 -d "$ANSIBLE_LOCAL_TEMP"
     - install -m 700 -d "$ANSIBLE_COLLECTIONS_PATH"
-    - ansible-galaxy collection install -r ops/ansible/requirements.yml -p "$ANSIBLE_COLLECTIONS_PATH"
+    - ansible-galaxy collection install -r deployment/ansible/requirements.yml -p "$ANSIBLE_COLLECTIONS_PATH"
 
 validate:ansible:
   extends: .ansible_base
@@ -19,9 +19,9 @@ validate:ansible:
     - changes:
         - .gitlab-ci.yml
         - .gitlab/ci/**/*.yml
-        - ops/ansible/**/*
-        - ops/compose/**/*
+        - deployment/ansible/**/*
+        - deployment/compose/**/*
   script:
-    - cd ops/ansible
+    - cd deployment/ansible
     - ansible-inventory -i inventory.yml --list >/dev/null
     - ansible-playbook -i inventory.yml playbook.yml --syntax-check

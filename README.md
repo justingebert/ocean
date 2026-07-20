@@ -7,12 +7,12 @@ Ocean is a fully managed database platform: log in and launch a **PostgreSQL** o
 
 ## Repository layout
 
-| Path        | What it is                                                              |
-| ----------- |-------------------------------------------------------------------------|
-| `frontend/` | React 19 + Vite UI                                                      |
-| `backend/`  | Scala / Play REST API                                                   |
-| `ops/`      | Deployment (Infrastructure as Code): boostrap scripts, Ansible, compose |
-| `docs/`     | Documentation and Guides for Development                                |
+| Path          | What it is                                                              |
+|---------------|-------------------------------------------------------------------------|
+| `frontend/`   | React 19 + Vite UI                                                      |
+| `backend/`    | Scala / Play REST API                                                   |
+| `deployment/` | Deployment (Infrastructure as Code): boostrap scripts, Ansible, compose |
+| `docs/`       | Documentation and Guides for Development                                |
 
 ## Guides
 
@@ -22,7 +22,7 @@ Ocean is a fully managed database platform: log in and launch a **PostgreSQL** o
 | [Deploy](docs/deploy.md)                      | ship a change to the running VMs         |
 | [Provisioning](docs/provisioning.md)          | spin up Ocean on fresh VMs      |
 | [Operations](docs/operations.md)              | renew TLS, rotate secrets, debug |
-| [Deployment architecture](ops/README.md)     | understand the IaC setup at a glance     |
+| [Deployment architecture](deployment/README.md)     | understand the IaC setup at a glance     |
 
 ## Architecture overview
 

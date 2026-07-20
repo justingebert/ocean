@@ -1,4 +1,4 @@
-# ops/ — deployment (Infrastructure as Code)
+# deployment/ — Infrastructure as Code
 
 Everything that defines a VM lives here and is version-controlled — there's no
 manual server setup. For *which VM talks to which* (the runtime topology), see

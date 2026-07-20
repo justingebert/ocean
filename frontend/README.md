@@ -82,4 +82,4 @@ npm run test:e2e   # Cypress E2E, dev server must be running
 
 `Dockerfile` builds the static bundle and serves it from `caddy:2-alpine`. Caddy
 terminates TLS, does the SPA fallback, and proxies `/v1/*` to the backend. The
-image is built and shipped by the deploy tooling: see [`ops/`](../ops/README.md).
+image is built and shipped by the deploy tooling: see [`deployment/`](../deployment/README.md).

@@ -75,7 +75,7 @@ configs:
   pg_hba_local:
     content: |
       # PostgreSQL Client Authentication Configuration for local docker-compose.
-      # Production uses ops/compose/pg/pg_hba.conf against HTW LDAPS; this dev
+      # Production uses deployment/compose/pg/pg_hba.conf against HTW LDAPS; this dev
 
       # TYPE     DATABASE  USER            ADDRESS       METHOD
       local      all       all                           trust

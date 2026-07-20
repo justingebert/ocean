@@ -5,7 +5,7 @@ once and then updated from GitLab CI, this page outlines how to depoy changes to
 
 >Want a fresh Deployment on your own VMs? [Provisioning new VMs](provisioning.md) covers setup with new VMs from scratch.
 >
->New to the setup? [Deployment architecture](../ops/README.md) explains the Infrastructure-as-Code in a page.
+>New to the setup? [Deployment architecture](../deployment/README.md) explains the Infrastructure-as-Code in a page.
 
 ## Deploy a change to production
 

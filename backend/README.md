@@ -88,4 +88,4 @@ API surface is `/v1` (see `conf/routes`); Swagger UI at `/docs/swagger-ui/`.
 `Dockerfile` builds with `sbt dist` and runs `bin/backend` as an unprivileged
 user on a JRE image; all runtime config flows in via the `${?VAR}` env
 overrides. The image is built and shipped by the deploy tooling. See
-[`ops/`](../ops/README.md).
+[`deployment/`](../deployment/README.md).

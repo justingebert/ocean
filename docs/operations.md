@@ -11,7 +11,7 @@ HTW certificates expire **2026-11-30**. Request reissue ~30 days before.
 2. Re-stage them:
 
    ```sh
-   cd ops/ansible
+   cd deployment/ansible
    export OCEAN_TLS_SRC="$(pwd)/../../.secrets/certs"
    ansible-playbook -i inventory.yml playbook.yml --tags tls
    ```

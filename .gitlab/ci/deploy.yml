@@ -41,7 +41,7 @@
         bash -eo pipefail -c 'curl -fsSL "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash'
         export OCEAN_TLS_SRC="$CI_PROJECT_DIR/.secure_files"
       fi
-    - cd ops/ansible
+    - cd deployment/ansible
     # Run the one playbook against the requested inventory group.
     - |
       ANSIBLE_SSH_COMMON_ARGS="-o StrictHostKeyChecking=accept-new" \

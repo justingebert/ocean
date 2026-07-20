@@ -2,7 +2,7 @@
 
 Stand up Ocean on a fresh set of VMs. You do this once; after it, every change
 ships via [Deploy](deploy.md). For how the moving parts fit together, see
-[Deployment architecture](../ops/README.md).
+[Deployment architecture](../deployment/README.md).
 
 ## Bootstrap order (read this first)
 
@@ -59,7 +59,7 @@ Each VM gets an `*.f4.htw-berlin.de` hostname. Also request a **TLS certificate 
 
 ## 2. Point the inventory at your VMs
 
-Edit `ops/ansible/inventory.yml`. Its header comment lists exactly what to
+Edit `deployment/ansible/inventory.yml`. Its header comment lists exactly what to
 change: each VM's `ansible_host`, its `tls_cert_file` / `tls_key_file`, and,
 once, `docker_registry_url` + `container_registry_image` (your GitLab registry).
 
@@ -94,7 +94,7 @@ Ansible logs in as the `ansible` user. Create it on each fresh VM:
 
 ```sh
 # copy the bootstrap script to the VM
-scp ops/bootstrap/bootstrap-vm.sh <you>@<vm>.f4.htw-berlin.de:/tmp/
+scp deployment/bootstrap/bootstrap-vm.sh <you>@<vm>.f4.htw-berlin.de:/tmp/
 
 # on the VM, as root, pass your laptop's SSH public key
 ssh <you>@<vm>.f4.htw-berlin.de
@@ -117,7 +117,7 @@ ssh ansible@<vm>.f4.htw-berlin.de sudo whoami   # -> root
 Each app/db VM runs a default-DROP iptables policy. The `firewall` role renders
 it to `/root/firewall.sh` (overwriting the HTW original) and applies it at the **start** of the
 playbook, before Docker, so there is no manual step. The inbound ports per role
-live in `ops/ansible/group_vars/`:
+live in `deployment/ansible/group_vars/`:
 
 | VM    | Open inbound (`firewall_open_ports`)  |
 | ----- | ------------------------------------- |
@@ -149,7 +149,7 @@ Sourcing the whole `prod.env` is fine. The other `OCEAN_*` values are simply
 unused here.
 
 ```sh
-cd ops/ansible
+cd deployment/ansible
 ansible-galaxy install -r requirements.yml
 
 set -a; . ../../.secrets/prod.env; set +a              # OCEAN_* secrets

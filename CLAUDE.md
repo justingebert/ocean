@@ -14,7 +14,7 @@ Three deployable parts plus docs:
 - `frontend/Dockerfile` — multi-stage Vite build → `caddy:2-alpine` serving `/usr/share/caddy`. `VITE_*` injected via `--build-arg` at build time. `frontend/Caddyfile` terminates TLS for `OCEAN_HOSTNAME` (cert mounted at `/etc/caddy/tls`) and does the SPA fallback; it is the only Caddyfile — no separate dev/prod split.
 - `backend/Dockerfile` — multi-stage `eclipse-temurin:17-jdk-jammy` + sbt → `sbt dist` → `eclipse-temurin:17-jre-jammy` runtime running `bin/backend` as the unprivileged `play` user. All runtime config (DB hosts, secrets, LDAP) flows in via env vars resolved by HOCON `${?VAR}` overrides.
 
-Deploy target is the three-VM HTW setup: `ops/compose/app/docker-compose.yml` (frontend + backend + internal Postgres), `ops/compose/pg/docker-compose.yml` (managed Postgres), `ops/compose/mongo/docker-compose.yml` (managed MongoDB). Provisioned via `ops/ansible/` against `inventory.yml`. VM env files are rendered from role templates; real deploy secrets come from local/GitLab `OCEAN_*` environment variables. TLS files come from `OCEAN_TLS_SRC` locally or GitLab secure files in CI.
+Deploy target is the three-VM HTW setup: `deployment/compose/app/docker-compose.yml` (frontend + backend + internal Postgres), `deployment/compose/pg/docker-compose.yml` (managed Postgres), `deployment/compose/mongo/docker-compose.yml` (managed MongoDB). Provisioned via `deployment/ansible/` against `inventory.yml`. VM env files are rendered from role templates; real deploy secrets come from local/GitLab `OCEAN_*` environment variables. TLS files come from `OCEAN_TLS_SRC` locally or GitLab secure files in CI.
 
 ## Running things locally
 
@@ -93,7 +93,7 @@ This repo is the starting point for a university research project. Explicitly on
 
 ## Work log — required after every meaningful change
 
-`./devnotes/WORK_LOG.md` is the source for the final research-project report. Append a new dated section at the top after every meaningful unit of work.
+`./docs/WORK_LOG.md` is the source for the final research-project report. Append a new dated section at the top after every meaningful unit of work.
 
 - Heading: `## YYYY-MM-DD — topic`. Then a few bullets — whatever shape fits (free notes, or **Did** / **Why** / **Result** / **Notes** / **Problems**).
 - High-level only: topic + what was done + why if non-obvious. No file lists, no diff replay — `git log` covers that.
