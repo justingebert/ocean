@@ -1,34 +1,33 @@
 # Provisioning new VMs
 
-Stand up Ocean on a fresh set of VMs. You do this once; after it, every change
+Spin up Ocean on a fresh set of VMs. You do this once; after it, every change
 ships via [Deploy](deploy.md). For how the moving parts fit together, see
 [Deployment architecture](../deployment/README.md).
 
 ## Bootstrap order (read this first)
 
-CI does the heavy lifting (it builds the images and deploys the app), but
-**nothing in CI runs until the GitLab runner exists, and the runner runs on the
-ops VM.** On top of that, the app VM has no image to run until CI has built one.
-So the chain is strict and one-directional:
+Almost everything here is done by CI. Exactly **two** things have to be done by
+hand, for one reason each:
+
+- **Ansible can't log in until the `ansible` user exists.** Creating it needs
+  root SSH on a fresh VM, so it can't be automated from inside the system it's
+  bootstrapping.
+- **The runner can't register itself.** CI jobs need a runner, and the runner
+  lives on the `ops` VM, so the first Ansible run has to come from your laptop.
+
+After those two, the laptop is out of the loop: CI builds the images and
+provisions every VM.
 
 ```
-  local bootstrap                 CI (on the ops runner)
-  ┌──────────────────┐      ┌───────────────┐
-  │ pg, mongo,       │ ───▶ │ build images  │ ───▶  deploy:app
-  │ ops (the runner) │      └───────────────┘
-  └──────────────────┘
-     runner            →        images        →        app
+  Manual, once (laptop)              GitLab                    CI (on the ops runner)
+  ┌──────────────────────┐      ┌──────────────┐      ┌──────────────┐
+  │ 1. create `ansible`  │      │ 3. secrets + │      │ 4. build     │ ─▶ deploy:pg
+  │    user on 4 VMs     │ ───▶ │    TLS files │ ───▶ │    images    │ ─▶ deploy:mongo
+  │ 2. register runner   │      └──────────────┘      └──────────────┘ ─▶ deploy:app
+  │    on ops            │
+  └──────────────────────┘
+   SSH key + runner token        5 vars + 3 cert pairs        everything else
 ```
-
-1. **Bootstrap locally** (your laptop): bring up the data tiers (`pg`, `mongo`)
-   and register the runner on `ops`. These use public images, so no registry is
-   needed yet.
-2. **CI builds the images**: push to `main`; the build stage pushes
-   `backend` + `frontend` to the registry.
-3. **CI deploys the app**: `deploy:app` pulls those images.
-
-The app VM is never deployed from your laptop: there is nothing to run until CI
-has built an image. Everything you do locally is just enough to make CI work.
 
 > **HTW note:** the VMs have no direct internet access. Outbound traffic goes
 > through the HTW web proxy `http://webproxy.rz.htw-berlin.de:3128`. Ansible and
@@ -39,58 +38,41 @@ has built an image. Everything you do locally is just enough to make CI work.
 - **Four VMs**: `app`, `pg`, `mongo`, `ops` (see step 1).
 - A **GitLab project** with the **Container Registry** enabled and **CI/CD**
   turned on. HTW GitLab has no shared runners, so you run your own on the `ops`
-  VM, which the local bootstrap registers.
-- On your laptop: `ssh`, `ansible`, the `OCEAN_*` secrets and TLS files (step 3),
-  and a **runner registration token** (GitLab → *Settings → CI/CD → Runners →
-  New project runner*).
+  VM, which step 4 registers.
+- On your laptop: `ssh`, `ansible`, and a **runner registration token**
+  (GitLab → _Settings → CI/CD → Runners → New project runner_).
+
+> https://gitlab.rz.htw-berlin.de/ does not have the Container Registry enabled. That's why we recommend using the https://gl-ai.f4.htw-berlin.de/
 
 ## 1. Request the VMs and certificates
 
 Ask HTW (F4) for the VMs. Ocean needs:
 
-| VM      | Role                                   | TLS cert/key |
-| ------- | -------------------------------------- | ------------ |
-| app     | frontend + backend                     | yes          |
-| pg      | managed PostgreSQL + Adminer           | yes          |
-| mongo   | managed MongoDB                        | yes          |
-| ops     | GitLab CI runner                       | no           |
+| VM    | Role                         | TLS cert/key |
+| ----- | ---------------------------- | ------------ |
+| app   | frontend + backend           | yes          |
+| pg    | managed PostgreSQL + Adminer | yes          |
+| mongo | managed MongoDB              | yes          |
+| ops   | GitLab CI runner             | no           |
 
 Each VM gets an `*.f4.htw-berlin.de` hostname. Also request a **TLS certificate + key** for the app, pg, and mongo hostnames (each terminates TLS itself).
 
 ## 2. Point the inventory at your VMs
 
-Edit `deployment/ansible/inventory.yml`. Its header comment lists exactly what to
-change: each VM's `ansible_host`, its `tls_cert_file` / `tls_key_file`, and,
-once, `docker_registry_url` + `container_registry_image` (your GitLab registry).
+Edit `deployment/ansible/inventory.yml` and commit it: CI reads this file, so
+it has to be in the repo before anything else works. Three things to change:
 
-## 3. Create the secrets and stage the TLS files
+| What                                               | Where                       |
+| -------------------------------------------------- | --------------------------- |
+| each VM's `ansible_host`                           | per host, under `children:` |
+| each VM's `tls_cert_file` / `tls_key_file`         | per host (app, pg, mongo)   |
+| `docker_registry_url` + `container_registry_image` | once, under `all.vars`      |
 
-From the repo root:
+The cert/key filenames must match exactly what you upload in step 5.
 
-```sh
-umask 077
-mkdir -p .secrets/certs
-{
-  printf 'OCEAN_APPLICATION_SECRET=%s\n'       "$(openssl rand -hex 32)"
-  printf 'OCEAN_JWT_SECRET=%s\n'               "$(openssl rand -hex 32)"
-  printf 'OCEAN_POSTGRES_ORM_PASSWORD=%s\n'    "$(openssl rand -hex 32)"
-  printf 'OCEAN_PG_CLUSTER_PASSWORD=%s\n'      "$(openssl rand -hex 32)"
-  printf 'OCEAN_MONGODB_CLUSTER_PASSWORD=%s\n' "$(openssl rand -hex 32)"
-} > .secrets/prod.env
-```
+## 3. Create the `ansible` user on every VM
 
-Put each VM's cert + key in `.secrets/certs/`, named exactly as in
-`inventory.yml`, e.g.:
-
-```text
-ocean-jg.pem     ocean-jg.f4.htw-berlin.de.key       # app
-ocean-pg.pem     ocean-pg.f4.htw-berlin.de.key       # pg
-ocean-mongo.pem  ocean-mongo.f4.htw-berlin.de.key    # mongo
-```
-
-## 4. Bootstrap each VM
-
-Ansible logs in as the `ansible` user. Create it on each fresh VM:
+Ansible logs in as the `ansible` user. Create it on each of the four fresh VMs:
 
 ```sh
 # copy the bootstrap script to the VM
@@ -108,84 +90,62 @@ Verify from your laptop:
 ssh ansible@<vm>.f4.htw-berlin.de sudo whoami   # -> root
 ```
 
-> Use the **same** SSH key for all four VMs. CI later reuses its private half
-> (`ANSIBLE_SSH_PRIVATE_KEY`, step 7) to deploy, so this one key authorises both
+> Use the **same** SSH key for all four VMs. CI reuses its private half
+> (`ANSIBLE_SSH_PRIVATE_KEY`, step 5) to deploy, so this one key authorises both
 > your laptop and the runner.
 
-## 5. Firewall (handled by Ansible)
+## 4. Register the GitLab runner on `ops`
 
-Each app/db VM runs a default-DROP iptables policy. The `firewall` role renders
-it to `/root/firewall.sh` (overwriting the HTW original) and applies it at the **start** of the
-playbook, before Docker, so there is no manual step. The inbound ports per role
-live in `deployment/ansible/group_vars/`:
-
-| VM    | Open inbound (`firewall_open_ports`)  |
-| ----- | ------------------------------------- |
-| app   | 80, 443                               |
-| pg    | 80, 443 (Adminer), 5432 (PostgreSQL)  |
-| mongo | 27017 (MongoDB)                       |
-
-Sources are restricted to the HTW network (`141.45.0.0/16`, `10.4.0.0/16`) via
-`firewall_htw_sources`. To change what a VM exposes, edit its `group_vars` file
-and re-run the playbook: the role re-applies, persists across reboot, and bounces Docker so it reinstalls
-its own chains. 
-
-## 6. Bootstrap locally: data tiers + runner
-
-Run Ansible from your laptop against `pg`, `mongo`, and `ops`. This brings up the
-managed databases and installs + registers the GitLab runner. `app` is left out
-on purpose: its image does not exist yet (step 8).
-
-The run reads these from the environment:
-
-| Env var                         | What it is                                          | Used by |
-| ------------------------------- | --------------------------------------------------- | ------- |
-| `OCEAN_PG_CLUSTER_PASSWORD`     | managed-Postgres superuser password (from step 3)   | pg      |
-| `OCEAN_MONGODB_CLUSTER_PASSWORD`| managed-Mongo root password (from step 3)           | mongo   |
-| `OCEAN_TLS_SRC`                 | path to the dir holding the cert/key files (step 3) | pg, mongo |
-| `GITLAB_RUNNER_TOKEN`           | runner registration token (Prerequisites)           | ops     |
-
-Sourcing the whole `prod.env` is fine. The other `OCEAN_*` values are simply
-unused here.
+The only Ansible run you do by hand. It needs **just the runner token**.
+Get the token from GitLab: → _Settings → CI/CD → Runners → New project runner_.
 
 ```sh
 cd deployment/ansible
 ansible-galaxy install -r requirements.yml
 
-set -a; . ../../.secrets/prod.env; set +a              # OCEAN_* secrets
-export OCEAN_TLS_SRC="$(pwd)/../../.secrets/certs"      # TLS cert/key dir
-export GITLAB_RUNNER_TOKEN='<token from GitLab>'        # registers the runner
+export GITLAB_RUNNER_TOKEN='<token from GitLab>'
 
-ansible -i inventory.yml pg:mongo:ops -m ping           # check connectivity
-ansible-playbook -i inventory.yml playbook.yml --limit pg:mongo:ops
+ansible -i inventory.yml ops -m ping                        # check connectivity
+ansible-playbook -i inventory.yml playbook.yml --limit ops
 ```
 
 The runner only needs registering once. After this, `ops` is normally left
 alone: you don't want a deploy restarting the runner that is executing it.
 
-## 7. Enable CI
+## 5. Load the secrets into GitLab
 
-So the runner can build images and deploy, configure the project's
-**Settings → CI/CD**:
+GitLab is the source of truth for every secret. Generate the five values and
+paste them straight into **Settings → CI/CD → Variables**, don't write them to
+a file:
 
-| Setting                                  | Value                                                          |
-| ---------------------------------------- | ------------------------------------------------------------- |
-| **Variable**, the five `OCEAN_*`         | the secrets from step 3                                        |
-| **Variable** `ANSIBLE_SSH_PRIVATE_KEY`   | the private key matching the bootstrap public key (step 4)     |
-| **Secure Files**                         | the TLS cert/key pairs from step 3                             |
-| Image registry                           | built-in `CI_REGISTRY_*`, nothing to add                       |
+```sh
+openssl rand -hex 32    # run once per variable
+```
 
-CI jobs run on the `ops` runner (jobs are tagged `ocean`).
+| Setting                                       | Value                                               |
+| --------------------------------------------- |-----------------------------------------------------|
+| **Variable** `OCEAN_APPLICATION_SECRET`       | random 32-byte hex                                  |
+| **Variable** `OCEAN_JWT_SECRET`               | random 32-byte hex                                  |
+| **Variable** `OCEAN_POSTGRES_ORM_PASSWORD`    | random 32-byte hex                                  |
+| **Variable** `OCEAN_PG_CLUSTER_PASSWORD`      | random 32-byte hex: managed-Postgres superuser      |
+| **Variable** `OCEAN_MONGODB_CLUSTER_PASSWORD` | random 32-byte hex: managed-Mongo root              |
+| **Variable** `ANSIBLE_SSH_PRIVATE_KEY`        | the private key matching the public key from step 3 |
+| **Secure Files**                              | the three TLS cert/key pairs from step 1            |
 
-## 8. Build and deploy via CI
+`ANSIBLE_SSH_PRIVATE_KEY` which needs type `File` and set visible because of formatting issues with Gitlab.
+Mark every other variable **Masked** and **Protected**. 
+Upload the TLS files under _Settings → CI/CD → Secure Files_, named exactly as in `inventory.yml`.
+
+## 6. Build and deploy via CI
 
 Push to `main`. CI builds the `backend` + `frontend` images and pushes them to
-the registry, then exposes the manual deploy jobs:
+the registry, then exposes the manual deploy jobs. Run all three
 
-- **`deploy:app`**: stands the app VM up from scratch (base + TLS + the stack)
-  and pulls the freshly built images.
-- `deploy:pg` / `deploy:mongo`: only when you later change their config or the
-  inventory; the data tiers are already running from step 6.
+| Job            | Brings up                                                          |
+| -------------- | ------------------------------------------------------------------ |
+| `deploy:pg`    | managed PostgreSQL + Adminer (public images only)                  |
+| `deploy:mongo` | managed MongoDB (public images only)                               |
+| `deploy:app`   | frontend + backend + internal Postgres, from the images just built |
 
 From here on, every change ships this way. See [Deploy](deploy.md).
 
@@ -195,4 +155,4 @@ From here on, every change ships this way. See [Deploy](deploy.md).
 - Create a PostgreSQL and a MongoDB database from the UI.
 - The database ports should be reachable only from the app VM and the HTW network.
 
-Next: [Operations](operations.md) for TLS renewal, secret rotation, redeploys.
+Next: [Operations](operations.md) for TLS renewal, secret rotation, redeploys & rollbacks.

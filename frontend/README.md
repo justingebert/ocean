@@ -15,7 +15,7 @@ Everything lives under `src/`:
 | Path          | What it is                                                         |
 | ------------- | ------------------------------------------------------------------ |
 | `app/`        | composition root: providers, router, routes, shell, and navigation |
-| `features/`   | domain modules: auth, databases, overview, reporting, and users    |
+| `features/`   | domain modules: auth, databases, reporting, and users              |
 | `components/` | shared presentation: shadcn primitives and small reusable modules  |
 | `api/`        | shared axios client plus session, token, and user transport        |
 | `lib/`        | framework-independent configuration and utilities                  |

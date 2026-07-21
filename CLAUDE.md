@@ -1,168 +1,110 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code (claude.ai/code) working in this repository.
 
 ## Repository layout
 
-Three deployable parts plus docs:
+Four parts, each with its own README that goes deeper than this file:
 
-- `backend/` — Scala 2.13 Play Framework REST API (the "managing" app). Package root: `com.htwhub.ocean`.
-- `frontend/` — current React 19 + Vite + Tailwind 4 UI (professor uploaded separately after the initial repo drop).
-- `docs/` — Docsify site (static).
+| Path          | What it is                                                                    | Read                                           |
+| ------------- | ----------------------------------------------------------------------------- | ---------------------------------------------- |
+| `backend/`    | Scala 2.13 Play REST API, package root `com.htwhub.ocean`                     | [`backend/README.md`](backend/README.md)       |
+| `frontend/`   | React 19 + Vite + Tailwind 4 SPA                                              | [`frontend/README.md`](frontend/README.md)     |
+| `deployment/` | Infrastructure as Code — Ansible + per-VM Compose stacks                      | [`deployment/README.md`](deployment/README.md) |
+| `docs/`       | Plain-markdown guides (local dev, deploy, operations, provisioning, handover) | [`docs/`](docs/)                               |
 
-`docker-compose.yaml` spins up the local development dependencies only (OpenLDAP, Postgres × 2, MongoDB, Adminer). The backend and frontend run directly via `sbt run` / `npm run dev` against those deps; their container images are built for the VM deploy by Ansible, not run locally. Both Dockerfiles still exist:
-- `frontend/Dockerfile` — multi-stage Vite build → `caddy:2-alpine` serving `/usr/share/caddy`. `VITE_*` injected via `--build-arg` at build time. `frontend/Caddyfile` terminates TLS for `OCEAN_HOSTNAME` (cert mounted at `/etc/caddy/tls`) and does the SPA fallback; it is the only Caddyfile — no separate dev/prod split.
-- `backend/Dockerfile` — multi-stage `eclipse-temurin:17-jdk-jammy` + sbt → `sbt dist` → `eclipse-temurin:17-jre-jammy` runtime running `bin/backend` as the unprivileged `play` user. All runtime config (DB hosts, secrets, LDAP) flows in via env vars resolved by HOCON `${?VAR}` overrides.
-
-Deploy target is the three-VM HTW setup: `deployment/compose/app/docker-compose.yml` (frontend + backend + internal Postgres), `deployment/compose/pg/docker-compose.yml` (managed Postgres), `deployment/compose/mongo/docker-compose.yml` (managed MongoDB). Provisioned via `deployment/ansible/` against `inventory.yml`. VM env files are rendered from role templates; real deploy secrets come from local/GitLab `OCEAN_*` environment variables. TLS files come from `OCEAN_TLS_SRC` locally or GitLab secure files in CI.
+Ocean provisions **managed** PostgreSQL and MongoDB databases for end users. Keep
+the distinction straight: the _internal_ database (`postgres_orm`) stores Ocean's
+own metadata; the _managed clusters_ (`pg_cluster`, `mongodb_cluster`) are what
+users get. Different code paths, different config files.
 
 ## Running things locally
 
-Development dependencies (LDAP, three DB clusters):
+`docker-compose.yaml` at the root starts **only the dev dependencies** (OpenLDAP,
+Postgres × 2, MongoDB, Adminer). The backend and frontend run directly against
+them; their images are built for the VM deploy, not run locally.
 
 ```sh
-docker compose up                              # all local dev deps (LDAP, 3 DB clusters, Adminer)
+docker compose up                 # dev deps
+cd backend  && sbt run            # :9000 
+cd frontend && npm run dev        # :5173
 ```
 
-Backend (Play, SBT) from `backend/`:
+Full setup, seeded logins, and troubleshooting: [`docs/local-dev.md`](docs/local-dev.md).
+
+**The CI gates** — run these before calling work done:
 
 ```sh
-sbt run               # dev mode — defaults in application.conf match the local docker-compose deps
-sbt test              # ScalaTest
-sbt cov               # clean + coverage + test + report
-sbt format            # alias: scalafmt + test:scalafmt
-sbt formatCheck       # alias: scalafmtCheck + test:scalafmtCheck
-sbt dist              # production build
+cd backend  && sbt formatCheck test
+cd frontend && npm run lint && npm run format:check && npm run build && npm run vitest
 ```
 
-A single backend test: `sbt "testOnly com.htwhub.ocean.service.UserServiceSpec"` (package under `test/com/htwhub/ocean/...`).
+Useful extras: `sbt "testOnly com.htwhub.ocean.service.UserServiceSpec"` (single
+backend test), `sbt cov` (coverage), `sbt format` (scalafmt — run before
+committing), `npm run vitest -- path/to/file.test.ts`,
+`npm run cypress:component` (dev server must **not** be running),
+`npm run test:e2e` (dev server **must** be running).
 
-Frontend from `frontend/`:
+## Conventions
 
-```sh
-npm run dev              # Vite dev server
-npm run build            # tsc -b && vite build
-npm run lint             # ESLint
-npm run vitest           # unit/component tests (single run)
-npm run vitest -- path/to/file.test.ts   # single file
-npm run cypress:component    # Cypress component tests — dev server must NOT be running
-npm run test:e2e             # Cypress E2E — dev server MUST be running
-```
+Only the things not covered by the sub-READMEs.
 
-## Backend architecture
+**Backend**
 
-Layered Play app wired with Guice. Request flow top-down:
+- Package path mirrors the directory: `com.htwhub.ocean.<layer>`.
+- Engines build SQL with `sql"""... #${name}"""` splices — identifiers (database
+  name, role name) are interpolated **unescaped**. Any new engine operation
+  taking a user-influenced name must be validated upstream; the managers already
+  do this for create/delete. Don't relax it.
+- Config is one HOCON file per subsystem under `conf/`, each following
+  `key = "default"` then `key = ${?VAR}`: defaults boot dev cleanly, env vars
+  override per environment. Don't reintroduce per-env `*.dev.conf` /
+  `*.production.conf` splits.
+- Secrets come from env vars only — never commit real values.
 
-1. `conf/routes` → `controllers/*Controller` (HTTP + JSON serialization via `serializers/`).
-2. Controllers call **Managers** (`managers/`) — business-logic orchestration, permissions, cross-resource rules. Managers are the place that ties together DB-row persistence with the *real* database cluster operations.
-3. Managers use two distinct collaborators:
-   - **Services** (`service/`) — CRUD for the internal metadata (users, instances, roles, invitations). Backed by `repositories/` (Slick/`play-slick`) against the `postgres_orm` database.
-   - **Engines** (`engines/PostgreSQLEngine`, `engines/MongoDBEngine`) — execute DDL/DML against the **managed** DB clusters (`pg_cluster`, `mongodb_cluster`) that Ocean provisions for end-users. This is where `CREATE DATABASE`, `CREATE ROLE`, mongo user management, etc. live.
-4. `OnStartupService` is bound as an eager singleton in `Module.scala` and runs provisioning checks (e.g. creating the LDAP group role in Postgres) at boot.
+**Frontend**
 
-Auth: LDAP bind via `LdapService` → JWT issued by `TokenService` (jwt-scala). `AuthManager` / `AuthController` handle signin + refresh. Protected controllers validate JWT and derive the user from it.
+- Always use the `@/` alias for cross-directory imports; `./` only for
+  same-folder siblings. Parent-relative `../` is banned by an ESLint
+  `no-restricted-imports` gate — note it lints `import`/`export`, not
+  `vi.mock()` string arguments, so keep those on `@/` by hand.
+- Dependency direction is **shared → features → app**, enforced by ESLint.
+  Prefer direct imports over `index.ts` barrels.
 
-Config is one file per subsystem under `backend/conf/`: `application.conf` is the entry point and `include`s `slick.conf`, `pg_cluster.conf`, `mongodb_cluster.conf`, `ldap.conf`, `swagger.local.conf`, `concurrent.local.conf`. Each subsystem file follows the HOCON pattern of `key = "default"` followed by `key = ${?VAR}` — defaults boot dev cleanly against the local docker-compose deps; env vars override per environment (compose `.env`, systemd unit, k8s secret). When adding new infrastructure, follow this same default-then-override pattern; don't reintroduce per-env `*.dev.conf` / `*.production.conf` splits.
-
-Schema evolutions live in `conf/evolutions/default/*.sql` (Play evolutions, `!Ups` / `!Downs`) — these migrate the **internal ORM** DB only, not the managed clusters.
-
-Adding a new managed database engine (one of the research-project targets) means: new `XxxEngine` in `engines/`, wire it into the relevant `Manager`, add a cluster block to `docker-compose.yaml`, create `conf/xxx_cluster.conf` following the default-then-`${?VAR}` pattern, add an `include` line to `application.conf`, and document the new env vars in `.env.example`.
-
-## Frontend architecture
-
-- React 19 + Vite 6 + Tailwind 4 (`@tailwindcss/vite` plugin, not PostCSS). UI primitives are shadcn (Base UI) under `src/components/ui/`.
-- **Feature-first layout** (`src/features/<capability>/`) — domain implementation is organised by capability. Current features are `auth`, `databases`, `reporting`, `users`, and `overview`; subfolders are created only when file density earns them.
-- `src/app/` is the composition root: providers, router, route modules, protected shell, and navigation. Cross-feature composition belongs in `app/routes/`; feature modules never import `app`.
-- Shared modules stay at `src/` top level: `api/` (axios + shared session/token/user transport), `types/` (genuinely cross-feature contracts), `components/{ui,common}/`, and `lib/` (`utils.ts`, `config.ts`). Database models and assets live with the database feature.
-- Dependency direction is **shared → features → app**. ESLint prevents shared modules from importing features/app and features from importing app. Direct feature imports are preferred over `index.ts` barrels.
-- State/data: **TanStack Query v5** on top of axios clients (`*Client.ts`). Routing: React Router 7 with lazy-loaded `app/routes/`. Forms: React Hook Form + Zod. Auth token: `jose` client-side.
-- **Imports**: always use the `@/` alias for cross-directory imports; `./` only for same-folder siblings. Parent-relative `../` paths are banned by an ESLint `no-restricted-imports` gate (note: it lints `import`/`export`, not `vi.mock()` string args — keep those on `@/` manually).
-- Tests are **colocated** next to sources (`foo.ts` + `foo.test.ts`); Vitest setup in `vitest.setup.ts` / `vitest.config.ts`. Cypress component specs (`*.cy.tsx`) live next to components, E2E under `cypress/e2e/`.
-- Backend API version prefix is `/v1` — see `backend/conf/routes` for the surface.
+**Adding a managed database engine** (a stated research-project goal): new
+`XxxEngine` in `engines/`, wire it into the relevant manager, add a cluster
+service to `docker-compose.yaml`, add `conf/xxx_cluster.conf` following the
+default-then-`${?VAR}` pattern, `include` it from `application.conf`, and
+document the new env vars.
 
 ## Research-project context
 
-This repo is the starting point for a university research project. Explicitly on the table (from the professor): dockerize the app, build a CI/CD pipeline, extend platform functionality, connect additional DB systems, build an admin tool for the managed DB systems, move toward microservices, bug-fix and update libraries, and add monitoring. The current shipping plan lives in `devnotes/ROADMAP.md`.
+This repo is a university research project. On the table, from the professor:
+dockerize the app, build CI/CD, extend platform functionality, connect
+additional DB systems, build an admin tool for the managed DB systems, move
+toward microservices, bug-fix and update libraries, add monitoring.
 
-## Conventions worth knowing
+The project is being handed over — see [`docs/handover.md`](docs/handover.md)
+for current state, known gaps, and open TODOs.
 
-- Scala formatting: scalafmt (`sbt format` before committing). `sbt formatCheck` is the gate.
-- Backend package path mirrors directory: `com.htwhub.ocean.<layer>` — keep that alignment when adding files.
-- Engine methods build SQL with `sql"""... #${name}"""` splices — identifiers (db name, role name) are interpolated unescaped. Any new engine operation that accepts user-influenced names must validate them upstream (managers already do this for create/delete flows); don't relax that.
-- Secrets (`play.http.secret.key`, `jwt.secret_key`, LDAP creds, cluster passwords) come from env vars / `*.dev.conf` placeholders — never commit real values.
+## Work log, required after every meaningful change
 
-## Work log — required after every meaningful change
+Append a dated section to the **top** of [`docs/notes/WORK_LOG.md`](docs/notes/WORK_LOG.md).
+It is the source material for the final report.
 
-`./docs/WORK_LOG.md` is the source for the final research-project report. Append a new dated section at the top after every meaningful unit of work.
+- Heading `## YYYY-MM-DD — topic`, then a few bullets.
+- High level only: what was done, and why if non-obvious. No file lists, no diff
+  replay — `git log` covers that.
+- One section per discrete unit of work; skip trivial stuff. If it takes more
+  30 seconds to scan, it's too long.
 
-- Heading: `## YYYY-MM-DD — topic`. Then a few bullets — whatever shape fits (free notes, or **Did** / **Why** / **Result** / **Notes** / **Problems**).
-- High-level only: topic + what was done + why if non-obvious. No file lists, no diff replay — `git log` covers that.
-- One section per discrete unit of work. Skip trivial stuff (typos, formatting).
-- If the entry takes more than a minute to scan, it's too long.
+## Working style
 
-
-## Coding Guidelines
-
-Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
-
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
-
-## 1. Think Before Coding
-
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
-
-Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
-
-## 2. Simplicity First
-
-**Minimum code that solves the problem. Nothing speculative.**
-
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
-
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
-
-## 3. Surgical Changes
-
-**Touch only what you must. Clean up only your own mess.**
-
-When editing existing code:
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
-
-When your changes create orphans:
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
-
-The test: Every changed line should trace directly to the user's request.
-
-## 4. Goal-Driven Execution
-
-**Define success criteria. Loop until verified.**
-
-Transform tasks into verifiable goals:
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
-
-For multi-step tasks, state a brief plan:
-```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
-```
-
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
-
----
-
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+- State assumptions; if a request has multiple readings, ask rather than pick
+  silently. If a simpler approach exists, say so.
+- Write the minimum that solves the problem — no speculative abstractions,
+  configurability, or error handling for impossible cases.
+- Keep changes surgical: match surrounding style, don't refactor what isn't
+  broken, don't fix adjacent code you weren't asked about. Clean up orphans your
+  own change created; mention pre-existing dead code rather than deleting it.
+- Define what "done" looks like before starting, then verify it.
