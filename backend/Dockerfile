@@ -9,6 +9,7 @@ RUN sbt -batch update
 
 COPY app/ app/
 COPY conf/ conf/
+COPY public/ public/
 
 RUN sbt -batch stage
 

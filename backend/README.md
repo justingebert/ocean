@@ -80,8 +80,8 @@ sbt formatCheck  # scalafmt check (the CI gate)
 sbt dist         # production build
 ```
 
-A single test: `sbt "testOnly com.htwhub.ocean.service.UserServiceSpec"`.
-API surface is `/v1` (see `conf/routes`); Swagger UI at `/docs/swagger-ui/`.
+API surface is `/v1` (see `conf/routes`). Swagger authorization metadata is intentionally not configured,
+so protected endpoints return `401` when invoked through **Try it out**.
 
 ## Build & deploy
 

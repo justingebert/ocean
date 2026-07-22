@@ -4,8 +4,8 @@
 	root * /usr/share/caddy
 	encode gzip zstd
 
-	# Backend API: SPA calls relative `/v1/...`; forward those to the Play app
-	@api path /v1/*
+	# Backend API and its generated documentation.
+	@api path /v1/* /swagger.json /docs/swagger-ui /docs/swagger-ui/*
 	handle @api {
 		reverse_proxy backend:9000
 	}

@@ -36,4 +36,7 @@ GET           /v1/metrics                                  com.htwhub.ocean.cont
 
 # Swagger
 GET           /swagger.json                                controllers.Assets.at(path="/public", file="swagger.json")
+GET           /docs/swagger-ui                              controllers.Assets.at(path="/public", file="swagger-ui.html")
+GET           /docs/swagger-ui/                             controllers.Assets.at(path="/public", file="swagger-ui.html")
+GET           /docs/swagger-ui/index.html                   controllers.Assets.at(path="/public", file="swagger-ui.html")
 GET           /docs/swagger-ui/*file                       controllers.Assets.at(path:String="/public/lib/swagger-ui", file:String)
