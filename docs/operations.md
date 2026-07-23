@@ -15,7 +15,9 @@ three of app, pg and mongo terminate TLS with their own certificate.
    (delete the old one first; the name is what the `tls` role looks up).
 2. **Run the deploy job** for each VM whose cert changed: `deploy:app`,
    `deploy:pg`, `deploy:mongo`.
-3. **Restart the pg and mongo stacks**, then verify:
+   Ansible detects changed TLS files and restarts the containers that consume
+   them so the new certificate is loaded.
+3. **Verify the live certificate**:
 
    ```sh
    openssl s_client -connect <app-host>:443   -servername <app-host> </dev/null 2>/dev/null \
@@ -26,21 +28,10 @@ three of app, pg and mongo terminate TLS with their own certificate.
      | openssl x509 -noout -dates
    ```
 
-> **A deploy stages the new cert but does not always activate it.** The cert is
-> bind-mounted from `/etc/ocean/tls` into Caddy / Postgres / mongod, and none of
-> them watch the file, they read it at startup. On the **app** VM every deploy
-> ships a new image tag, so the frontend container is recreated and picks the
-> cert up. On **pg** and **mongo** nothing in the stack changed, so the
-> containers are _not_ recreated and keep serving the **old** certificate until
-> you restart them:
->
-> ```sh
-> ssh ansible@<pg-or-mongo-host>.f4.htw-berlin.de
-> cd /etc/ocean && sudo docker compose restart
-> ```
->
-> Always verify with `openssl s_client` above, don't assume a green pipeline
-> means a live certificate.
+> Caddy, Postgres and mongod read their certificate at startup. The deployment
+> therefore restarts their containers when Ansible copies changed TLS material.
+> Always verify with `openssl s_client` above; don't assume a green pipeline means
+> a live certificate.
 
 ## Rotate a secret
 

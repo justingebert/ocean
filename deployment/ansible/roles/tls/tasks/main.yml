@@ -20,6 +20,7 @@
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0644"
+  register: tls_cert_copy
 
 - name: Copy private key
   ansible.builtin.copy:
@@ -28,8 +29,13 @@
     owner: "{{ tls_key_uid }}"
     group: "{{ tls_key_uid }}"
     mode: "0600"
+  register: tls_key_copy
   no_log: true
   diff: false
+
+- name: Record whether TLS material changed
+  ansible.builtin.set_fact:
+    tls_material_changed: "{{ tls_cert_copy.changed or tls_key_copy.changed }}"
 
 - name: Assemble mongo combined.pem (key + cert)
   ansible.builtin.shell: |

@@ -37,3 +37,12 @@
     state: present
     remove_orphans: true
   tags: compose
+
+- name: Restart MongoDB after TLS change
+  community.docker.docker_compose_v2:
+    project_src: "{{ etc_ocean }}"
+    state: restarted
+    services:
+      - mongodb_cluster
+  when: tls_material_changed | default(false)
+  tags: compose

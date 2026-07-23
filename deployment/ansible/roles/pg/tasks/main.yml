@@ -69,3 +69,13 @@
     state: present
     remove_orphans: true
   tags: compose
+
+- name: Restart PostgreSQL TLS consumers after TLS change
+  community.docker.docker_compose_v2:
+    project_src: "{{ etc_ocean }}"
+    state: restarted
+    services:
+      - pg_cluster
+      - adminer_proxy
+  when: tls_material_changed | default(false)
+  tags: compose

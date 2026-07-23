@@ -91,3 +91,12 @@
     pull: policy
     remove_orphans: true
   tags: compose
+
+- name: Restart frontend after TLS change
+  community.docker.docker_compose_v2:
+    project_src: "{{ etc_ocean }}"
+    state: restarted
+    services:
+      - frontend
+  when: tls_material_changed | default(false)
+  tags: compose
