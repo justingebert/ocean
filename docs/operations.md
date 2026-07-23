@@ -7,7 +7,7 @@ cert/key is a Secure File
 
 ## Renew TLS certificates
 
-HTW certificates expire **2026-11-30**. Request reissue ~30 days before. All
+HTW certificates expire **2027-02-06**. Request reissue ~30 days before. All
 three of app, pg and mongo terminate TLS with their own certificate.
 
 1. **Replace the Secure Files** — _Settings → CI/CD → Secure Files_. Upload the
