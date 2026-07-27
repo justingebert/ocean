@@ -1,7 +1,8 @@
 # deployment/ — Infrastructure as Code
 
-Everything that defines a VM lives here and is version-controlled. There's no
-manual server setup. For _which VM talks to which_ (the runtime topology), see
+Everything that defines a VM lives here and is version-controlled. Apart from
+creating the initial `ansible` login and registering the first runner, there is
+no manual server setup. For _which VM talks to which_ (the runtime topology), see
 the root README's [Architecture overview](../README.md#architecture-overview).
 
 ## Layout
@@ -48,19 +49,24 @@ Inbound ports are declared per VM group in `ansible/group_vars/`:
 | pg    | 80, 443 (Adminer), 5432 (PostgreSQL) |
 | mongo | 27017 (MongoDB)                      |
 
-Sources are restricted to the HTW network — `141.45.0.0/16`, `10.4.0.0/16`
-(`firewall_htw_sources` in `group_vars/all.yml`). The app VM additionally opens
+Sources are restricted to the HTW network. The app VM additionally opens
 outbound LDAPS and the Docker bridge (`firewall_allow_ldaps`,
 `firewall_allow_docker_bridge`), which the default-DROP policy would otherwise
 block.
 
-To change what a VM exposes, edit its `group_vars` file and run with vm deploy job after commting.
+To change what a VM exposes, edit its `group_vars` file, commit the change, and
+run that VM's deploy job.
+
+> **HTW note:** the VMs have no direct internet access. Outbound traffic goes
+> through the HTW web proxy `http://webproxy.rz.htw-berlin.de:3128`. Ansible and
+> the VMs are already configured for it.
 
 ## How a deploy flows
 
 1. **GitLab CI** builds the `backend` and `frontend` images and pushes them to the registry.
 2. From the **ops runner** VM, CI runs **Ansible** over SSH.
-3. **Ansible** reads `inventory.yml`, the per-deployment values (hostnames, TLS filenames, registry) and runs against each VM.
+3. **Ansible** reads `inventory.yml` for hostnames and TLS filenames; GitLab's
+   predefined `CI_REGISTRY*` values select the current project's registry.
 4. Each role renders that VM's config from the inventory + the `OCEAN_*` secrets, stages the compose files, and (re)starts the stack.
 
 So a change ships as: **build images → run Ansible → re-render config and

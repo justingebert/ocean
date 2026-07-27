@@ -1,22 +1,19 @@
-# Provisioning new VMs
+# Provision Ocean on fresh VMs
 
-Spin up Ocean on a fresh set of VMs. You do this once; after it, every change
-ships via [Deploy](deploy.md). For how the moving parts fit together, see
-[Deployment architecture](../deployment/README.md).
+This is a guide for copying Ocean into a new project on the HTW GitLab (https://gl-ai.f4.htw-berlin.de/) and deploying it to four newly requested VMs. 
+Start with an empty GitLab project and fresh VMs; after the initial setup, deployments happen through CI only.
 
-## Bootstrap order (read this first)
+For how the moving parts fit together, see[Deployment architecture](../deployment/README.md).
 
-Almost everything here is done by CI. Exactly **two** things have to be done by
-hand, for one reason each:
+## What is manual and what is automated
 
-- **Ansible can't log in until the `ansible` user exists.** Creating it needs
-  root SSH on a fresh VM, so it can't be automated from inside the system it's
-  bootstrapping.
-- **The runner can't register itself.** CI jobs need a runner, and the runner
-  lives on the `ops` VM, so the first Ansible run has to come from your laptop.
+Two bootstrapping actions must happen from a laptop:
 
-After those two, the laptop is out of the loop: CI builds the images and
-provisions every VM.
+1. create the `ansible` account on all four VMs; and
+2. install and register the first GitLab runner on the `ops` VM.
+
+The runner then builds the application images. The three manual deploy jobs
+provision the database VMs and app VM through Ansible.
 
 ```
   Manual, once (laptop)              GitLab                    CI (on the ops runner)
@@ -29,130 +26,183 @@ provisions every VM.
    SSH key + runner token        5 vars + 3 cert pairs        everything else
 ```
 
-> **HTW note:** the VMs have no direct internet access. Outbound traffic goes
-> through the HTW web proxy `http://webproxy.rz.htw-berlin.de:3128`. Ansible and
-> the VMs are already configured for it.
+## Prerequisites and assumptions
 
-## Prerequisites
+- Four HTW F4 VMs: `app`, `pg`, `mongo`, and `ops`.
+- A laptop with `git`, `ssh`, `openssl`, and Ansible installed.
+- Access to the HTW network, either on campus or through the HTW VPN. SSH and
+  all application/database ports are restricted to HTW source networks.
+- A new project on `https://gl-ai.f4.htw-berlin.de/`. Do not use
+  `gitlab.rz.htw-berlin.de`: that instance does not provide the Container
+  Registry required by this pipeline.
+- Maintainer access to configure runners, CI/CD variables, Secure Files,
+  protected branches, and the Container Registry.
 
-- **Four VMs**: `app`, `pg`, `mongo`, `ops` (see step 1).
-- A **GitLab project** with the **Container Registry** enabled and **CI/CD**
-  turned on. HTW GitLab has no shared runners, so you run your own on the `ops`
-  VM, which step 4 registers.
-- On your laptop: `ssh`, `ansible`, and a **runner registration token**
-  (GitLab → _Settings → CI/CD → Runners → New project runner_).
+## 1. Copy the repository to a new GitLab project
 
-> https://gitlab.rz.htw-berlin.de/ does not have the Container Registry enabled. That's why we recommend using the https://gl-ai.f4.htw-berlin.de/
+Create a **blank** project on `gl-ai.f4.htw-berlin.de` with no generated README.
+Keep the default branch name `main` and make sure **Deploy → Container Registry**
+is available. Then copy the repository.
 
-## 1. Request the VMs and certificates
+In the new project, protect `main` under **Settings → Repository → Branch
+rules**. This matters because protected CI/CD variables are not exposed to a
+pipeline on an unprotected branch.
 
-Ask HTW (F4) for the VMs. Ocean needs:
+The pipeline can initially remain pending because no runner exists yet.
 
-| VM    | Role                         | TLS cert/key |
-| ----- | ---------------------------- | ------------ |
-| app   | frontend + backend           | yes          |
-| pg    | managed PostgreSQL + Adminer | yes          |
-| mongo | managed MongoDB              | yes          |
-| ops   | GitLab CI runner             | no           |
+## 2. Request VMs and TLS certificates
 
-Each VM gets an `*.f4.htw-berlin.de` hostname. Also request a **TLS certificate + key** for the app, pg, and mongo hostnames (each terminates TLS itself).
+Request the following from HTW F4:
 
-## 2. Point the inventory at your VMs
+| VM      | Services                                      | TLS certificate/key |
+| ------- | --------------------------------------------- | ------------------- |
+| `app`   | frontend, backend, internal PostgreSQL        | yes                 |
+| `pg`    | managed PostgreSQL and Adminer                | yes                 |
+| `mongo` | managed MongoDB                               | yes                 |
+| `ops`   | project-specific GitLab runner                | no                  |
 
-Edit `deployment/ansible/inventory.yml` and commit it: CI reads this file, so
-it has to be in the repo before anything else works. Three things to change:
+## 3. Configure the Ansible inventory
 
-| What                                               | Where                       |
-| -------------------------------------------------- | --------------------------- |
-| each VM's `ansible_host`                           | per host, under `children:` |
-| each VM's `tls_cert_file` / `tls_key_file`         | per host (app, pg, mongo)   |
-| `docker_registry_url` + `container_registry_image` | once, under `all.vars`      |
+Edit [`deployment/ansible/inventory.yml`](../deployment/ansible/inventory.yml):
 
-The cert/key filenames must match exactly what you upload in step 5.
+- replace all four `ansible_host` values with the new VM FQDNs; and
+- replace `tls_cert_file` and `tls_key_file` for `app`, `pg`, and `mongo` with
+  the exact filenames received from HTW.
 
-## 3. Create the `ansible` user on every VM
+Do not put a GitLab namespace into the inventory. In CI, `CI_REGISTRY` and
+`CI_REGISTRY_IMAGE` automatically select the Container Registry belonging to
+the new project.
 
-Ansible logs in as the `ansible` user. Create it on each of the four fresh VMs:
+Commit and push the inventory change to `main` before deploying.
+
+## 4. Create a dedicated deployment SSH key
+
+Create a new, project-specific key. It must have no passphrase because the CI
+job has no interactive agent with which to unlock it:
 
 ```sh
-# copy the bootstrap script to the VM
-scp deployment/bootstrap/bootstrap-vm.sh <you>@<vm>.f4.htw-berlin.de:/tmp/
+ssh-keygen -t ed25519 -N '' -C 'ocean-ansible' -f ~/.ssh/ocean_ansible
+chmod 600 ~/.ssh/ocean_ansible
+```
 
-# on the VM, as root, pass your laptop's SSH public key
-ssh <you>@<vm>.f4.htw-berlin.de
+On each of the four VMs, copy and run the bootstrap script using the initial
+user account supplied by HTW:
+
+```sh
+scp deployment/bootstrap/bootstrap-vm.sh <user>@<vm-fqdn>:/tmp/
+ssh <user>@<vm-fqdn>
 su -
-bash /tmp/bootstrap-vm.sh "ssh-ed25519 AAAA... your-key"
+bash /tmp/bootstrap-vm.sh 'ssh-ed25519 AAAA... ocean-ansible'
 ```
 
-Verify from your laptop:
+Replace the last argument with the complete single line printed by
+`cat ~/.ssh/ocean_ansible.pub` on the laptop. Only the `.pub` content belongs on
+the VMs; the private `ocean_ansible` file stays on the laptop and in GitLab's
+protected file variable.
+
+Run this verification from the laptop for **all four** hostnames:
 
 ```sh
-ssh ansible@<vm>.f4.htw-berlin.de sudo whoami   # -> root
+ssh -i ~/.ssh/ocean_ansible ansible@<vm-fqdn> sudo whoami
+# expected output: root
 ```
 
-> Use the **same** SSH key for all four VMs. CI reuses its private half
-> (`ANSIBLE_SSH_PRIVATE_KEY`, step 5) to deploy, so this one key authorises both
-> your laptop and the runner.
+## 5. Create and register the project runner
 
-## 4. Register the GitLab runner on `ops`
+In the new GitLab project, open **Settings → CI/CD → Runners → Create project
+runner**:
 
-The only Ansible run you do by hand. It needs **just the runner token**.
-Get the token from GitLab: → _Settings → CI/CD → Runners → New project runner_.
+- choose Linux;
+- add the tag `ocean` (every job in `.gitlab-ci.yml` requires it);
+- keep the runner assigned only to this project; and
+- copy the short-lived runner authentication token shown after creation.
+
+GitLab routes tagged jobs only to runners with all required tags; see GitLab's
+[project runner documentation](https://docs.gitlab.com/ci/runners/runners_scope/#create-a-project-runner-with-a-runner-authentication-token).
+
+From the repository on the laptop, install the Ansible collection and provision
+only the `ops` VM. Explicitly select the dedicated key:
 
 ```sh
 cd deployment/ansible
-ansible-galaxy install -r requirements.yml
+ansible-galaxy collection install -r requirements.yml
+export GITLAB_RUNNER_TOKEN='<token shown by GitLab>'
 
-export GITLAB_RUNNER_TOKEN='<token from GitLab>'
-
-ansible -i inventory.yml ops -m ping                        # check connectivity
-ansible-playbook -i inventory.yml playbook.yml --limit ops
+ansible -i inventory.yml ops -m ping --private-key ~/.ssh/ocean_ansible
+ansible-playbook -i inventory.yml playbook.yml \
+  --limit ops \
+  --private-key ~/.ssh/ocean_ansible
+unset GITLAB_RUNNER_TOKEN
 ```
 
-The runner only needs registering once. After this, `ops` is normally left
-alone: you don't want a deploy restarting the runner that is executing it.
+Return to the Runners page and wait until the runner is **online**. If jobs stay
+pending, first check that the runner has the exact `ocean` tag.
 
-## 5. Load the secrets into GitLab
+## 6. Add CI/CD variables
 
-GitLab is the source of truth for every secret. Generate the five values and
-paste them straight into **Settings → CI/CD → Variables**, don't write them to
-a file:
+Open **Settings → CI/CD → Variables**. Generate a separate value for each of the
+five application/database variables:
 
 ```sh
-openssl rand -hex 32    # run once per variable
+openssl rand -hex 32
 ```
 
-| Setting                                       | Value                                               |
-| --------------------------------------------- |-----------------------------------------------------|
-| **Variable** `OCEAN_APPLICATION_SECRET`       | random 32-byte hex                                  |
-| **Variable** `OCEAN_JWT_SECRET`               | random 32-byte hex                                  |
-| **Variable** `OCEAN_POSTGRES_ORM_PASSWORD`    | random 32-byte hex                                  |
-| **Variable** `OCEAN_PG_CLUSTER_PASSWORD`      | random 32-byte hex: managed-Postgres superuser      |
-| **Variable** `OCEAN_MONGODB_CLUSTER_PASSWORD` | random 32-byte hex: managed-Mongo root              |
-| **Variable** `ANSIBLE_SSH_PRIVATE_KEY`        | the private key matching the public key from step 3 |
-| **Secure Files**                              | the three TLS cert/key pairs from step 1            |
+Create these variables with environment scope `*`, variable expansion off, and
+**Protect variable** enabled:
 
-`ANSIBLE_SSH_PRIVATE_KEY` which needs type `File` and set visible because of formatting issues with Gitlab.
-Mark every other variable **Masked** and **Protected**. 
-Upload the TLS files under _Settings → CI/CD → Secure Files_, named exactly as in `inventory.yml`.
+| Key                                | Type       | Visibility | Value                         |
+| ---------------------------------- | ---------- | ---------- | ----------------------------- |
+| `OCEAN_APPLICATION_SECRET`         | Variable   | Masked     | unique 32-byte hex            |
+| `OCEAN_JWT_SECRET`                 | Variable   | Masked     | unique 32-byte hex            |
+| `OCEAN_POSTGRES_ORM_PASSWORD`      | Variable   | Masked     | unique 32-byte hex            |
+| `OCEAN_PG_CLUSTER_PASSWORD`        | Variable   | Masked     | unique 32-byte hex            |
+| `OCEAN_MONGODB_CLUSTER_PASSWORD`   | Variable   | Masked     | unique 32-byte hex            |
+| `ANSIBLE_SSH_PRIVATE_KEY`          | **File**   | **Visible** | complete `ocean_ansible` file |
 
-## 6. Build and deploy via CI
+Important SSH-key pitfall: paste the complete multiline private key, including
+the `BEGIN`/`END OPENSSH PRIVATE KEY` lines and final newline. GitLab's masked
+value rules require a single line, so a multiline OpenSSH key cannot be Masked.
+Select **Type: File** and **Visibility: Visible** explicitly; newer GitLab
+versions default to Masked. The pipeline treats the variable value as a file
+path. Keep it Protected, restrict Maintainer access, and never print it in a
+job. GitLab docu: [file type CI/CD variables](https://docs.gitlab.com/ci/variables/#use-file-type-cicd-variables).
 
-Push to `main`. CI builds the `backend` + `frontend` images and pushes them to
-the registry, then exposes the manual deploy jobs. Run all three
+## 7. Upload TLS Secure Files
 
-| Job            | Brings up                                                          |
-| -------------- | ------------------------------------------------------------------ |
-| `deploy:pg`    | managed PostgreSQL + Adminer (public images only)                  |
-| `deploy:mongo` | managed MongoDB (public images only)                               |
-| `deploy:app`   | frontend + backend + internal Postgres, from the images just built |
+Under **Settings → CI/CD → Secure Files**, upload the three certificate/key
+pairs: six files in total. Their names must match `tls_cert_file` and
+`tls_key_file` in `inventory.yml` character for character, including case and
+extensions.
 
-From here on, every change ships this way. See [Deploy](deploy.md).
+Secure Files are project-specific and are not copied with the Git repository.
+Do not add `OCEAN_TLS_SRC`; the deploy job downloads Secure Files and sets that
+path itself.
 
-## Verify
+## 8. Build and perform the first deployment
 
-- Open `https://<app-hostname>/` and log in.
-- Create a PostgreSQL and a MongoDB database from the UI.
-- The database ports should be reachable only from the app VM and the HTW network.
+Run a pipeline for the latest commit on protected `main`, or push the completed
+inventory commit. Confirm that both build jobs succeed and that images appear
+under **Deploy → Container Registry**.
 
-Next: [Operations](operations.md) for TLS renewal, secret rotation, redeploys & rollbacks.
+From that same successful pipeline, start the manual jobs in this order:
+
+1. `deploy:pg`
+2. `deploy:mongo`
+3. `deploy:app`
+
+The database tiers use public images. The app job pulls the backend and frontend
+images tagged with that pipeline's commit SHA from the **new project's**
+registry. 
+
+Do not start `deploy:ops` during normal setup. It is intentionally hidden unless
+the pipeline variable `DEPLOY_OPS=true` is supplied, and the first runner setup
+has already been completed from the laptop.
+
+## 9. Acceptance checklist
+
+- [ ] All CI validation and build jobs are green; no job is pending for a runner.
+- [ ] `deploy:pg`, `deploy:mongo`, and `deploy:app` succeed.
+- [ ] `https://<app-fqdn>/` presents the expected certificate and accepts an HTW
+  login.
+
+For maintenance continue with [Operations](operations.md).

@@ -11,7 +11,7 @@ Ocean is a fully managed database platform: log in and launch a **PostgreSQL** o
 |---------------|-------------------------------------------------------------------------|
 | `frontend/`   | React 19 + Vite UI                                                      |
 | `backend/`    | Scala / Play REST API                                                   |
-| `deployment/` | Deployment (Infrastructure as Code): boostrap scripts, Ansible, compose |
+| `deployment/` | Deployment (Infrastructure as Code): bootstrap scripts, Ansible, compose |
 | `docs/`       | Documentation and Guides for Development                                |
 
 ## Guides

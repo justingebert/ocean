@@ -29,6 +29,17 @@
       - "'change-me' not in ocean_mongodb_cluster_password"
     fail_msg: "Set real OCEAN_* deploy secrets before running the app role."
 
+- name: Validate app registry configuration
+  ansible.builtin.assert:
+    that:
+      - docker_registry_url | length > 0
+      - container_registry_image | length > 0
+      - docker_registry_username | length > 0
+      - docker_registry_password | length > 0
+    fail_msg: >-
+      The app role needs CI_REGISTRY, CI_REGISTRY_IMAGE, CI_REGISTRY_USER and
+      CI_REGISTRY_PASSWORD. Deploy the app from the GitLab pipeline.
+
 - name: Render app env files
   ansible.builtin.template:
     src: "{{ item }}.j2"

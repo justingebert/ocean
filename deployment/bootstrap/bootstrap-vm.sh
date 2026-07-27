@@ -19,7 +19,7 @@ if [[ "$(id -u)" -ne 0 ]]; then
 fi
 
 if [[ -z "$PUBKEY" || "$PUBKEY" != ssh-* ]]; then
-  echo "ERROR: pass the laptop SSH public key as the first argument." >&2
+  echo "ERROR: pass the dedicated deployment SSH public key as the first argument." >&2
   echo "Usage: bash $0 \"ssh-ed25519 AAAA... your-key\"" >&2
   exit 2
 fi

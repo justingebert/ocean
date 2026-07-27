@@ -52,5 +52,9 @@ cd frontend && npm run vitest
 ```
 
 ## Common issues
-- Docker Compose doesnt start: Port already in use
-  - stop local services e.g. local postgres or mongodb instance
+
+- If Docker Compose reports that a port is already in use, stop the local
+  PostgreSQL, MongoDB, LDAP, or Adminer process using that port, then retry.
+- If seeded LDAP users are missing after changing the seed, run
+  `docker compose down --volumes` and start again. This deletes all local-only
+  development database data.

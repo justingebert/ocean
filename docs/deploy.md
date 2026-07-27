@@ -42,3 +42,11 @@ builds new images from this clean state, so `main` and production stay aligned.
 3. Merge the revert after its checks pass.
 4. Wait for the new `main` pipeline to build both images, then run `deploy:app`.
 5. Verify that the UI and login work.
+
+## Reconfigure the runner VM
+
+The `deploy:ops` job is hidden during normal pipelines so a runner does not
+restart itself accidentally. To expose it, run a new `main` pipeline with the
+pipeline variable `DEPLOY_OPS=true`, then start `deploy:ops` manually. Register
+a runner on a new or reset `ops` VM from a laptop as described in the
+[provisioning guide](provisioning.md); CI cannot create its own first runner.
