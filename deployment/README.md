@@ -38,24 +38,28 @@ Ansible applies roles per VM group (wired in `ansible/playbook.yml`):
 ## Firewall
 
 Each app/db VM runs a **default-DROP** iptables policy. The `firewall` role
-renders it to `/root/firewall.sh` (overwriting the HTW original) and applies it
-at the _start_ of the playbook.
+renders it to `/root/firewall.sh` (overwriting the HTW original), applies it at
+the _start_ of the playbook, and installs `ocean-firewall.service` to re-apply it
+once per boot, before Docker starts.
 
-Inbound ports are declared per VM group in `ansible/group_vars/`:
+Inbound, the host itself only accepts SSH and ping from the HTW network. The
+services run in containers, and container traffic bypasses the host's
+INPUT/OUTPUT rules, so it is filtered in Docker's `DOCKER-USER` chain instead:
+only HTW sources may reach a published port. **What a VM exposes is whatever its
+compose stack publishes** under `ports:`:
 
-| VM    | Open inbound (`firewall_open_ports`) |
-| ----- | ------------------------------------ |
-| app   | 80, 443                              |
-| pg    | 80, 443 (Adminer), 5432 (PostgreSQL) |
-| mongo | 27017 (MongoDB)                      |
+| VM    | Published                             |
+| ----- | ------------------------------------- |
+| app   | 80, 443                               |
+| pg    | 443 (Adminer), 5432 (PostgreSQL)      |
+| mongo | 27017 (MongoDB)                       |
 
-Sources are restricted to the HTW network. The app VM additionally opens
-outbound LDAPS and the Docker bridge (`firewall_allow_ldaps`,
-`firewall_allow_docker_bridge`), which the default-DROP policy would otherwise
-block.
-
-To change what a VM exposes, edit its `group_vars` file, commit the change, and
-run that VM's deploy job.
+To expose or close a port, change `ports:` in `compose/<vm>/docker-compose.yml`,
+commit, and deploy. The app VM's internal Postgres has no published host port;
+the backend connects to `postgres_orm:5432` over the Compose network. For
+administrative access, use `docker compose exec postgres_orm psql -U postgres -d internal`
+on the app VM. The app VM additionally lets host processes reach the Docker
+bridge (`firewall_allow_docker_bridge`) for Docker's userland proxy.
 
 > **HTW note:** the VMs have no direct internet access. Outbound traffic goes
 > through the HTW web proxy `http://webproxy.rz.htw-berlin.de:3128`. Ansible and

@@ -14,7 +14,33 @@
   failed_when: false
   changed_when: false
 
-- name: Apply firewall (flush + rebuild + persist)
+- name: Apply firewall (flush + rebuild)
   ansible.builtin.command: /root/firewall.sh
   when: fw_script.changed
   notify: Restart docker if running
+
+# Boot-time apply. Only enabled, not started: starting it here would flush
+# Docker's live rules; the task above already applied the script.
+- name: Install firewall boot service
+  ansible.builtin.template:
+    src: ocean-firewall.service.j2
+    dest: /etc/systemd/system/ocean-firewall.service
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable firewall boot service
+  ansible.builtin.systemd:
+    name: ocean-firewall
+    enabled: true
+    daemon_reload: true
+
+# Replaced by ocean-firewall.service. The if-up hook re-applied a snapshot
+# without Docker's rules whenever networking restarted.
+- name: Remove legacy if-up firewall restore
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/network/if-up.d/iptables
+    - /etc/firewall.conf

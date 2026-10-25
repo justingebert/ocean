@@ -1,0 +1,17 @@
+# MANAGED BY ANSIBLE (roles/firewall). Applies /root/firewall.sh once per boot,
+# before the network and Docker come up, so Docker adds its rules on top.
+[Unit]
+Description=Ocean iptables rules
+DefaultDependencies=no
+Wants=network-pre.target local-fs.target systemd-modules-load.service
+After=local-fs.target systemd-modules-load.service
+Before=network-pre.target docker.service shutdown.target
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/root/firewall.sh
+
+[Install]
+WantedBy=multi-user.target

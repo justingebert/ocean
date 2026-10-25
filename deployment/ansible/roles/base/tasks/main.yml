@@ -36,6 +36,19 @@
   when: outbound_proxy_url is defined and outbound_proxy_url | length > 0
   notify: Restart docker
 
+# Default json-file logs never rotate and eventually fill the disk.
+# Applies to containers created after the change; existing ones keep the old setting.
+- name: Configure Docker log rotation
+  ansible.builtin.copy:
+    dest: /etc/docker/daemon.json
+    mode: "0644"
+    content: |
+      {
+        "log-driver": "json-file",
+        "log-opts": { "max-size": "10m", "max-file": "3" }
+      }
+  notify: Restart docker
+
 - name: Enable and start Docker
   ansible.builtin.systemd:
     name: docker
