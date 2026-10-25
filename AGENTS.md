@@ -14,33 +14,6 @@ the distinction straight: the _internal_ database (`postgres_orm`) stores Ocean'
 own metadata; the _managed clusters_ (`pg_cluster`, `mongodb_cluster`) are what
 users get. Different code paths, different config files.
 
-## Running things locally
-
-`docker-compose.yaml` at the root starts **only the dev dependencies** (OpenLDAP,
-Postgres × 2, MongoDB, Adminer). The backend and frontend run directly against
-them; their images are built for the VM deploy, not run locally.
-
-```sh
-docker compose up                 # dev deps
-cd backend  && sbt run            # :9000 
-cd frontend && npm run dev        # :5173
-```
-
-Full setup, seeded logins, and troubleshooting: [`docs/local-dev.md`](docs/local-dev.md).
-
-**The CI gates** — run these before calling work done:
-
-```sh
-cd backend  && sbt formatCheck test
-cd frontend && npm run lint && npm run format:check && npm run build && npm run vitest
-```
-
-Useful extras: `sbt "testOnly com.htwhub.ocean.service.UserServiceSpec"` (single
-backend test), `sbt cov` (coverage), `sbt format` (scalafmt — run before
-committing), `npm run vitest -- path/to/file.test.ts`,
-`npm run cypress:component` (dev server must **not** be running),
-`npm run test:e2e` (dev server **must** be running).
-
 ## Conventions
 
 Only the things not covered by the sub-READMEs.
@@ -80,19 +53,15 @@ dockerize the app, build CI/CD, extend platform functionality, connect
 additional DB systems, build an admin tool for the managed DB systems, move
 toward microservices, bug-fix and update libraries, add monitoring.
 
-The project is being handed over — see [`docs/handover.md`](docs/handover.md)
-for current state, known gaps, and open TODOs.
-
 ## Work log, required after every meaningful change
 
-Append a dated section to the **top** of [`docs/notes/WORK_LOG.md`](docs/notes/WORK_LOG.md).
-It is the source material for the final report.
+Append a dated section to the **top** of [`docs/notes/WORK_LOG B.md`](docs/notes/WORK_LOG%20B.md).
+It is the source material for the final report. 
 
-- Heading `## YYYY-MM-DD — topic`, then a few bullets.
+- Heading `## YYYY-MM-DD: topic`, then a few bullets.
 - High level only: what was done, and why if non-obvious. No file lists, no diff
-  replay — `git log` covers that.
-- One section per discrete unit of work; skip trivial stuff. If it takes more
-  30 seconds to scan, it's too long.
+  replay.
+- One section per discrete unit of work; skip trivial stuff. 
 
 ## Working style
 

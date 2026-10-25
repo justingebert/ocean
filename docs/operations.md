@@ -16,8 +16,7 @@ mongo terminate TLS with their own certificate.
 1. **Replace the Secure Files** — _Settings → CI/CD → Secure Files_. Upload the
    new cert/key keeping the **exact same filenames** as in `inventory.yml`
    (delete the old one first; the name is what the `tls` role looks up).
-2. **Run the deploy job** for each VM whose cert changed: `deploy:app`,
-   `deploy:pg`, `deploy:mongo`.
+2. **Run the `deploy` job.**
    Ansible detects changed TLS files and restarts the containers that consume
    them so the new certificate is loaded.
 3. **Verify the live certificate**:
@@ -39,15 +38,7 @@ mongo terminate TLS with their own certificate.
 ## Rotate a secret
 
 1. Change the value in _Settings → CI/CD → Variables_.
-2. Run the deploy job for each tier that uses it:
-
-   | Variable                         | Re-run                              |
-   | -------------------------------- | ----------------------------------- |
-   | `OCEAN_APPLICATION_SECRET`       | `deploy:app`                        |
-   | `OCEAN_JWT_SECRET`               | `deploy:app`                        |
-   | `OCEAN_POSTGRES_ORM_PASSWORD`    | `deploy:app`                        |
-   | `OCEAN_PG_CLUSTER_PASSWORD`      | `deploy:app` **and** `deploy:pg`    |
-   | `OCEAN_MONGODB_CLUSTER_PASSWORD` | `deploy:app` **and** `deploy:mongo` |
+2. Run the `deploy` job.
 
 
 > **Careful:** changing a database password in a variable does **not** change the
@@ -94,7 +85,8 @@ sudo docker compose logs backend  # one service
 | Image will not pull              | images exist in this project's registry; Docker login logs     |
 | TLS error in the browser/client  | full chain; matching key; SAN/FQDN; port; certificate dates    |
 
-Restart a tier by re-running its deploy job, or on the VM:
+Restart a tier on its VM (a redeploy only restarts containers whose config,
+image or TLS changed):
 
 ```sh
 sudo docker compose restart

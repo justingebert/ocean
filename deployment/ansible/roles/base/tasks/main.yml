@@ -52,7 +52,7 @@
 
 - name: Create config dir
   ansible.builtin.file:
-    path: "{{ etc_ocean }}"
+    path: "/etc/ocean"
     state: directory
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
@@ -60,7 +60,7 @@
 
 - name: Create data root
   ansible.builtin.file:
-    path: "{{ data_root }}"
+    path: "/srv/ocean"
     state: directory
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"

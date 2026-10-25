@@ -1,7 +1,7 @@
 - name: Stage docker-compose.yml
   ansible.builtin.copy:
     src: "{{ compose_src }}"
-    dest: "{{ etc_ocean }}/docker-compose.yml"
+    dest: "/etc/ocean/docker-compose.yml"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0640"
@@ -16,7 +16,7 @@
 - name: Render mongodb_cluster.env
   ansible.builtin.template:
     src: mongodb_cluster.env.j2
-    dest: "{{ etc_ocean }}/mongodb_cluster.env"
+    dest: "/etc/ocean/mongodb_cluster.env"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0600"
@@ -25,7 +25,7 @@
 
 - name: Create mongodb_cluster data dir
   ansible.builtin.file:
-    path: "{{ data_root }}/mongodb_cluster/data"
+    path: "/srv/ocean/mongodb_cluster/data"
     state: directory
     owner: "999"
     group: "999"
@@ -33,14 +33,14 @@
 
 - name: Bring up mongo compose stack
   community.docker.docker_compose_v2:
-    project_src: "{{ etc_ocean }}"
+    project_src: "/etc/ocean"
     state: present
     remove_orphans: true
   tags: compose
 
 - name: Restart MongoDB after TLS change
   community.docker.docker_compose_v2:
-    project_src: "{{ etc_ocean }}"
+    project_src: "/etc/ocean"
     state: restarted
     services:
       - mongodb_cluster

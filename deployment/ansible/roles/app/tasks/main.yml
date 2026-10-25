@@ -1,7 +1,7 @@
 - name: Stage docker-compose.yml
   ansible.builtin.copy:
     src: "{{ compose_src }}"
-    dest: "{{ etc_ocean }}/docker-compose.yml"
+    dest: "/etc/ocean/docker-compose.yml"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0640"
@@ -9,7 +9,7 @@
 - name: Stage compose env file
   ansible.builtin.template:
     src: compose.env.j2
-    dest: "{{ etc_ocean }}/compose.env"
+    dest: "/etc/ocean/compose.env"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0600"
@@ -43,7 +43,7 @@
 - name: Render app env files
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ etc_ocean }}/{{ item }}"
+    dest: "/etc/ocean/{{ item }}"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0600"
@@ -56,14 +56,14 @@
 - name: Render frontend runtime config
   ansible.builtin.template:
     src: frontend-config.js.j2
-    dest: "{{ etc_ocean }}/frontend-config.js"
+    dest: "/etc/ocean/frontend-config.js"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0644"
 
 - name: Create postgres_orm data dir
   ansible.builtin.file:
-    path: "{{ data_root }}/postgres_orm/data"
+    path: "/srv/ocean/postgres_orm/data"
     state: directory
     owner: "70"
     group: "70"
@@ -94,9 +94,9 @@
 
 - name: Bring up app compose stack
   community.docker.docker_compose_v2:
-    project_src: "{{ etc_ocean }}"
+    project_src: "/etc/ocean"
     env_files:
-      - "{{ etc_ocean }}/compose.env"
+      - "/etc/ocean/compose.env"
     state: present
     build: never
     pull: policy
@@ -105,7 +105,7 @@
 
 - name: Restart frontend after TLS change
   community.docker.docker_compose_v2:
-    project_src: "{{ etc_ocean }}"
+    project_src: "/etc/ocean"
     state: restarted
     services:
       - frontend

@@ -54,29 +54,15 @@
         -e "backend_image=$BACKEND_IMAGE:$CI_COMMIT_SHORT_SHA" \
         -e "frontend_image=$FRONTEND_IMAGE:$CI_COMMIT_SHORT_SHA"
 
-deploy:app:
+# app/pg/mongo in one run: unchanged services are left alone, and the playbook
+# brings up pg and mongo before app.
+deploy:
   extends: .deploy_ansible
   variables:
-    ANSIBLE_LIMIT: app
+    ANSIBLE_LIMIT: app:pg:mongo
     ANSIBLE_FETCH_SECURE_FILES: "true"
     ANSIBLE_REQUIRED_ENV: OCEAN_APPLICATION_SECRET OCEAN_JWT_SECRET OCEAN_POSTGRES_ORM_PASSWORD OCEAN_PG_CLUSTER_PASSWORD OCEAN_MONGODB_CLUSTER_PASSWORD
-    DEPLOY_ENVIRONMENT_NAME: production/app
-
-deploy:pg:
-  extends: .deploy_ansible
-  variables:
-    ANSIBLE_LIMIT: pg
-    ANSIBLE_FETCH_SECURE_FILES: "true"
-    ANSIBLE_REQUIRED_ENV: OCEAN_PG_CLUSTER_PASSWORD
-    DEPLOY_ENVIRONMENT_NAME: production/pg
-
-deploy:mongo:
-  extends: .deploy_ansible
-  variables:
-    ANSIBLE_LIMIT: mongo
-    ANSIBLE_FETCH_SECURE_FILES: "true"
-    ANSIBLE_REQUIRED_ENV: OCEAN_MONGODB_CLUSTER_PASSWORD
-    DEPLOY_ENVIRONMENT_NAME: production/mongo
+    DEPLOY_ENVIRONMENT_NAME: production
 
 deploy:ops:
   extends: .deploy_ansible

@@ -1,7 +1,7 @@
 - name: Stage docker-compose.yml
   ansible.builtin.copy:
     src: "{{ compose_src }}"
-    dest: "{{ etc_ocean }}/docker-compose.yml"
+    dest: "/etc/ocean/docker-compose.yml"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0640"
@@ -9,7 +9,7 @@
 - name: Stage compose env file
   ansible.builtin.template:
     src: compose.env.j2
-    dest: "{{ etc_ocean }}/compose.env"
+    dest: "/etc/ocean/compose.env"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0600"
@@ -17,7 +17,7 @@
 - name: Stage pg_hba.conf
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../compose/pg/pg_hba.conf"
-    dest: "{{ etc_ocean }}/pg_hba.conf"
+    dest: "/etc/ocean/pg_hba.conf"
     owner: "999"
     group: "999"
     mode: "0640"
@@ -25,7 +25,7 @@
 - name: Stage LDAP CA for Postgres LDAP auth
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../../backend/docker/dfn-community-root-ca-2022.pem"
-    dest: "{{ etc_ocean }}/dfn-community-root-ca-2022.pem"
+    dest: "/etc/ocean/dfn-community-root-ca-2022.pem"
     owner: "root"
     group: "root"
     mode: "0644"
@@ -33,7 +33,7 @@
 - name: Stage Caddyfile
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../compose/pg/Caddyfile"
-    dest: "{{ etc_ocean }}/Caddyfile"
+    dest: "/etc/ocean/Caddyfile"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0644"
@@ -48,7 +48,7 @@
 - name: Render pg_cluster.env
   ansible.builtin.template:
     src: pg_cluster.env.j2
-    dest: "{{ etc_ocean }}/pg_cluster.env"
+    dest: "/etc/ocean/pg_cluster.env"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
     mode: "0600"
@@ -57,7 +57,7 @@
 
 - name: Create pg_cluster data dir
   ansible.builtin.file:
-    path: "{{ data_root }}/pg_cluster/data"
+    path: "/srv/ocean/pg_cluster/data"
     state: directory
     owner: "999"
     group: "999"
@@ -65,14 +65,14 @@
 
 - name: Bring up pg compose stack
   community.docker.docker_compose_v2:
-    project_src: "{{ etc_ocean }}"
+    project_src: "/etc/ocean"
     state: present
     remove_orphans: true
   tags: compose
 
 - name: Restart PostgreSQL TLS consumers after TLS change
   community.docker.docker_compose_v2:
-    project_src: "{{ etc_ocean }}"
+    project_src: "/etc/ocean"
     state: restarted
     services:
       - pg_cluster

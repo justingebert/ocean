@@ -12,15 +12,15 @@ Two bootstrapping actions must happen from a laptop:
 1. create the `ansible` account on all four VMs; and
 2. install and register the first GitLab runner on the `ops` VM.
 
-The runner then builds the application images. The three manual deploy jobs
-provision the database VMs and app VM through Ansible.
+The runner then builds the application images. The manual `deploy` job
+provisions the database VMs and app VM through Ansible.
 
 ```
   Manual, once (laptop)              GitLab                    CI (on the ops runner)
   ┌──────────────────────┐      ┌──────────────┐      ┌──────────────┐
-  │ 1. create `ansible`  │      │ 3. secrets + │      │ 4. build     │ ─▶ deploy:pg
-  │    user on 4 VMs     │ ───▶ │    TLS files │ ───▶ │    images    │ ─▶ deploy:mongo
-  │ 2. register runner   │      └──────────────┘      └──────────────┘ ─▶ deploy:app
+  │ 1. create `ansible`  │      │ 3. secrets + │      │ 4. build     │
+  │    user on 4 VMs     │ ───▶ │    TLS files │ ───▶ │    images    │ ─▶ deploy
+  │ 2. register runner   │      └──────────────┘      └──────────────┘
   │    on ops            │
   └──────────────────────┘
    SSH key + runner token        5 vars + 3 cert pairs        everything else
@@ -184,13 +184,10 @@ Run a pipeline for the latest commit on protected `main`, or push the completed
 inventory commit. Confirm that both build jobs succeed and that images appear
 under **Deploy → Container Registry**.
 
-From that same successful pipeline, start the manual jobs in this order:
+From that same successful pipeline, start the manual `deploy` job. It sets up
+pg and mongo first, then app.
 
-1. `deploy:pg`
-2. `deploy:mongo`
-3. `deploy:app`
-
-The database tiers use public images. The app job pulls the backend and frontend
+The database tiers use public images. The app VM pulls the backend and frontend
 images tagged with that pipeline's commit SHA from the **new project's**
 registry. 
 
@@ -201,7 +198,7 @@ has already been completed from the laptop.
 ## 9. Acceptance checklist
 
 - [ ] All CI validation and build jobs are green; no job is pending for a runner.
-- [ ] `deploy:pg`, `deploy:mongo`, and `deploy:app` succeed.
+- [ ] `deploy` succeeds.
 - [ ] `https://<app-fqdn>/` presents the expected certificate and accepts an HTW
   login.
 
