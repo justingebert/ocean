@@ -42,3 +42,13 @@ services:
     volumes:
       - /etc/ocean/Caddyfile:/etc/caddy/Caddyfile:ro
       - /etc/ocean/tls:/etc/caddy/tls:ro
+
+  # Log source for the Dozzle hub on ops; 7007 only reachable from ops (firewall).
+  dozzle_agent:
+    image: amir20/dozzle:v11
+    restart: unless-stopped
+    command: agent
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "7007:7007"

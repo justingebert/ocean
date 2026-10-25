@@ -45,6 +45,8 @@ iptables -A INPUT -s {{ htw_networks }} -p tcp --dport 22 -j ACCEPT
 # port. What is open is whatever the compose stack publishes.
 iptables -N DOCKER-USER 2>/dev/null || true
 iptables -A DOCKER-USER -m state --state ESTABLISHED,RELATED -j RETURN
+# Dozzle agent: only the hub on ops may connect (agent grants full log + exec access).
+iptables -A DOCKER-USER -i {{ ansible_default_ipv4.interface }} -p tcp --dport 7007 ! -s {{ hostvars[groups['ops'][0]].ip }} -j DROP
 iptables -A DOCKER-USER -i {{ ansible_default_ipv4.interface }} -s {{ htw_networks }} -j RETURN
 iptables -A DOCKER-USER -i {{ ansible_default_ipv4.interface }} -s 10.45.64.36 -j RETURN
 iptables -A DOCKER-USER -i {{ ansible_default_ipv4.interface }} -j DROP

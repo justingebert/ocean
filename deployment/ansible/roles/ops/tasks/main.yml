@@ -1,0 +1,22 @@
+- name: Stage docker-compose.yml
+  ansible.builtin.copy:
+    src: "{{ compose_src }}"
+    dest: "/etc/ocean/docker-compose.yml"
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0640"
+
+- name: Stage compose env file
+  ansible.builtin.template:
+    src: compose.env.j2
+    dest: "/etc/ocean/compose.env"
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0600"
+
+- name: Bring up ops compose stack
+  community.docker.docker_compose_v2:
+    project_src: "/etc/ocean"
+    state: present
+    remove_orphans: true
+  tags: compose

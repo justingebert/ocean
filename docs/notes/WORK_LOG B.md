@@ -1,5 +1,11 @@
 # Ocean — Work Log B
 
+## 2026-10-25: Dozzle log hub on ops (simplified redo)
+- Dozzle hub on the ops VM, agents in the app/pg/mongo stacks, so logs and container stats of all VMs are in one place.
+- Agent port 7007 is reachable only from the ops IP: an agent hands out full log and exec access to anyone who can connect, and its built-in cert is shared by every Dozzle install.
+- No login yet, so the UI is bound to localhost on ops and reached via SSH tunnel; proper access (Caddy + TLS + auth) is the next step.
+- Ops now gets the same managed firewall as the other VMs: its stock HTW script blocked the tunnel (no Docker-bridge exception) and still had the `if-up` restore hook that drops Docker's rules.
+
 ## 2026-10-25: Keep the app's internal Postgres off host ports
 - Confirmed the backend is the only application client of Ocean's metadata database and connects over the Compose network; removed the app VM's localhost port mapping.
 - Administrative access uses a command inside the database container. Local development keeps its host port because the backend runs outside Docker there.

@@ -1,0 +1,9 @@
+name: ocean-ops
+
+services:
+  dozzle:
+    image: amir20/dozzle:v11
+    restart: unless-stopped
+    env_file: /etc/ocean/compose.env
+    ports:
+      - "127.0.0.1:8080:8080"

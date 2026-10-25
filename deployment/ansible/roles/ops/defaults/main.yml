@@ -1,0 +1,1 @@
+compose_src: "{{ playbook_dir }}/../compose/ops/docker-compose.yml"

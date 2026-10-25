@@ -27,17 +27,18 @@ Ansible applies roles per VM group (wired in `ansible/playbook.yml`):
 
 | Role            | Runs on        | What it does                                                                               |
 | --------------- | -------------- | ------------------------------------------------------------------------------------------ |
-| `firewall`      | app, pg, mongo | apply the default-DROP iptables policy (runs **first**, before Docker)                     |
+| `firewall`      | all VMs        | apply the default-DROP iptables policy (runs **first**, before Docker)                     |
 | `base`          | all VMs        | Docker + compose, outbound proxy, the `ocean` user, `/etc/ocean` + `/srv/ocean`            |
 | `tls`           | app, pg, mongo | stage the TLS cert/key the VM terminates with                                              |
 | `app`           | app VM         | render env + frontend config, start the app stack (frontend + backend + internal Postgres) |
 | `pg`            | pg VM          | render env, start the managed-Postgres stack (+ Adminer behind Caddy)                      |
 | `mongo`         | mongo VM       | render env, start the managed-MongoDB stack                                                |
 | `gitlab-runner` | ops VM         | install + register the GitLab CI runner                                                    |
+| `ops`           | ops VM         | start the Dozzle log hub on `127.0.0.1:8080` (SSH tunnel); agents run in app/pg/mongo     |
 
 ## Firewall
 
-Each app/db VM runs a **default-DROP** iptables policy. The `firewall` role
+Every VM runs a **default-DROP** iptables policy. The `firewall` role
 renders it to `/root/firewall.sh` (overwriting the HTW original), applies it at
 the _start_ of the playbook, and installs `ocean-firewall.service` to re-apply it
 once per boot, before Docker starts.
@@ -50,9 +51,13 @@ compose stack publishes** under `ports:`:
 
 | VM    | Published                             |
 | ----- | ------------------------------------- |
-| app   | 80, 443                               |
-| pg    | 443 (Adminer), 5432 (PostgreSQL)      |
-| mongo | 27017 (MongoDB)                       |
+| app   | 80, 443, 7007 (Dozzle agent)          |
+| pg    | 443 (Adminer), 5432 (PostgreSQL), 7007 |
+| mongo | 27017 (MongoDB), 7007                 |
+| ops   | none (Dozzle UI on `127.0.0.1:8080`)  |
+
+Port 7007 (Dozzle agent) is the exception: only the ops VM (its `ip` in `inventory.yml`)
+may reach it, since an agent gives full log and exec access to its host's containers.
 
 To expose or close a port, change `ports:` in `compose/<vm>/docker-compose.yml`,
 commit, and deploy. The app VM's internal Postgres has no published host port;

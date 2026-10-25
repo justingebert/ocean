@@ -65,7 +65,9 @@ Request the following from HTW F4:
 
 Edit [`deployment/ansible/inventory.yml`](../deployment/ansible/inventory.yml):
 
-- replace all four `ansible_host` values with the new VM FQDNs; and
+- replace all four `ansible_host` values with the new VM FQDNs;
+- set `ip` on `ops` to the ops VM's IPv4 address (the firewall only lets that
+  address reach the Dozzle agents); and
 - replace `tls_cert_file` and `tls_key_file` for `app`, `pg`, and `mongo` with
   the exact filenames received from HTW.
 

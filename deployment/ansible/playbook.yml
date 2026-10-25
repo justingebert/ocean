@@ -1,5 +1,5 @@
-- name: Firewall on app/db hosts
-  hosts: app:pg:mongo
+- name: Firewall on app/db/ops hosts
+  hosts: app:pg:mongo:ops
   become: true
   roles:
     - firewall
@@ -36,8 +36,9 @@
   roles:
     - app
 
-- name: Provision GitLab runner VM
+- name: Provision GitLab runner & ops tooling
   hosts: ops
   become: true
   roles:
     - gitlab-runner
+    - ops
