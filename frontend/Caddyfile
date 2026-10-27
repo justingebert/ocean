@@ -25,5 +25,11 @@
 }
 
 :80 {
-	redir https://{host}{uri} permanent
+	# plain-HTTP target for the container healthcheck; everything else goes to HTTPS.
+	handle /healthz {
+		respond "ok" 200
+	}
+	handle {
+		redir https://{host}{uri} permanent
+	}
 }
