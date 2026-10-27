@@ -3,6 +3,7 @@ name: ocean-mongo
 services:
   mongodb_cluster:
     image: mongo:8.0
+    pull_policy: always
     restart: unless-stopped
     env_file: /etc/ocean/mongodb_cluster.env
     ports:
@@ -21,6 +22,7 @@ services:
   # Log source for the Dozzle hub on ops; 7007 only reachable from ops (firewall).
   dozzle_agent:
     image: amir20/dozzle:v11
+    pull_policy: always
     restart: unless-stopped
     command: agent
     volumes:

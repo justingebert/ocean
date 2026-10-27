@@ -3,6 +3,7 @@ name: ocean-pg
 services:
   pg_cluster:
     image: postgres:18.4
+    pull_policy: always
     restart: unless-stopped
     env_file: /etc/ocean/pg_cluster.env
     environment:
@@ -23,6 +24,7 @@ services:
 
   adminer:
     image: adminer:5
+    pull_policy: always
     restart: unless-stopped
     command: ["php", "-S", "0.0.0.0:8080", "-t", "/var/www/html"] #bind to ipV4
     environment:
@@ -33,6 +35,7 @@ services:
 
   adminer_proxy:
     image: caddy:2-alpine
+    pull_policy: always
     restart: unless-stopped
     env_file: /etc/ocean/compose.env
     depends_on:
@@ -46,6 +49,7 @@ services:
   # Log source for the Dozzle hub on ops; 7007 only reachable from ops (firewall).
   dozzle_agent:
     image: amir20/dozzle:v11
+    pull_policy: always
     restart: unless-stopped
     command: agent
     volumes:

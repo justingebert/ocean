@@ -3,6 +3,7 @@ name: ocean-app
 services:
   postgres_orm:
     image: postgres:18.4-alpine
+    pull_policy: always
     restart: unless-stopped
     env_file: /etc/ocean/postgres_orm.env
     ports:
@@ -35,6 +36,7 @@ services:
 
   dozzle_agent:
     image: amir20/dozzle:v11
+    pull_policy: always
     restart: unless-stopped
     command: agent
     volumes:
