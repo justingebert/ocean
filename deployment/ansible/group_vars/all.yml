@@ -4,7 +4,7 @@ ocean_jwt_secret: "{{ lookup('ansible.builtin.env', 'OCEAN_JWT_SECRET') | defaul
 ocean_postgres_orm_password: "{{ lookup('ansible.builtin.env', 'OCEAN_POSTGRES_ORM_PASSWORD') | default('', true) | trim }}"
 ocean_pg_cluster_password: "{{ lookup('ansible.builtin.env', 'OCEAN_PG_CLUSTER_PASSWORD') | default('', true) | trim }}"
 ocean_mongodb_cluster_password: "{{ lookup('ansible.builtin.env', 'OCEAN_MONGODB_CLUSTER_PASSWORD') | default('', true) | trim }}"
-beszel_hub_pubkey: ""
+beszel_hub_pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICEb6mTZTkm0IosTmlMzcJtf0MVRBLhWFzerUc/cGmx+"
 # HTW address ranges (comma-separated, as iptables -s/-d accept them).
 htw_networks: "141.45.0.0/16,10.4.0.0/16"
 # HTW outbound HTTP(S) only reachable via this proxy.
