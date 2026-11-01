@@ -1,5 +1,20 @@
 # Ocean — Work Log B
 
+## 2026-11-01: Beszel resource monitoring on ops (basic, SSH tunnel)
+- Added Beszel for CPU, RAM, disk, network and per-container stats: hub on the ops VM, an agent on every VM including ops itself (the runner VM is the likeliest to fill its disk unnoticed).
+- Uses Beszel's SSH mode for now: the hub connects to the agents, the same direction as Dozzle, so it works before the ops TLS certificate exists. Agent port 45876 only accepts the ops IP; since agents use host networking, that rule lives in the host's INPUT chain instead of `DOCKER-USER`. The ops agent talks to the hub through a shared unix socket.
+- Kept deliberately minimal: admin via the first-run wizard, systems added once in the UI, hub public key committed by hand after the first start (it is not a secret). Planned follow-up once the certificate arrives: WebSocket mode with a universal token (agents self-register), users from config, and HTTPS on `/resources` next to Dozzle on `/logs`.
+- Hub and agents are pinned to the same exact tag in every compose file.
+
+## 2026-10-27: Deploys pull fresh third-party images (PHP2Shell)
+- PHP2Shell (CVE-2026-109618/-109619, unauthenticated PHP RCE) affects the PHP that Adminer runs on. The official `adminer:5` image was rebuilt on PHP 8.4.27, the fixed version, so no image bump was needed.
+- But deploys never picked it up: the compose tasks only pulled images missing on the VM, so the moving tags (`adminer:5`, `postgres:18.4`, `mongo:8.0`, …) stayed on the first copy ever downloaded. Every third-party image now has `pull_policy: always` in its compose file, so any `docker compose up` (deploy or manual) pulls. Set in compose rather than Ansible because the app role can't pull everything: local dev uses locally built backend/frontend images.
+- Trade-off: a deploy can briefly restart a managed DB container when upstream has published a rebuilt image. Deploys are manual, so the timing stays controllable.
+
+## 2026-10-25: Frontend healthcheck no longer reports unhealthy
+- Dozzle flagged the frontend as unhealthy although the site worked: the healthcheck hit port 80, which only redirects to HTTPS for the real hostname, so the check failed the TLS handshake on `127.0.0.1`.
+- Port 80 now answers `/healthz` directly and the healthcheck targets it; it proves Caddy is up, not that TLS is fine.
+
 ## 2026-10-25: Dozzle log hub on ops (simplified redo)
 - Dozzle hub on the ops VM, agents in the app/pg/mongo stacks, so logs and container stats of all VMs are in one place.
 - Agent port 7007 is reachable only from the ops IP: an agent hands out full log and exec access to anyone who can connect, and its built-in cert is shared by every Dozzle install.

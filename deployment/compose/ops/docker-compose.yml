@@ -8,3 +8,26 @@ services:
     env_file: /etc/ocean/compose.env
     ports:
       - "127.0.0.1:8080:8080"
+
+  # Resource monitoring hub; keep the tag in sync with every beszel-agent.
+  beszel:
+    image: henrygd/beszel:0.21.1
+    pull_policy: always
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8090:8090"
+    volumes:
+      - /srv/ocean/beszel/data:/beszel_data
+      - /srv/ocean/beszel/socket:/beszel_socket
+
+  beszel_agent:
+    image: henrygd/beszel-agent:0.21.1
+    pull_policy: always
+    restart: unless-stopped
+    network_mode: host # real NIC stats
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /srv/ocean/beszel/socket:/beszel_socket
+    environment:
+      LISTEN: /beszel_socket/beszel.sock
+      KEY: ${BESZEL_KEY}

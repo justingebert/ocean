@@ -66,6 +66,8 @@
 - name: Bring up pg compose stack
   community.docker.docker_compose_v2:
     project_src: "/etc/ocean"
+    env_files:
+      - "/etc/ocean/compose.env"
     state: present
     remove_orphans: true
   tags: compose
@@ -73,6 +75,8 @@
 - name: Restart PostgreSQL TLS consumers after TLS change
   community.docker.docker_compose_v2:
     project_src: "/etc/ocean"
+    env_files:
+      - "/etc/ocean/compose.env"
     state: restarted
     services:
       - pg_cluster

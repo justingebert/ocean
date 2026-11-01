@@ -14,9 +14,22 @@
     group: "{{ ocean_user }}"
     mode: "0600"
 
+- name: Create Beszel hub data and agent socket dirs
+  ansible.builtin.file:
+    path: "/srv/ocean/beszel/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  loop:
+    - data
+    - socket
+
 - name: Bring up ops compose stack
   community.docker.docker_compose_v2:
     project_src: "/etc/ocean"
+    env_files:
+      - "/etc/ocean/compose.env"
     state: present
     remove_orphans: true
   tags: compose
