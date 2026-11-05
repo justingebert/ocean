@@ -4,8 +4,8 @@ systems:
   - name: {{ h }}
     host: {{ hostvars[h].ansible_host }}
     port: 45876
-    users: [{{ beszel_admin_email }}]
+    users: [{{ ocean_ops_user }}]
 {% endfor %}
   - name: {{ inventory_hostname }}
     host: /beszel_socket/beszel.sock
-    users: [{{ beszel_admin_email }}]
+    users: [{{ ocean_ops_user }}]

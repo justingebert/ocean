@@ -1,6 +1,4 @@
 compose_src: "{{ playbook_dir }}/../compose/ops/docker-compose.yml"
 
-# Beszel's only user. Nobody types its password: Caddy logs everyone in as
-# this user via a header. Derived from the login hash so it stays stable.
-beszel_admin_email: admin@ocean.local
-beszel_admin_password: "{{ ocean_ops_password_hash | hash('sha256') }}"
+# The one login for Dozzle and Beszel (Beszel wants an email).
+ocean_ops_user: mon@ocean.de

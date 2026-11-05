@@ -23,7 +23,7 @@ provisions the database VMs and app VM through Ansible.
   │ 2. register runner   │      └──────────────┘      └──────────────┘
   │    on ops            │
   └──────────────────────┘
-   SSH key + runner token        5 vars + 4 cert pairs        everything else
+   SSH key + runner token        6 vars + 4 cert pairs        everything else
 ```
 
 ## Prerequisites and assumptions
@@ -144,7 +144,7 @@ pending, first check that the runner has the exact `ocean` tag.
 ## 6. Add CI/CD variables
 
 Open **Settings → CI/CD → Variables**. Generate a separate value for each of the
-five application/database variables:
+six application/database/monitoring variables:
 
 ```sh
 openssl rand -hex 32
@@ -161,16 +161,10 @@ Create these variables with environment scope `*`, variable expansion off, and
 | `OCEAN_PG_CLUSTER_PASSWORD`        | Variable   | Masked     | unique 32-byte hex            |
 | `OCEAN_MONGODB_CLUSTER_PASSWORD`   | Variable   | Masked     | unique 32-byte hex            |
 | `ANSIBLE_SSH_PRIVATE_KEY`          | **File**   | **Visible** | complete `ocean_ansible` file |
-| `OCEAN_OPS_PASSWORD_HASH`          | Variable   | Masked     | bcrypt hash, see below        |
+| `OCEAN_OPS_PASSWORD`               | Variable   | Masked     | unique 32-byte hex            |
 
-The monitoring UIs on ops share one login, user `ocean`. Generate its password,
-give it to the maintainers (it is stored nowhere else), and put only its hash
-into GitLab. 
-
-```sh
-openssl rand -hex 16                                            # the password
-docker run --rm caddy:2-alpine caddy hash-password --plaintext '<password>'   # the hash
-```
+`OCEAN_OPS_PASSWORD` is the password of the monitoring login on ops (Dozzle and
+Beszel, user `mon@ocean.de`); maintainers look it up in GitLab.
 
 Important SSH-key pitfall: paste the complete multiline private key, including
 the `BEGIN`/`END OPENSSH PRIVATE KEY` lines and final newline. GitLab's masked
@@ -212,7 +206,7 @@ registry.
 - [ ] `deploy` succeeds.
 - [ ] `https://<app-fqdn>/` presents the expected certificate and accepts an HTW
   login.
-- [ ] `https://<ops-fqdn>/` asks for the `ocean` login; Logs and Resources show
+- [ ] `https://<ops-fqdn>/` shows Logs and Resources; both accept `mon@ocean.de` and show
   all four VMs.
 
 For maintenance continue with [Operations](operations.md).

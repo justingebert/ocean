@@ -1,0 +1,6 @@
+users:
+  {{ ocean_ops_user | to_json }}:
+    email: {{ ocean_ops_user | to_json }}
+    name: Ocean
+    # Fixed salt derived from the password, so the hash (and file) only change with it.
+    password: {{ ocean_ops_password | password_hash('bcrypt', salt=(ocean_ops_password | hash('sha256'))[:21] ~ 'e') | to_json }}

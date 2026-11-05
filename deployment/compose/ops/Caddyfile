@@ -2,29 +2,15 @@
 	tls /etc/caddy/tls/cert.pem /etc/caddy/tls/key.pem
 	encode gzip zstd
 
-	# One shared login for everything behind it.
-	basic_auth {
-		ocean {$OCEAN_OPS_PASSWORD_HASH}
-	}
-
-	# Dozzle serves itself under /logs and trusts Remote-User (forward-proxy
-	# auth). Drop every other Remote-* header so a client can't set roles/filters.
+	# Dozzle and Beszel each have their own login (same user), Caddy only routes.
 	handle /logs* {
-		reverse_proxy dozzle:8080 {
-			header_up Remote-User ocean
-			header_up -Remote-Email
-			header_up -Remote-Name
-			header_up -Remote-Filter
-			header_up -Remote-Roles
-		}
+		reverse_proxy dozzle:8080
 	}
 
-	# Beszel expects the prefix stripped; it logs in whoever this header names.
+	# Beszel expects the prefix stripped.
 	redir /resources /resources/
 	handle_path /resources/* {
-		reverse_proxy beszel:8090 {
-			header_up X-Ocean-User {$BESZEL_ADMIN_EMAIL}
-		}
+		reverse_proxy beszel:8090
 	}
 
 	handle / {

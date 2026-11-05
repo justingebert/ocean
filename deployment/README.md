@@ -77,10 +77,10 @@ bridge (`firewall_allow_docker_bridge`) for Docker's userland proxy.
 ## Monitoring
 
 Both hubs run on the ops VM behind Caddy, reachable from the HTW network at
-`https://<ops-host>/` (linked from Ocean's admin page) with one shared login:
-user `ocean`, password from the maintainers (its hash is the CI variable
-`OCEAN_OPS_PASSWORD_HASH`). Caddy passes the logged-in user on to both tools,
-which have no login or port of their own.
+`https://<ops-host>/` (linked from Ocean's admin page). Each has its own login
+with the same user, `mon@ocean.de`, and the password from the CI variable
+`OCEAN_OPS_PASSWORD`. Beszel only takes that password when its data dir is new:
+after changing it, also change it in Beszel's settings (or delete the data dir).
 
 - **Dozzle** (logs), `/logs`: ops' own containers plus the agents on app/pg/mongo (port 7007).
 - **Beszel** (CPU, RAM, disk, network, per-container stats), `/resources`:
