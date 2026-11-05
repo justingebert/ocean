@@ -10,8 +10,8 @@ certificate/key is a Secure File. Persistent database data lives under
 
 Check the actual expiry dates in GitLab's Secure Files or in the live services;
 newly requested certificates do not share the original deployment's expiry
-date. Request reissue about 30 days before expiry. All three of app, pg and
-mongo terminate TLS with their own certificate.
+date. Request reissue about 30 days before expiry. All four of app, pg, mongo
+and ops terminate TLS with their own certificate.
 
 1. **Replace the Secure Files** — _Settings → CI/CD → Secure Files_. Upload the
    new cert/key keeping the **exact same filenames** as in `inventory.yml`

@@ -38,6 +38,10 @@ iptables -A OUTPUT -p tcp --dport 3128 -d 141.45.0.0/16 -j ACCEPT
 #
 # SSH INPUT zulassen
 iptables -A INPUT -s {{ htw_networks }} -p tcp --dport 22 -j ACCEPT
+{% if inventory_hostname in groups['ops'] %}
+# Ocean: CI jobs run in Docker on this VM and SSH back into it (deploy).
+iptables -A INPUT -s 172.16.0.0/12 -p tcp --dport 22 -j ACCEPT
+{% endif %}
 #
 # Ocean: Beszel agent (host network, so INPUT not DOCKER-USER): only the hub on ops may poll it.
 iptables -A INPUT -s {{ hostvars[groups['ops'][0]].ip }} -p tcp --dport 45876 -j ACCEPT

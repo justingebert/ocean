@@ -1,5 +1,4 @@
-# Shared Ansible deployment wrapper.
-.deploy_ansible:
+deploy:
   extends: .ansible_base
   stage: deploy
   resource_group: production
@@ -9,8 +8,10 @@
       allow_failure: true
     - when: never
   environment:
-    name: $DEPLOY_ENVIRONMENT_NAME
+    name: production
     deployment_tier: production
+  variables:
+    ANSIBLE_REQUIRED_ENV: OCEAN_APPLICATION_SECRET OCEAN_JWT_SECRET OCEAN_POSTGRES_ORM_PASSWORD OCEAN_PG_CLUSTER_PASSWORD OCEAN_MONGODB_CLUSTER_PASSWORD
   script:
     # Prepare SSH access. Ansible below accepts new host keys on first connect.
     - |
@@ -35,14 +36,12 @@
           exit 1
         fi
       done
-    # Download TLS material only for hosts that terminate TLS.
+    # Download TLS material (every VM terminates TLS).
     - |
-      if [ "${ANSIBLE_FETCH_SECURE_FILES:-false}" = "true" ]; then
-        bash -eo pipefail -c 'curl -fsSL "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash'
-        export OCEAN_TLS_SRC="$CI_PROJECT_DIR/.secure_files"
-      fi
+      bash -eo pipefail -c 'curl -fsSL "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash'
+      export OCEAN_TLS_SRC="$CI_PROJECT_DIR/.secure_files"
     - cd deployment/ansible
-    # Run the one playbook against the requested inventory group.
+    # Run the playbook against all VMs.
     - |
       ANSIBLE_SSH_COMMON_ARGS="-o StrictHostKeyChecking=accept-new" \
       GITLAB_REGISTRY_USER="${CI_REGISTRY_USER:-}" \
@@ -50,29 +49,5 @@
       ansible-playbook \
         -i inventory.yml \
         playbook.yml \
-        --limit "$ANSIBLE_LIMIT" \
         -e "backend_image=$BACKEND_IMAGE:$CI_COMMIT_SHORT_SHA" \
         -e "frontend_image=$FRONTEND_IMAGE:$CI_COMMIT_SHORT_SHA"
-
-# app/pg/mongo in one run: unchanged services are left alone, and the playbook
-# brings up pg and mongo before app.
-deploy:
-  extends: .deploy_ansible
-  variables:
-    ANSIBLE_LIMIT: app:pg:mongo
-    ANSIBLE_FETCH_SECURE_FILES: "true"
-    ANSIBLE_REQUIRED_ENV: OCEAN_APPLICATION_SECRET OCEAN_JWT_SECRET OCEAN_POSTGRES_ORM_PASSWORD OCEAN_PG_CLUSTER_PASSWORD OCEAN_MONGODB_CLUSTER_PASSWORD
-    DEPLOY_ENVIRONMENT_NAME: production
-
-deploy:ops:
-  extends: .deploy_ansible
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main" && $DEPLOY_OPS == "true"'
-      when: manual
-      allow_failure: true
-    - when: never
-  variables:
-    ANSIBLE_LIMIT: ops
-    ANSIBLE_FETCH_SECURE_FILES: "false"
-    ANSIBLE_REQUIRED_ENV: ""
-    DEPLOY_ENVIRONMENT_NAME: production/ops

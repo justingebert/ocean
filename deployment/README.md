@@ -23,13 +23,15 @@ next deploy.
 
 ## Roles
 
-Ansible applies roles per VM group (wired in `ansible/playbook.yml`):
+Ansible applies roles per VM group, wired in `ansible/playbook.yml` (CI) and
+`ansible/ops-bootstrap.yml` (firewall, base and runner on ops, run from a laptop;
+see [What deploys from where](../docs/deploy.md#what-deploys-from-where)):
 
 | Role            | Runs on        | What it does                                                                               |
 | --------------- | -------------- | ------------------------------------------------------------------------------------------ |
 | `firewall`      | all VMs        | apply the default-DROP iptables policy (runs **first**, before Docker)                     |
 | `base`          | all VMs        | Docker + compose, outbound proxy, the `ocean` user, `/etc/ocean` + `/srv/ocean`            |
-| `tls`           | app, pg, mongo | stage the TLS cert/key the VM terminates with                                              |
+| `tls`           | all VMs        | stage the TLS cert/key the VM terminates with                                              |
 | `app`           | app VM         | render env + frontend config, start the app stack (frontend + backend + internal Postgres) |
 | `pg`            | pg VM          | render env, start the managed-Postgres stack (+ Adminer behind Caddy)                      |
 | `mongo`         | mongo VM       | render env, start the managed-MongoDB stack                                                |

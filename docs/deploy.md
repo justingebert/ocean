@@ -37,10 +37,15 @@ builds new images from this clean state, so `main` and production stay aligned.
 4. Wait for the new `main` pipeline to build both images, then run `deploy`.
 5. Verify that the UI and login work.
 
-## Reconfigure the runner VM
+## What deploys from where
 
-The `deploy:ops` job is hidden during normal pipelines so a runner does not
-restart itself accidentally. To expose it, run a new `main` pipeline with the
-pipeline variable `DEPLOY_OPS=true`, then start `deploy:ops` manually. Register
-a runner on a new or reset `ops` VM from a laptop as described in the
-[provisioning guide](provisioning.md); CI cannot create its own first runner.
+| From          | Runs                                 | On             | What                                              |
+| ------------- | ------------------------------------ | -------------- | ------------------------------------------------- |
+| GitLab CI     | `deploy` job → `playbook.yml`        | app, pg, mongo | everything: firewall, Docker, TLS, compose stacks |
+|               |                                      | ops            | TLS and the monitoring stack only                 |
+| Laptop (rare) | `ops-bootstrap.yml`                  | ops            | firewall, Docker, GitLab runner                   |
+
+The runner lives on ops, so a CI job there must not restart Docker or the
+runner: that would kill the job itself. Those parts of ops are applied from a
+laptop, only when they change (or on a new VM, see the
+[provisioning guide](provisioning.md)): Run it while no CI job is running.

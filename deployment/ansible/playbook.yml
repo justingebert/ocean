@@ -1,22 +1,28 @@
-- name: Firewall on app/db/ops hosts
-  hosts: app:pg:mongo:ops
+- name: Firewall on app/db hosts
+  hosts: app:pg:mongo
   become: true
   roles:
     - firewall
   tags: firewall
 
-- name: Base setup on all hosts
-  hosts: all
+- name: Base setup on app/db hosts
+  hosts: app:pg:mongo
   become: true
   roles:
     - base
 
-- name: Stage TLS material on app/db hosts
-  hosts: app:pg:mongo
+- name: Stage TLS material on all hosts
+  hosts: app:pg:mongo:ops
   become: true
   roles:
     - tls
   tags: tls
+
+- name: Provision ops monitoring
+  hosts: ops
+  become: true
+  roles:
+    - ops
 
 - name: Provision pg-vm
   hosts: pg
@@ -35,10 +41,3 @@
   become: true
   roles:
     - app
-
-- name: Provision GitLab runner & ops tooling
-  hosts: ops
-  become: true
-  roles:
-    - gitlab-runner
-    - ops

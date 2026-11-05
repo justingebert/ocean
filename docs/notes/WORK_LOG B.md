@@ -1,5 +1,10 @@
 # Ocean — Work Log B
 
+## 2026-11-05: Ops VM gets its TLS certificate and is deployed from CI
+- The ops VM now has its own certificate (Secure Files, like the other three), as the base for exposing the monitoring UIs over HTTPS.
+- The old `deploy:ops` job could not work: the CI job runs in a container on ops and deploys ops itself, so its SSH back into the host was dropped by the firewall, and the firewall/base/runner roles restart Docker or the runner, which would kill the running job.
+- Split ops in two: the one `deploy` job now covers all four VMs but on ops applies only TLS and the monitoring stack; firewall, Docker and the runner there moved to a separate laptop-run playbook (`ops-bootstrap.yml`). The hidden `deploy:ops` job and its `DEPLOY_OPS` switch are gone, and the ops firewall lets job containers SSH to their own host.
+
 ## 2026-11-01: Beszel resource monitoring on ops (basic, SSH tunnel)
 - Added Beszel for CPU, RAM, disk, network and per-container stats: hub on the ops VM, an agent on every VM including ops itself (the runner VM is the likeliest to fill its disk unnoticed).
 - Uses Beszel's SSH mode for now: the hub connects to the agents, the same direction as Dozzle, so it works before the ops TLS certificate exists. Agent port 45876 only accepts the ops IP; since agents use host networking, that rule lives in the host's INPUT chain instead of `DOCKER-USER`. The ops agent talks to the hub through a shared unix socket.

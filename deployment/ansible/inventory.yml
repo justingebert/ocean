@@ -11,6 +11,9 @@ all:
         ocean-ops:
           ansible_host: ocean-ops.f4.htw-berlin.de
           ip: 10.4.100.174
+          tls_cert_file: ocean-ops.pem
+          tls_key_file: ocean-ops.f4.htw-berlin.de.key
+          tls_key_uid: "{{ ocean_user }}"
     app:
       hosts:
         ocean-app:

@@ -25,3 +25,4 @@ validate:ansible:
     - cd deployment/ansible
     - ansible-inventory -i inventory.yml --list >/dev/null
     - ansible-playbook -i inventory.yml playbook.yml --syntax-check
+    - ansible-playbook -i inventory.yml ops-bootstrap.yml --syntax-check

@@ -23,7 +23,7 @@ provisions the database VMs and app VM through Ansible.
   │ 2. register runner   │      └──────────────┘      └──────────────┘
   │    on ops            │
   └──────────────────────┘
-   SSH key + runner token        5 vars + 3 cert pairs        everything else
+   SSH key + runner token        5 vars + 4 cert pairs        everything else
 ```
 
 ## Prerequisites and assumptions
@@ -59,7 +59,7 @@ Request the following from HTW F4:
 | `app`   | frontend, backend, internal PostgreSQL        | yes                 |
 | `pg`    | managed PostgreSQL and Adminer                | yes                 |
 | `mongo` | managed MongoDB                               | yes                 |
-| `ops`   | project-specific GitLab runner                | no                  |
+| `ops`   | project-specific GitLab runner, monitoring    | yes                 |
 
 ## 3. Configure the Ansible inventory
 
@@ -68,8 +68,8 @@ Edit [`deployment/ansible/inventory.yml`](../deployment/ansible/inventory.yml):
 - replace all four `ansible_host` values with the new VM FQDNs;
 - set `ip` on `ops` to the ops VM's IPv4 address (the firewall only lets that
   address reach the Dozzle agents); and
-- replace `tls_cert_file` and `tls_key_file` for `app`, `pg`, and `mongo` with
-  the exact filenames received from HTW.
+- replace `tls_cert_file` and `tls_key_file` on all four hosts with the exact
+  filenames received from HTW.
 
 Do not put a GitLab namespace into the inventory. In CI, `CI_REGISTRY` and
 `CI_REGISTRY_IMAGE` automatically select the Container Registry belonging to
@@ -122,8 +122,10 @@ runner**:
 GitLab routes tagged jobs only to runners with all required tags; see GitLab's
 [project runner documentation](https://docs.gitlab.com/ci/runners/runners_scope/#create-a-project-runner-with-a-runner-authentication-token).
 
-From the repository on the laptop, install the Ansible collection and provision
-only the `ops` VM. Explicitly select the dedicated key:
+From the repository on the laptop, install the Ansible collection and set up
+the `ops` VM's firewall, Docker and runner (the rest of ops comes from CI, see
+[What deploys from where](deploy.md#what-deploys-from-where)). Explicitly select
+the dedicated key:
 
 ```sh
 cd deployment/ansible
@@ -131,8 +133,7 @@ ansible-galaxy collection install -r requirements.yml
 export GITLAB_RUNNER_TOKEN='<token shown by GitLab>'
 
 ansible -i inventory.yml ops -m ping --private-key ~/.ssh/ocean_ansible
-ansible-playbook -i inventory.yml playbook.yml \
-  --limit ops \
+ansible-playbook -i inventory.yml ops-bootstrap.yml \
   --private-key ~/.ssh/ocean_ansible
 unset GITLAB_RUNNER_TOKEN
 ```
@@ -171,8 +172,8 @@ job. GitLab docu: [file type CI/CD variables](https://docs.gitlab.com/ci/variabl
 
 ## 7. Upload TLS Secure Files
 
-Under **Settings → CI/CD → Secure Files**, upload the three certificate/key
-pairs: six files in total. Their names must match `tls_cert_file` and
+Under **Settings → CI/CD → Secure Files**, upload the four certificate/key
+pairs: eight files in total. Their names must match `tls_cert_file` and
 `tls_key_file` in `inventory.yml` character for character, including case and
 extensions.
 
@@ -186,16 +187,14 @@ Run a pipeline for the latest commit on protected `main`, or push the completed
 inventory commit. Confirm that both build jobs succeed and that images appear
 under **Deploy → Container Registry**.
 
-From that same successful pipeline, start the manual `deploy` job. It sets up
-pg and mongo first, then app.
+From that same successful pipeline, start the manual `deploy` job. It stages
+the certificates, starts the monitoring stack on ops, sets up pg and mongo, then
+app.
 
 The database tiers use public images. The app VM pulls the backend and frontend
 images tagged with that pipeline's commit SHA from the **new project's**
 registry. 
 
-Do not start `deploy:ops` during normal setup. It is intentionally hidden unless
-the pipeline variable `DEPLOY_OPS=true` is supplied, and the first runner setup
-has already been completed from the laptop.
 
 ## 9. Acceptance checklist
 

@@ -1,0 +1,19 @@
+# Run from a laptop, not CI: sets up the ops VM so it can run CI jobs
+- name: Firewall on ops
+  hosts: ops
+  become: true
+  roles:
+    - firewall
+  tags: firewall
+
+- name: Base setup on ops
+  hosts: ops
+  become: true
+  roles:
+    - base
+
+- name: Provision GitLab runner
+  hosts: ops
+  become: true
+  roles:
+    - gitlab-runner
