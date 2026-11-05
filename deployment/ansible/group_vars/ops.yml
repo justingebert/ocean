@@ -1,1 +1,3 @@
 firewall_allow_docker_bridge: true
+# bcrypt hash of the shared monitoring login (user `ocean`), see docs/provisioning.md.
+ocean_ops_password_hash: "{{ lookup('ansible.builtin.env', 'OCEAN_OPS_PASSWORD_HASH') | default('', true) | trim }}"

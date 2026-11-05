@@ -1,0 +1,11 @@
+# Beszel hub systems, synced on every hub start: systems missing here are deleted.
+systems:
+{% for h in groups['app'] + groups['pg'] + groups['mongo'] %}
+  - name: {{ h }}
+    host: {{ hostvars[h].ansible_host }}
+    port: 45876
+    users: [{{ beszel_admin_email }}]
+{% endfor %}
+  - name: {{ inventory_hostname }}
+    host: /beszel_socket/beszel.sock
+    users: [{{ beszel_admin_email }}]

@@ -1,7 +1,7 @@
 # Deploy Guide
 
 Ocean's services run on three HTW VMs: **app**, **pg**, and **mongo**. A fourth
-**ops** VM hosts the GitLab runner. The VMs are provisioned once and then
+**ops** VM hosts the GitLab runner and the monitoring (Dozzle, Beszel). The VMs are provisioned once and then
 updated from GitLab CI; this page explains how to deploy changes to production.
 
 > Want a fresh deployment on your own VMs? [Provisioning new VMs](provisioning.md) covers setup with new VMs from scratch.

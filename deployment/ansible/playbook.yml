@@ -24,6 +24,19 @@
   roles:
     - ops
 
+# The Beszel agents only accept the hub's key, which the ops role generated.
+- name: Hand the Beszel hub key to the agents
+  hosts: app:pg:mongo
+  gather_facts: false
+  tasks:
+    - name: Read Beszel hub public key from ops
+      ansible.builtin.slurp:
+        src: /srv/ocean/beszel/data/id_ed25519.pub
+      delegate_to: "{{ groups['ops'][0] }}"
+      become: true
+      run_once: true
+      register: beszel_hub_pubkey_file
+
 - name: Provision pg-vm
   hosts: pg
   become: true

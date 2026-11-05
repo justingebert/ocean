@@ -161,6 +161,16 @@ Create these variables with environment scope `*`, variable expansion off, and
 | `OCEAN_PG_CLUSTER_PASSWORD`        | Variable   | Masked     | unique 32-byte hex            |
 | `OCEAN_MONGODB_CLUSTER_PASSWORD`   | Variable   | Masked     | unique 32-byte hex            |
 | `ANSIBLE_SSH_PRIVATE_KEY`          | **File**   | **Visible** | complete `ocean_ansible` file |
+| `OCEAN_OPS_PASSWORD_HASH`          | Variable   | Masked     | bcrypt hash, see below        |
+
+The monitoring UIs on ops share one login, user `ocean`. Generate its password,
+give it to the maintainers (it is stored nowhere else), and put only its hash
+into GitLab. 
+
+```sh
+openssl rand -hex 16                                            # the password
+docker run --rm caddy:2-alpine caddy hash-password --plaintext '<password>'   # the hash
+```
 
 Important SSH-key pitfall: paste the complete multiline private key, including
 the `BEGIN`/`END OPENSSH PRIVATE KEY` lines and final newline. GitLab's masked
@@ -202,5 +212,7 @@ registry.
 - [ ] `deploy` succeeds.
 - [ ] `https://<app-fqdn>/` presents the expected certificate and accepts an HTW
   login.
+- [ ] `https://<ops-fqdn>/` asks for the `ocean` login; Logs and Resources show
+  all four VMs.
 
 For maintenance continue with [Operations](operations.md).

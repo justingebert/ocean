@@ -1,24 +1,50 @@
 name: ocean-ops
 
 services:
+  caddy:
+    image: caddy:2-alpine
+    pull_policy: always
+    restart: unless-stopped
+    depends_on:
+      - dozzle
+      - beszel
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/ocean/Caddyfile:/etc/caddy/Caddyfile:ro
+      - /etc/ocean/index.html:/srv/index.html:ro
+      - /etc/ocean/tls:/etc/caddy/tls:ro
+    environment:
+      OCEAN_HOSTNAME: ${OCEAN_HOSTNAME}
+      OCEAN_OPS_PASSWORD_HASH: ${OCEAN_OPS_PASSWORD_HASH}
+      BESZEL_ADMIN_EMAIL: ${BESZEL_ADMIN_EMAIL}
+
   dozzle:
     image: amir20/dozzle:v11
     pull_policy: always
     restart: unless-stopped
-    env_file: /etc/ocean/compose.env
-    ports:
-      - "127.0.0.1:8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # ops' own containers
+    environment:
+      DOZZLE_REMOTE_AGENT: ${DOZZLE_REMOTE_AGENT}
+      DOZZLE_BASE: /logs
+      DOZZLE_AUTH_PROVIDER: forward-proxy
 
   # Resource monitoring hub; keep the tag in sync with every beszel-agent.
+  # Polls the agents over SSH;
   beszel:
     image: henrygd/beszel:0.21.1
     pull_policy: always
     restart: unless-stopped
-    ports:
-      - "127.0.0.1:8090:8090"
     volumes:
       - /srv/ocean/beszel/data:/beszel_data
       - /srv/ocean/beszel/socket:/beszel_socket
+    environment:
+      APP_URL: https://${OCEAN_HOSTNAME}/resources
+      USER_EMAIL: ${BESZEL_ADMIN_EMAIL}
+      USER_PASSWORD: ${BESZEL_ADMIN_PASSWORD}
+      TRUSTED_AUTH_HEADER: X-Ocean-User
 
   beszel_agent:
     image: henrygd/beszel-agent:0.21.1

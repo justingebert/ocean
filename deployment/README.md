@@ -36,7 +36,7 @@ see [What deploys from where](../docs/deploy.md#what-deploys-from-where)):
 | `pg`            | pg VM          | render env, start the managed-Postgres stack (+ Adminer behind Caddy)                      |
 | `mongo`         | mongo VM       | render env, start the managed-MongoDB stack                                                |
 | `gitlab-runner` | ops VM         | install + register the GitLab CI runner                                                    |
-| `ops`           | ops VM         | start the Dozzle log hub and Beszel monitoring hub (SSH tunnel only), see [Monitoring](#monitoring) |
+| `ops`           | ops VM         | start Caddy, Dozzle and Beszel behind one login, see [Monitoring](#monitoring)             |
 
 ## Firewall
 
@@ -56,7 +56,7 @@ compose stack publishes** under `ports:`:
 | app   | 80, 443, 7007 (Dozzle agent), 45876 (Beszel agent)               |
 | pg    | 443 (Adminer), 5432 (PostgreSQL), 7007, 45876                    |
 | mongo | 27017 (MongoDB), 7007, 45876                                     |
-| ops   | none (Dozzle UI on `127.0.0.1:8080`, Beszel UI on `127.0.0.1:8090`) |
+| ops   | 80, 443 (Dozzle + Beszel behind login)                           |
 
 Ports 7007 (Dozzle agent) and 45876 (Beszel agent) are the exception: only the ops
 VM (its `ip` in `inventory.yml`) may reach them. A Dozzle agent gives full log and
@@ -76,28 +76,19 @@ bridge (`firewall_allow_docker_bridge`) for Docker's userland proxy.
 
 ## Monitoring
 
-Both hubs run on the ops VM and are only bound to localhost, so reach them through
-an SSH tunnel:
+Both hubs run on the ops VM behind Caddy, reachable from the HTW network at
+`https://<ops-host>/` (linked from Ocean's admin page) with one shared login:
+user `ocean`, password from the maintainers (its hash is the CI variable
+`OCEAN_OPS_PASSWORD_HASH`). Caddy passes the logged-in user on to both tools,
+which have no login or port of their own.
 
-```sh
-ssh -L 8080:127.0.0.1:8080 -L 8090:127.0.0.1:8090 <user>@ocean-ops.f4.htw-berlin.de
-```
-
-- **Dozzle** (logs), <http://localhost:8080>: the hub pulls from the agents on app/pg/mongo (port 7007).
-- **Beszel** (CPU, RAM, disk, network, per-container stats), <http://localhost:8090>:
+- **Dozzle** (logs), `/logs`: ops' own containers plus the agents on app/pg/mongo (port 7007).
+- **Beszel** (CPU, RAM, disk, network, per-container stats), `/resources`:
   the hub connects to an agent on every VM over SSH (port 45876, the ops agent via a
-  unix socket). Hub data lives in `/srv/ocean/beszel/data` on ops. Hub and agents
+  unix socket). Ansible generates the hub key, hands it to the agents and lists the
+  systems in `config.yml`, so nothing is set up in the UI. Hub data lives in
+  `/srv/ocean/beszel/data` on ops; delete it and deploy to start over. Hub and agents
   must run the same version: bump the `henrygd/beszel*` tags in all four compose files together.
-
-**Beszel bootstrap** (once, or after wiping `/srv/ocean/beszel/data`). Agents only
-accept the hub's public key, which the hub generates on its first start:
-
-1. Deploy. The hub comes up; the agents restart in a loop because they have no key yet.
-2. Open Beszel through the tunnel and create the admin account.
-3. Click **Add system**, copy the public key, and set it as `beszel_hub_pubkey` in
-   `ansible/group_vars/all.yml` (it is not a secret). Commit and deploy again.
-4. Add the systems: app, pg and mongo by hostname with port `45876`; ops with
-   host `/beszel_socket/beszel.sock`.
 
 ## How a deploy flows
 

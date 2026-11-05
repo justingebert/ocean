@@ -1,3 +1,10 @@
+- name: Validate monitoring login hash
+  ansible.builtin.assert:
+    that:
+      - ocean_ops_password_hash is match('^\$2[aby]\$')
+    fail_msg: "Set OCEAN_OPS_PASSWORD_HASH to a bcrypt hash (caddy hash-password), see docs/provisioning.md."
+    quiet: true
+
 - name: Stage docker-compose.yml
   ansible.builtin.copy:
     src: "{{ compose_src }}"
@@ -6,13 +13,22 @@
     group: "{{ ocean_user }}"
     mode: "0640"
 
-- name: Stage compose env file
-  ansible.builtin.template:
-    src: compose.env.j2
-    dest: "/etc/ocean/compose.env"
+- name: Stage Caddyfile
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../compose/ops/Caddyfile"
+    dest: "/etc/ocean/Caddyfile"
     owner: "{{ ocean_user }}"
     group: "{{ ocean_user }}"
-    mode: "0600"
+    mode: "0644"
+  register: ops_caddyfile
+
+- name: Stage monitoring link page
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../compose/ops/index.html"
+    dest: "/etc/ocean/index.html"
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0644"
 
 - name: Create Beszel hub data and agent socket dirs
   ansible.builtin.file:
@@ -25,6 +41,36 @@
     - data
     - socket
 
+# The hub uses this key if present; generating it here lets Ansible hand the public half to the agents
+- name: Generate Beszel hub key
+  ansible.builtin.command:
+    cmd: ssh-keygen -q -t ed25519 -N "" -C beszel-hub -f /srv/ocean/beszel/data/id_ed25519
+    creates: /srv/ocean/beszel/data/id_ed25519
+
+- name: Read Beszel hub public key
+  ansible.builtin.slurp:
+    src: /srv/ocean/beszel/data/id_ed25519.pub
+  register: beszel_hub_pubkey_file
+
+- name: Stage Beszel systems config
+  ansible.builtin.template:
+    src: beszel-config.yml.j2
+    dest: /srv/ocean/beszel/data/config.yml
+    owner: root
+    group: root
+    mode: "0600"
+  register: beszel_config
+
+- name: Stage compose env file
+  ansible.builtin.template:
+    src: compose.env.j2
+    dest: "/etc/ocean/compose.env"
+    owner: "{{ ocean_user }}"
+    group: "{{ ocean_user }}"
+    mode: "0600"
+  no_log: true
+  diff: false
+
 - name: Bring up ops compose stack
   community.docker.docker_compose_v2:
     project_src: "/etc/ocean"
@@ -32,4 +78,27 @@
       - "/etc/ocean/compose.env"
     state: present
     remove_orphans: true
+  tags: compose
+
+# Bind-mounted config is only read at start, so compose doesn't notice changes.
+- name: Restart Caddy after Caddyfile or TLS change
+  community.docker.docker_compose_v2:
+    project_src: "/etc/ocean"
+    env_files:
+      - "/etc/ocean/compose.env"
+    state: restarted
+    services:
+      - caddy
+  when: ops_caddyfile.changed or (tls_material_changed | default(false))
+  tags: compose
+
+- name: Restart Beszel hub after systems config change
+  community.docker.docker_compose_v2:
+    project_src: "/etc/ocean"
+    env_files:
+      - "/etc/ocean/compose.env"
+    state: restarted
+    services:
+      - beszel
+  when: beszel_config.changed
   tags: compose

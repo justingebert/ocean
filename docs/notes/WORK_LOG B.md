@@ -1,5 +1,11 @@
 # Ocean — Work Log B
 
+## 2026-11-05: Monitoring exposed in the HTW network behind one login
+- Dozzle and Beszel are now reachable from the HTW network over HTTPS on the ops VM (`/logs`, `/resources`, plus a small link page) instead of only through an SSH tunnel, so the professor can use them too.
+- One shared login (user `ocean`) in Caddy covers both: Caddy checks the password and passes a fixed identity on as a header, which both tools trust (Dozzle's forward-proxy mode, Beszel's trusted header). Neither tool publishes its own port any more, since anything reaching them directly would skip the login. Only the password's bcrypt hash is a CI variable. GitLab OAuth or LDAP were considered: neither tool supports LDAP, and OAuth needs an extra proxy plus a GitLab app per project, so it stays a possible later upgrade that only changes Caddy.
+- Beszel needs no manual setup any more: Ansible generates the hub key on ops and hands its public half to the agents in the same deploy, lists the systems in Beszel's `config.yml`, and the admin user comes from env vars on a fresh data dir. It stays in SSH mode; WebSocket would remove the agent port but add a token secret and tie metrics to Caddy.
+- Dozzle now also shows the ops VM's own containers (Caddy, hubs, runner, CI jobs).
+
 ## 2026-11-05: Ops VM gets its TLS certificate and is deployed from CI
 - The ops VM now has its own certificate (Secure Files, like the other three), as the base for exposing the monitoring UIs over HTTPS.
 - The old `deploy:ops` job could not work: the CI job runs in a container on ops and deploys ops itself, so its SSH back into the host was dropped by the firewall, and the firewall/base/runner roles restart Docker or the runner, which would kill the running job.
