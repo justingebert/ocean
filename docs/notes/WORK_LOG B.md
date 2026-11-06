@@ -1,5 +1,12 @@
 # Ocean — Work Log B
 
+## 2026-11-06: One setup script for fresh VMs
+- The laptop part of provisioning (deploy key, `ansible` user on four VMs, runner on ops, CI secrets) was about a dozen hand-typed commands spread over four doc steps; mixing up keys there already broke a deploy once. It is now one re-runnable script, `deployment/setup.sh`, that skips whatever is already done.
+- Ansible for the ops bootstrap runs in a throwaway Alpine container with the same packages as CI, so the laptop only needs Docker and nothing drifts from CI. Kept bash with no GitLab API: the GitLab clicks (runner, variables, Secure Files) stay manual, and the script prints exactly what to enter.
+- CI secret values are generated once into a gitignored file and reused on re-runs, since a fresh value on an existing deployment would break the database logins.
+- It also catches the one silent inventory mistake: a wrong ops `ip` would only show up as missing logs.
+- The VM bootstrap script is now `deployment/prepare-vm.sh`, since it only gives Ansible access.
+
 ## 2026-11-05: Monitoring exposed in the HTW network with a login
 - Dozzle and Beszel are now reachable from the HTW network over HTTPS on the ops VM (`/logs`, `/resources`, plus a small link page) instead of only through an SSH tunnel, so the professor can use them too.
 - Each tool uses its own login, with the same user and a password from one CI variable; Caddy only does TLS and routing. A single shared login in Caddy that passes the identity on as a trusted header was tried first and failed: Beszel's web app sends its own token in the `Authorization` header, which replaces the browser's Basic login, so every API call was rejected. Working around that meant a hand-rolled session cookie, so the built-in logins won: real sessions, no trusted headers. GitLab OAuth or LDAP were considered: neither tool supports LDAP, and OAuth needs a GitLab app per project; both tools support OIDC natively, so it stays a possible upgrade.

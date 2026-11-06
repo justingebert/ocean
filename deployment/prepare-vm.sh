@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bootstrap an HTW Ocean VM so Ansible can take over.
+# Give Ansible access to a fresh HTW Ocean VM (run as root; setup.sh does this for you).
 #
 # Exit codes:
 #     0  success
@@ -24,7 +24,7 @@ if [[ -z "$PUBKEY" || "$PUBKEY" != ssh-* ]]; then
   exit 2
 fi
 
-echo ">>> bootstrap: starting on $(hostname)"
+echo ">>> prepare-vm: starting on $(hostname)"
 
 # ---------- 1. install sudo ----------
 
@@ -75,5 +75,5 @@ else
   echo ">>> sudoers entry already present, skipping"
 fi
 
-echo ">>> bootstrap: done. Verify :"
+echo ">>> prepare-vm: done. Verify :"
 echo "    ssh $ANSIBLE_USER@$(hostname) sudo whoami    # → root"

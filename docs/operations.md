@@ -63,16 +63,6 @@ data is destructive.
 
 ## Troubleshoot
 
-On a VM, the stack runs as a Docker Compose project in `/etc/ocean`:
-
-```sh
-ssh ansible@<vm>.f4.htw-berlin.de
-cd /etc/ocean
-sudo docker compose ps            # container status
-sudo docker compose logs -f       # follow all logs
-sudo docker compose logs backend  # one service
-```
-
 | Symptom                          | Look at                                                        |
 | -------------------------------- | -------------------------------------------------------------- |
 | Job stays pending                | runner online; runner has the exact `ocean` tag                |
@@ -84,10 +74,3 @@ sudo docker compose logs backend  # one service
 | App cannot reach a database      | firewall; VM hostname in `inventory.yml`; HTW/VPN connectivity |
 | Image will not pull              | images exist in this project's registry; Docker login logs     |
 | TLS error in the browser/client  | full chain; matching key; SAN/FQDN; port; certificate dates    |
-
-Restart a tier on its VM (a redeploy only restarts containers whose config,
-image or TLS changed):
-
-```sh
-sudo docker compose restart
-```

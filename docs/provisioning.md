@@ -7,29 +7,24 @@ For how the moving parts fit together, see[Deployment architecture](../deploymen
 
 ## What is manual and what is automated
 
-Two bootstrapping actions must happen from a laptop:
-
-1. create the `ansible` account on all four VMs; and
-2. install and register the first GitLab runner on the `ops` VM.
-
-The runner then builds the application images. The manual `deploy` job
-provisions the database VMs and app VM through Ansible.
+One script runs once from a laptop, [`deployment/setup.sh`](../deployment/setup.sh):
+it creates the `ansible` account on all four VMs and installs and registers the
+GitLab runner on `ops`. Everything after that runs from GitLab: the runner builds
+the images, and the manual `deploy` job provisions all VMs through Ansible.
 
 ```
-  Manual, once (laptop)              GitLab                    CI (on the ops runner)
+  Laptop, once                     GitLab                 Gitlab CI
   ┌──────────────────────┐      ┌──────────────┐      ┌──────────────┐
-  │ 1. create `ansible`  │      │ 3. secrets + │      │ 4. build     │
-  │    user on 4 VMs     │ ───▶ │    TLS files │ ───▶ │    images    │ ─▶ deploy
-  │ 2. register runner   │      └──────────────┘      └──────────────┘
-  │    on ops            │
+  │ ./deployment/setup.sh│ ───▶ │ variables +  │ ───▶ │ build images │ ─▶ deploy
+  │ (ansible user, ops   │      │ Secure Files │      └──────────────┘
+  │  runner)             │      └──────────────┘
   └──────────────────────┘
-   SSH key + runner token        6 vars + 4 cert pairs        everything else
 ```
 
 ## Prerequisites and assumptions
 
 - Four HTW F4 VMs: `app`, `pg`, `mongo`, and `ops`.
-- A laptop with `git`, `ssh`, `openssl`, and Ansible installed.
+- A laptop (macOS, Linux or WSL) with `git`, `ssh`, `openssl` and Docker.
 - Access to the HTW network, either on campus or through the HTW VPN. SSH and
   all application/database ports are restricted to HTW source networks.
 - A new project on `https://gl-ai.f4.htw-berlin.de/`. Do not use
@@ -44,148 +39,80 @@ Create a **blank** project on `gl-ai.f4.htw-berlin.de` with no generated README.
 Keep the default branch name `main` and make sure **Deploy → Container Registry**
 is available. Then copy the repository.
 
-In the new project, protect `main` under **Settings → Repository → Branch
-rules**. This matters because protected CI/CD variables are not exposed to a
-pipeline on an unprotected branch.
-
 The pipeline can initially remain pending because no runner exists yet.
 
 ## 2. Request VMs and TLS certificates
 
-Request the following from HTW F4:
+Request 4 Vms with TLS certificates from HTW F4:
 
-| VM      | Services                                      | TLS certificate/key |
-| ------- | --------------------------------------------- | ------------------- |
-| `app`   | frontend, backend, internal PostgreSQL        | yes                 |
-| `pg`    | managed PostgreSQL and Adminer                | yes                 |
-| `mongo` | managed MongoDB                               | yes                 |
-| `ops`   | project-specific GitLab runner, monitoring    | yes                 |
+| VM      | Services                                      |
+| ------- | --------------------------------------------- |
+| `app`   | frontend, backend, internal PostgreSQL        |
+| `pg`    | managed PostgreSQL and Adminer                |
+| `mongo` | managed MongoDB                               | 
+| `ops`   | project-specific GitLab runner, monitoring    |
 
-## 3. Configure the Ansible inventory
+## 3. Point Ansible to the new VMs
 
 Edit [`deployment/ansible/inventory.yml`](../deployment/ansible/inventory.yml):
 
 - replace all four `ansible_host` values with the new VM FQDNs;
-- set `ip` on `ops` to the ops VM's IPv4 address (the firewall only lets that
-  address reach the Dozzle agents); and
+- set `ip` on `ops` to the ops VM's IPv4 address and
 - replace `tls_cert_file` and `tls_key_file` on all four hosts with the exact
   filenames received from HTW.
 
-Do not put a GitLab namespace into the inventory. In CI, `CI_REGISTRY` and
-`CI_REGISTRY_IMAGE` automatically select the Container Registry belonging to
-the new project.
+Commit and push the inventory change to `main`.
 
-Commit and push the inventory change to `main` before deploying.
+## 4. Run the setup script
 
-## 4. Create a dedicated deployment SSH key
-
-Create a new, project-specific key. It must have no passphrase because the CI
-job has no interactive agent with which to unlock it:
+From the repository root on the laptop (HTW network or VPN):
 
 ```sh
-ssh-keygen -t ed25519 -N '' -C 'ocean-ansible' -f ~/.ssh/ocean_ansible
-chmod 600 ~/.ssh/ocean_ansible
+./deployment/setup.sh
 ```
 
-On each of the four VMs, copy and run the bootstrap script using the initial
-user account supplied by HTW:
+It is safe to re-run: every step skips what is already done. It
 
-```sh
-scp deployment/bootstrap/bootstrap-vm.sh <user>@<vm-fqdn>:/tmp/
-ssh <user>@<vm-fqdn>
-su -
-bash /tmp/bootstrap-vm.sh 'ssh-ed25519 AAAA... ocean-ansible'
-```
+1. checks for Docker, ssh and openssl, and prints what the inventory says, so
+   leftovers from old VMs stand out;
+2. creates the deploy key `~/.ssh/ocean_ansible`.
+3. gives Ansible access to each VM by running
+   [`prepare-vm.sh`](../deployment/prepare-vm.sh) there. For each VM it asks
+   for the local login user and, via `su -`, the root password;
+4. checks that `ip` on ops matches the ops VM;
+5. sets up firewall, Docker and the GitLab runner on ops. It asks for the
+   runner token, see below; and
+6. prints the CI/CD variables and Secure Files to enter in GitLab, see below.
 
-Replace the last argument with the complete single line printed by
-`cat ~/.ssh/ocean_ansible.pub` on the laptop. Only the `.pub` content belongs on
-the VMs; the private `ocean_ansible` file stays on the laptop and in GitLab's
-protected file variable.
+Re-running it later re-applies firewall, Docker and runner on ops (see
+[What deploys from where](deploy.md#what-deploys-from-where)); do that while no
+CI job is running.
 
-Run this verification from the laptop for **all four** hostnames:
+**Runner token.** In the new GitLab project, open **Settings → CI/CD → Runners →
+Create project runner**: choose Linux, add the tag `ocean` (every job requires
+it), keep it assigned to this project only, and paste the token shown after
+creation into the script. Afterwards the runner should show as **online**.
+See GitLab's [project runner documentation](https://docs.gitlab.com/ci/runners/runners_scope/#create-a-project-runner-with-a-runner-authentication-token).
 
-```sh
-ssh -i ~/.ssh/ocean_ansible ansible@<vm-fqdn> sudo whoami
-# expected output: root
-```
+**CI/CD variables.** Under **Settings → CI/CD → Variables**, create the printed
+variables with **Protect variable** on and variable expansion off. The script
+generates the values once into `.secrets/ci-variables.env` (gitignored) and
+prints the same ones on every run. Once they are in GitLab you can delete the
+file: GitLab is the source of truth. `OCEAN_OPS_PASSWORD` is the monitoring
+login on ops (Dozzle and Beszel, user `mon@ocean.de`); maintainers look it up
+in GitLab.
 
-## 5. Create and register the project runner
+SSH-key pitfall: `ANSIBLE_SSH_PRIVATE_KEY` must be **Type: File** and
+**Visibility: Visible** (newer GitLab defaults to Masked, and a multiline key
+can't be masked). Paste the whole key file, including the `BEGIN`/`END` lines
+and the final newline, and never print it in a job. GitLab docu:
+[file type CI/CD variables](https://docs.gitlab.com/ci/variables/#use-file-type-cicd-variables).
 
-In the new GitLab project, open **Settings → CI/CD → Runners → Create project
-runner**:
+**Secure Files.** Under **Settings → CI/CD → Secure Files**, upload the eight
+printed certificate/key files. Their names must match `tls_cert_file` and
+`tls_key_file` in `inventory.yml` exactly. 
 
-- choose Linux;
-- add the tag `ocean` (every job in `.gitlab-ci.yml` requires it);
-- keep the runner assigned only to this project; and
-- copy the short-lived runner authentication token shown after creation.
-
-GitLab routes tagged jobs only to runners with all required tags; see GitLab's
-[project runner documentation](https://docs.gitlab.com/ci/runners/runners_scope/#create-a-project-runner-with-a-runner-authentication-token).
-
-From the repository on the laptop, install the Ansible collection and set up
-the `ops` VM's firewall, Docker and runner (the rest of ops comes from CI, see
-[What deploys from where](deploy.md#what-deploys-from-where)). Explicitly select
-the dedicated key:
-
-```sh
-cd deployment/ansible
-ansible-galaxy collection install -r requirements.yml
-export GITLAB_RUNNER_TOKEN='<token shown by GitLab>'
-
-ansible -i inventory.yml ops -m ping --private-key ~/.ssh/ocean_ansible
-ansible-playbook -i inventory.yml ops-bootstrap.yml \
-  --private-key ~/.ssh/ocean_ansible
-unset GITLAB_RUNNER_TOKEN
-```
-
-Return to the Runners page and wait until the runner is **online**. If jobs stay
-pending, first check that the runner has the exact `ocean` tag.
-
-## 6. Add CI/CD variables
-
-Open **Settings → CI/CD → Variables**. Generate a separate value for each of the
-six application/database/monitoring variables:
-
-```sh
-openssl rand -hex 32
-```
-
-Create these variables with environment scope `*`, variable expansion off, and
-**Protect variable** enabled:
-
-| Key                                | Type       | Visibility | Value                         |
-| ---------------------------------- | ---------- | ---------- | ----------------------------- |
-| `OCEAN_APPLICATION_SECRET`         | Variable   | Masked     | unique 32-byte hex            |
-| `OCEAN_JWT_SECRET`                 | Variable   | Masked     | unique 32-byte hex            |
-| `OCEAN_POSTGRES_ORM_PASSWORD`      | Variable   | Masked     | unique 32-byte hex            |
-| `OCEAN_PG_CLUSTER_PASSWORD`        | Variable   | Masked     | unique 32-byte hex            |
-| `OCEAN_MONGODB_CLUSTER_PASSWORD`   | Variable   | Masked     | unique 32-byte hex            |
-| `ANSIBLE_SSH_PRIVATE_KEY`          | **File**   | **Visible** | complete `ocean_ansible` file |
-| `OCEAN_OPS_PASSWORD`               | Variable   | Masked     | unique 32-byte hex            |
-
-`OCEAN_OPS_PASSWORD` is the password of the monitoring login on ops (Dozzle and
-Beszel, user `mon@ocean.de`); maintainers look it up in GitLab.
-
-Important SSH-key pitfall: paste the complete multiline private key, including
-the `BEGIN`/`END OPENSSH PRIVATE KEY` lines and final newline. GitLab's masked
-value rules require a single line, so a multiline OpenSSH key cannot be Masked.
-Select **Type: File** and **Visibility: Visible** explicitly; newer GitLab
-versions default to Masked. The pipeline treats the variable value as a file
-path. Keep it Protected, restrict Maintainer access, and never print it in a
-job. GitLab docu: [file type CI/CD variables](https://docs.gitlab.com/ci/variables/#use-file-type-cicd-variables).
-
-## 7. Upload TLS Secure Files
-
-Under **Settings → CI/CD → Secure Files**, upload the four certificate/key
-pairs: eight files in total. Their names must match `tls_cert_file` and
-`tls_key_file` in `inventory.yml` character for character, including case and
-extensions.
-
-Secure Files are project-specific and are not copied with the Git repository.
-Do not add `OCEAN_TLS_SRC`; the deploy job downloads Secure Files and sets that
-path itself.
-
-## 8. Build and perform the first deployment
+## 5. Build and perform the first deployment
 
 Run a pipeline for the latest commit on protected `main`, or push the completed
 inventory commit. Confirm that both build jobs succeed and that images appear
@@ -200,13 +127,11 @@ images tagged with that pipeline's commit SHA from the **new project's**
 registry. 
 
 
-## 9. Acceptance checklist
+## 6. Acceptance checklist
 
 - [ ] All CI validation and build jobs are green; no job is pending for a runner.
 - [ ] `deploy` succeeds.
-- [ ] `https://<app-fqdn>/` presents the expected certificate and accepts an HTW
-  login.
-- [ ] `https://<ops-fqdn>/` shows Logs and Resources; both accept `mon@ocean.de` and show
-  all four VMs.
+- [ ] `https://<app-fqdn>/` accepts an HTW login.
+- [ ] `https://<ops-fqdn>/` shows Logs and Resources; both accept `mon@ocean.de` + `OCEAN_OPS_PASSWORD` and show all four VMs.
 
 For maintenance continue with [Operations](operations.md).

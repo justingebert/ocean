@@ -4,7 +4,8 @@ Ocean's services run on three HTW VMs: **app**, **pg**, and **mongo**. A fourth
 **ops** VM hosts the GitLab runner and the monitoring (Dozzle, Beszel). The VMs are provisioned once and then
 updated from GitLab CI; this page explains how to deploy changes to production.
 
-> Want a fresh deployment on your own VMs? [Provisioning new VMs](provisioning.md) covers setup with new VMs from scratch.
+> Want a fresh deployment on your own VMs? [Provisioning new VMs](provisioning.md) covers setup with new VMs from
+> scratch.
 >
 > New to the setup? [Deployment architecture](../deployment/README.md) explains the Infrastructure-as-Code in a page.
 
@@ -39,13 +40,14 @@ builds new images from this clean state, so `main` and production stay aligned.
 
 ## What deploys from where
 
-| From          | Runs                                 | On             | What                                              |
-| ------------- | ------------------------------------ | -------------- | ------------------------------------------------- |
-| GitLab CI     | `deploy` job → `playbook.yml`        | app, pg, mongo | everything: firewall, Docker, TLS, compose stacks |
-|               |                                      | ops            | TLS and the monitoring stack only                 |
-| Laptop (rare) | `ops-bootstrap.yml`                  | ops            | firewall, Docker, GitLab runner                   |
+| From          | Runs         | On             | What                                              |
+|---------------|--------------|----------------|---------------------------------------------------|
+| GitLab CI     | `deploy` job | app, pg, mongo | everything: firewall, Docker, TLS, compose stacks |
+|               |              | ops            | TLS and the monitoring stack only                 |
+| Laptop (rare) | `setup.sh`   | ops            | firewall, Docker, GitLab runner                   |
 
 The runner lives on ops, so a CI job there must not restart Docker or the
 runner: that would kill the job itself. Those parts of ops are applied from a
-laptop, only when they change (or on a new VM, see the
-[provisioning guide](provisioning.md)): Run it while no CI job is running.
+laptop by re-running `./deployment/setup.sh`, only when they change (or on a
+new VM, see the [provisioning guide](provisioning.md)). Run it while no CI job
+is running.

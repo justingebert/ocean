@@ -1,17 +1,18 @@
 # deployment/ — Infrastructure as Code
 
 Everything that defines a VM lives here and is version-controlled. Apart from
-creating the initial `ansible` login and registering the first runner, there is
-no manual server setup. For _which VM talks to which_ (the runtime topology), see
+running `setup.sh` once from a laptop (`ansible` login on every VM, first
+runner on ops), there is no manual server setup. For _which VM talks to which_ (the runtime topology), see
 the root README's [Architecture overview](../README.md#architecture-overview).
 
 ## Layout
 
-| Path         | What it is                                              |
-| ------------ |---------------------------------------------------------|
-| `ansible/`   | the engine: provisions every VM                         |
-| `compose/`   | what actually runs on the VMs                           |
-| `bootstrap/` | one-shot: create the `ansible` login user on a fresh VM |
+| Path            | What it is                                                         |
+| --------------- | ------------------------------------------------------------------ |
+| `ansible/`      | the engine: provisions every VM                                    |
+| `compose/`      | what actually runs on the VMs                                      |
+| `setup.sh`      | one-shot laptop setup for fresh VMs, see [provisioning](../docs/provisioning.md) |
+| `prepare-vm.sh` | creates the `ansible` login user on a VM (called by `setup.sh`)    |
 
 ## The model
 
