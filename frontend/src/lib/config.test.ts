@@ -33,6 +33,20 @@ describe("config", () => {
     expect(config.adminerUrl).toBe("https://pg.example.test/");
   });
 
+  it("derives the monitoring URL from the runtime ops hostname", async () => {
+    window.__OCEAN_CONFIG__ = { opsHostname: "ops.example.test" };
+
+    const { config } = await import("./config");
+
+    expect(config.monitoringUrl).toBe("https://ops.example.test");
+  });
+
+  it("leaves the monitoring URL empty without an ops hostname", async () => {
+    const { config } = await import("./config");
+
+    expect(config.monitoringUrl).toBe("");
+  });
+
   it("parses MongoDB TLS from runtime config before build-time env", async () => {
     vi.stubEnv("VITE_MONGODB_TLS", "false");
     window.__OCEAN_CONFIG__ = { mongodbTls: true };

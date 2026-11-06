@@ -7,12 +7,14 @@ type OceanConfig = {
   mongodbTls: boolean;
   adminerUrl: string;
   adminerPostgresqlServer: string;
+  monitoringUrl: string;
 };
 
 type RuntimeOceanConfig = {
   postgresqlHostname?: string;
   mongodbHostname?: string;
   mongodbTls?: boolean;
+  opsHostname?: string;
 };
 
 declare global {
@@ -26,6 +28,7 @@ const env = import.meta.env;
 
 const postgresqlHostname = runtimeConfig.postgresqlHostname || env.VITE_POSTGRESQL_HOSTNAME || "";
 const mongodbHostname = runtimeConfig.mongodbHostname || env.VITE_MONGODB_HOSTNAME || "";
+const opsHostname = runtimeConfig.opsHostname || "";
 const mongodbTls = runtimeConfig.mongodbTls ?? env.VITE_MONGODB_TLS?.toLowerCase() !== "false";
 
 export const config: OceanConfig = {
@@ -37,4 +40,5 @@ export const config: OceanConfig = {
   mongodbTls,
   adminerUrl: env.VITE_ADMINER_URL || (postgresqlHostname ? `https://${postgresqlHostname}/` : ""),
   adminerPostgresqlServer: env.VITE_ADMINER_POSTGRESQL_SERVER || "pg_cluster:5432",
+  monitoringUrl: opsHostname ? `https://${opsHostname}` : "",
 };

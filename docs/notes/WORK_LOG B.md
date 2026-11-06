@@ -5,6 +5,7 @@
 - Each tool uses its own login, with the same user and a password from one CI variable; Caddy only does TLS and routing. A single shared login in Caddy that passes the identity on as a trusted header was tried first and failed: Beszel's web app sends its own token in the `Authorization` header, which replaces the browser's Basic login, so every API call was rejected. Working around that meant a hand-rolled session cookie, so the built-in logins won: real sessions, no trusted headers. GitLab OAuth or LDAP were considered: neither tool supports LDAP, and OAuth needs a GitLab app per project; both tools support OIDC natively, so it stays a possible upgrade.
 - Beszel needs no manual setup any more: Ansible generates the hub key on ops and hands its public half to the agents in the same deploy, lists the systems in Beszel's `config.yml`, and the user comes from env vars on a fresh data dir (so a password change also needs a change in Beszel). It stays in SSH mode; WebSocket would remove the agent port but add a token secret and tie metrics to Caddy.
 - Dozzle now also shows the ops VM's own containers (Caddy, hubs, runner, CI jobs).
+- Ocean's Administration page links to both (Logs, Resources); the ops hostname comes from the inventory through the frontend's runtime config, so the buttons are hidden in local dev.
 
 ## 2026-11-05: Ops VM gets its TLS certificate and is deployed from CI
 - The ops VM now has its own certificate (Secure Files, like the other three), as the base for exposing the monitoring UIs over HTTPS.

@@ -1,4 +1,6 @@
+import { ExternalLinkIcon } from "lucide-react";
 import { PageHeader } from "@/components/common/PageHeader";
+import { buttonVariants } from "@/components/ui/button";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import ErrorState from "@/components/common/ErrorState";
 import ListSkeleton from "@/components/common/ListSkeleton";
@@ -11,6 +13,12 @@ import { IStats, Stats } from "@/features/reporting/Stats";
 import { DatabaseAdminList } from "@/features/databases/components/DatabaseAdminList";
 import { useUsersQuery } from "@/features/users/hooks/useUserQuery";
 import { UserAdminList } from "@/features/users/components/UserAdminList";
+import { config } from "@/lib/config";
+
+const monitoringLinks = [
+  { label: "Logs", path: "/logs/" },
+  { label: "VM Resources", path: "/resources/" },
+];
 
 const ReportingRoute = () => {
   const metricsQuery = useMetricsQuery();
@@ -38,7 +46,25 @@ const ReportingRoute = () => {
 
   return (
     <div>
-      <PageHeader title="Administration" />
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <PageHeader title="Administration" />
+        {config.monitoringUrl ? (
+          <div className="flex flex-wrap gap-2">
+            {monitoringLinks.map((link) => (
+              <a
+                key={link.path}
+                href={`${config.monitoringUrl}${link.path}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+              >
+                <ExternalLinkIcon />
+                {link.label}
+              </a>
+            ))}
+          </div>
+        ) : null}
+      </div>
       {metricsQuery.isPending ? (
         <ListSkeleton className="mt-5" rows={2} />
       ) : metricsQuery.isError ? (
