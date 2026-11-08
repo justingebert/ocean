@@ -19,7 +19,8 @@ services:
       - --tlsAllowConnectionsWithoutCertificates
       - --auth
 
-  # Log source for the Dozzle hub on ops; 7007 only reachable from ops (firewall).
+  # Log source for the Dozzle hub on ops; 7007 only reachable from ops (firewall)
+  # and only accepts a hub with the same cert pair.
   dozzle_agent:
     image: amir20/dozzle:v11
     pull_policy: always
@@ -27,6 +28,10 @@ services:
     command: agent
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/ocean/dozzle:/certs:ro # the hub's cert pair, from Ansible
+    environment:
+      DOZZLE_CERT: /certs/dozzle_cert.pem
+      DOZZLE_KEY: /certs/dozzle_key.pem
     ports:
       - "7007:7007"
 

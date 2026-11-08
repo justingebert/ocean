@@ -90,6 +90,25 @@
   no_log: true
   diff: false
 
+# One pair for the hub and all agents; the agents get it in the next play.
+# Renewed 30 days before it expires (5 years), the same deploy rolls it out.
+- name: Check Dozzle agent cert
+  ansible.builtin.command:
+    cmd: openssl x509 -checkend 2592000 -noout -in /srv/ocean/dozzle/dozzle_cert.pem
+  register: dozzle_cert_check
+  changed_when: false
+  failed_when: false
+
+# generate-certs sets the extensions Dozzle expects; compose run keeps the image tag in one place.
+- name: Generate Dozzle agent cert
+  ansible.builtin.command:
+    cmd: >-
+      docker compose --env-file compose.env run --rm --no-deps -T dozzle
+      generate-certs --force --cert-out /data/dozzle_cert.pem --key-out /data/dozzle_key.pem
+    chdir: /etc/ocean
+  when: dozzle_cert_check.rc != 0
+  register: dozzle_cert_generated
+
 - name: Bring up ops compose stack
   community.docker.docker_compose_v2:
     project_src: "/etc/ocean"
@@ -97,6 +116,17 @@
       - "/etc/ocean/compose.env"
     state: present
     remove_orphans: true
+  tags: compose
+
+- name: Restart Dozzle after cert change
+  community.docker.docker_compose_v2:
+    project_src: "/etc/ocean"
+    env_files:
+      - "/etc/ocean/compose.env"
+    state: restarted
+    services:
+      - dozzle
+  when: dozzle_cert_generated is changed
   tags: compose
 
 # Bind-mounted config is only read at start, so compose doesn't notice changes.

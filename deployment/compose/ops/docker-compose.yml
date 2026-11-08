@@ -24,11 +24,14 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro # ops' own containers
-      - /srv/ocean/dozzle:/data # users.yml (Ansible) + session secret
+      - /srv/ocean/dozzle:/data # users.yml + agent cert pair (Ansible), session secret
     environment:
       DOZZLE_REMOTE_AGENT: ${DOZZLE_REMOTE_AGENT}
       DOZZLE_BASE: /logs
       DOZZLE_AUTH_PROVIDER: simple
+      # Agents only accept a hub with this pair, instead of the one built into every Dozzle.
+      DOZZLE_CERT: /data/dozzle_cert.pem
+      DOZZLE_KEY: /data/dozzle_key.pem
 
   # Resource monitoring hub; keep the tag in sync with every beszel-agent.
   # Polls the agents over SSH;

@@ -1,5 +1,10 @@
 # Ocean — Work Log B
 
+## 2026-11-06: Dozzle agents only accept our own hub
+- The Dozzle agents on app, pg and mongo used the certificate built into every Dozzle image, so anyone past the firewall could connect with a stock Dozzle and read logs, exec into containers or start and stop them. Hub and agents now share a cert pair of their own, and a stock hub is rejected (tested locally with the real images).
+- Same pattern as the Beszel key: Ansible generates the pair on ops on the first deploy and copies it to the agents in the same run, so there is no new CI variable or manual step; if ops is rebuilt, the next deploy rolls out a fresh pair. A CI variable or Secure File was the alternative (survives an ops rebuild, but one more secret to paste).
+- Dozzle's own `generate-certs` makes the pair because Dozzle checks specific certificate extensions; it is valid for five years and Ansible renews it 30 days before expiry. The hub reconnects to agents that come back with the new pair on its own, so only the side whose files changed is restarted.
+
 ## 2026-11-06: One setup script for fresh VMs
 - The laptop part of provisioning (deploy key, `ansible` user on four VMs, runner on ops, CI secrets) was about a dozen hand-typed commands spread over four doc steps; mixing up keys there already broke a deploy once. It is now one re-runnable script, `deployment/setup.sh`, that skips whatever is already done.
 - Ansible for the ops bootstrap runs in a throwaway Alpine container with the same packages as CI, so the laptop only needs Docker and nothing drifts from CI. Kept bash with no GitLab API: the GitLab clicks (runner, variables, Secure Files) stay manual, and the script prints exactly what to enter.

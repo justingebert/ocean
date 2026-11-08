@@ -1,0 +1,53 @@
+# Runs on app/pg/mongo: copy the hubs' keys from ops to the Beszel and Dozzle agents.
+- name: Read Beszel hub public key from ops
+  ansible.builtin.slurp:
+    src: /srv/ocean/beszel/data/id_ed25519.pub
+  delegate_to: "{{ groups['ops'][0] }}"
+  run_once: true
+  register: beszel_hub_pubkey_file
+
+- name: Read Dozzle cert pair from ops
+  ansible.builtin.slurp:
+    src: "/srv/ocean/dozzle/{{ item }}"
+  loop:
+    - dozzle_cert.pem
+    - dozzle_key.pem
+  delegate_to: "{{ groups['ops'][0] }}"
+  run_once: true
+  register: dozzle_pair
+  no_log: true
+
+- name: Create Dozzle cert dir
+  ansible.builtin.file:
+    path: /etc/ocean/dozzle
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Stage Dozzle cert pair
+  ansible.builtin.copy:
+    content: "{{ item.content | b64decode }}"
+    dest: "/etc/ocean/dozzle/{{ item.item }}"
+    owner: root
+    group: root
+    mode: "0600"
+  loop: "{{ dozzle_pair.results }}"
+  register: dozzle_pair_staged
+  no_log: true
+
+# On a fresh VM the VM's role starts the agent with the pair; later renewals need a restart.
+- name: Check for a running agent stack
+  ansible.builtin.stat:
+    path: /etc/ocean/docker-compose.yml
+  register: agent_compose_file
+
+- name: Restart Dozzle agent after cert change
+  community.docker.docker_compose_v2:
+    project_src: /etc/ocean
+    env_files:
+      - /etc/ocean/compose.env
+    state: restarted
+    services:
+      - dozzle_agent
+  when: dozzle_pair_staged is changed and agent_compose_file.stat.exists

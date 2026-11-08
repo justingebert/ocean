@@ -37,6 +37,7 @@ see [What deploys from where](../docs/deploy.md#what-deploys-from-where)):
 | `pg`            | pg VM          | render env, start the managed-Postgres stack (+ Adminer behind Caddy)                      |
 | `mongo`         | mongo VM       | render env, start the managed-MongoDB stack                                                |
 | `gitlab-runner` | ops VM         | install + register the GitLab CI runner                                                    |
+| `monitoring`    | app, pg, mongo | copy the Beszel and Dozzle hub keys from ops to the agents                                 |
 | `ops`           | ops VM         | start Caddy, Dozzle and Beszel behind one login, see [Monitoring](#monitoring)             |
 
 ## Firewall
@@ -84,6 +85,10 @@ with the same user, `mon@ocean.de`, and the password from the CI variable
 after changing it, also change it in Beszel's settings (or delete the data dir).
 
 - **Dozzle** (logs), `/logs`: ops' own containers plus the agents on app/pg/mongo (port 7007).
+  Hub and agents share one cert pair instead of the one built into every Dozzle image, so
+  only this hub can talk to the agents. Ansible generates it on ops (`/srv/ocean/dozzle`),
+  copies it to the agents (`/etc/ocean/dozzle`) and renews it 30 days before it expires
+  (5 years). If the agents miss it, they silently fall back to the built-in cert.
 - **Beszel** (CPU, RAM, disk, network, per-container stats), `/resources`:
   the hub connects to an agent on every VM over SSH (port 45876, the ops agent via a
   unix socket). Ansible generates the hub key, hands it to the agents and lists the
