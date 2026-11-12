@@ -2,7 +2,6 @@ gitlab_runner_url: https://gl-ai.f4.htw-berlin.de/
 gitlab_runner_token: "{{ lookup('ansible.builtin.env', 'GITLAB_RUNNER_TOKEN') | default('', true) | trim }}"
 gitlab_runner_executor: docker
 gitlab_runner_docker_image: alpine:3.20
-gitlab_runner_docker_privileged: true
 gitlab_runner_concurrent: 2
 gitlab_runner_limit: 2
 gitlab_runner_request_concurrency: 2

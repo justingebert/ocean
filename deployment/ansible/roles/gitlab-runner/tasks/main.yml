@@ -39,7 +39,6 @@
     path: /etc/systemd/system/gitlab-runner.service.d
     state: directory
     mode: "0755"
-  when: outbound_proxy_url is defined and outbound_proxy_url | length > 0
 
 - name: Configure GitLab Runner HTTP proxy
   ansible.builtin.copy:
@@ -50,7 +49,6 @@
       Environment="HTTP_PROXY={{ outbound_proxy_url }}"
       Environment="HTTPS_PROXY={{ outbound_proxy_url }}"
       Environment="NO_PROXY={{ outbound_no_proxy }}"
-  when: outbound_proxy_url is defined and outbound_proxy_url | length > 0
   notify: Restart gitlab-runner
 
 - name: Check for local GitLab Runner registration
@@ -75,18 +73,13 @@
 - name: Register GitLab Runner
   ansible.builtin.shell: |
     set -euo pipefail
-    privileged_arg=""
-    if [ "{{ gitlab_runner_docker_privileged | bool | lower }}" = "true" ]; then
-      privileged_arg="--docker-privileged"
-    fi
-
     gitlab-runner register \
       --non-interactive \
       --url "{{ gitlab_runner_url }}" \
       --token "$GITLAB_RUNNER_TOKEN" \
       --executor "{{ gitlab_runner_executor }}" \
       --docker-image "{{ gitlab_runner_docker_image }}" \
-      $privileged_arg
+      --docker-privileged
   args:
     executable: /bin/bash
   environment: "{{ outbound_proxy_env | combine({'GITLAB_RUNNER_TOKEN': gitlab_runner_token}) }}"

@@ -34,13 +34,3 @@
     name: ocean-firewall
     enabled: true
     daemon_reload: true
-
-# Replaced by ocean-firewall.service. The if-up hook re-applied a snapshot
-# without Docker's rules whenever networking restarted.
-- name: Remove legacy if-up firewall restore
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-    - /etc/network/if-up.d/iptables
-    - /etc/firewall.conf

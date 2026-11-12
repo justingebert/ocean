@@ -10,8 +10,6 @@ deploy:
   environment:
     name: production
     deployment_tier: production
-  variables:
-    ANSIBLE_REQUIRED_ENV: OCEAN_APPLICATION_SECRET OCEAN_JWT_SECRET OCEAN_POSTGRES_ORM_PASSWORD OCEAN_PG_CLUSTER_PASSWORD OCEAN_MONGODB_CLUSTER_PASSWORD OCEAN_OPS_PASSWORD
   script:
     # Prepare SSH access. Ansible below accepts new host keys on first connect.
     - |
@@ -27,15 +25,6 @@ deploy:
         printf '%s\n' "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
       fi
       chmod 600 ~/.ssh/id_ed25519
-    # Fail early when a target-specific secret is missing.
-    - |
-      for required in $ANSIBLE_REQUIRED_ENV; do
-        value="$(printenv "$required" || true)"
-        if [ -z "$value" ]; then
-          echo "$required is required."
-          exit 1
-        fi
-      done
     # Download TLS material (every VM terminates TLS).
     - |
       bash -eo pipefail -c 'curl -fsSL "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash'
