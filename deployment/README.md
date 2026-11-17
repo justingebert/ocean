@@ -89,6 +89,8 @@ after changing it, also change it in Beszel's settings (or delete the data dir).
   only this hub can talk to the agents. Ansible generates it on ops (`/srv/ocean/dozzle`),
   copies it to the agents (`/etc/ocean/dozzle`) and renews it 30 days before it expires
   (5 years). If the agents miss it, they silently fall back to the built-in cert.
+  Container actions are on: start/stop/restart/remove/update, and on each host card
+  "Reclaimable" prunes unused images, stopped containers, build cache and (opt-in) volumes.
 - **Beszel** (CPU, RAM, disk, network, per-container stats), `/resources`:
   the hub connects to an agent on every VM over SSH (port 45876, the ops agent via a
   unix socket). Ansible generates the hub key, hands it to the agents and lists the

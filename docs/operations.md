@@ -54,6 +54,37 @@ out of every VM at once. The replacement CI/CD variable must remain **Type:
 File**, **Visibility: Visible**, and **Protected** because an OpenSSH private key
 is multiline and cannot satisfy GitLab's masked-value format.
 
+## Alert emails
+
+Beszel on ops emails when a VM is down or a resource stays too high. Mail goes
+straight to HTW's mail server (port 25, no login), so **only HTW addresses
+receive it**.
+
+All of it is set in Beszel's UI and stored in its data dir (`/srv/ocean/beszel/data`),
+so it survives redeploys. Redo these steps only after ops is rebuilt or that dir
+is deleted. Log in as the monitoring user (`mon@ocean.de`, password in
+`OCEAN_OPS_PASSWORD`).
+
+1. **Mail server.** Open `https://<ops-host>/resources/_/` (Beszel's admin panel),
+   then _Settings → Mail settings_:
+   - Sender name `Ocean Monitoring`, address `ocean@f4.htw-berlin.de`
+   - _Use SMTP mail server_: host `mail1.rz.htw-berlin.de`, port `25`, TLS off
+     (STARTTLS is still used), no username or password
+   - Under _more options_, EHLO/HELO domain: the ops hostname
+   - Save, then _Send test email_ to check it arrives.
+2. **Recipients.** In Beszel, _Settings → Notifications → To email(s)_.
+3. **Rules.** Bell icon on any system → _All systems_ tab:
+
+   | Alert  | Threshold | For    |
+   | ------ | --------- | ------ |
+   | Status | down      | 1 min  |
+   | Disk   | > 85 %    | 10 min |
+   | Memory | > 90 %    | 10 min |
+   | CPU    | > 95 %    | 60 min |
+
+   Durations max out at 60 min (Beszel keeps 1-minute samples for one hour
+   only). A VM added later doesn't get the rules on its own: repeat this step.
+
 ## Persistent data and destructive commands
 
 Normal Ansible redeploys and `docker compose down` preserve `/srv/ocean` because

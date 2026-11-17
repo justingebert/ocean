@@ -1,5 +1,25 @@
 # Ocean — Work Log B
 
+## 2026-11-17: Planned automatic database expiry
+- Planned the professor's "auto-delete old databases" admin feature (plan in `docs/plans/db-expiry.md`). Each database gets an expiry date (6 months, configurable) that the owner can renew. Owners get reminder emails 30, 7 and 1 day(s) before deletion through the HTW mail server already proven with Beszel, and admins can exempt databases.
+- Chose age-plus-renew over detecting inactivity: Postgres and MongoDB don't record a "last used" time, so inactivity would need daily snapshots of activity counters, which counter resets and Ocean's own traffic make unreliable. Inactivity detection can come later as an automatic renew without changing the design.
+- Safety choices: a database is only deleted once every reminder has actually been sent, the whole feature is off by default, and existing databases get a fresh 6 months from deploy, so the first deletions happen about 6 months after rollout.
+
+## 2026-11-12: Ansible cleanup for maintainability
+- Reviewed the Ansible setup with handover in mind (about 1,100 lines). It was mostly lean, so the cleanup only removed code a reader would have to puzzle over without it ever mattering: checks for an outbound proxy that is always set, a configurable runner setting that is never changed, and a one-time migration task for the old firewall hook.
+- Deploy secrets were checked twice, by a shell loop in the CI job and by the asserts in the Ansible roles. Only the asserts remain, since they also run on a laptop deploy and check length and placeholder values.
+- Deliberately left as is: the repeated stage, start and restart steps in the four VM roles. A shared role would save lines but hide what each VM does; four roles that read top to bottom are easier to hand over.
+
+## 2026-11-12: Container actions in Dozzle
+- Dozzle can now start, stop, restart, remove and update containers and free disk space (unused images, stopped containers, build cache) on every VM from the browser, so routine fixes like a full disk no longer need SSH.
+- It is one switch on the hub. The agents never enforced it: anyone holding the hub's cert pair could already do this, so access is still guarded by the Dozzle login and the agents only trusting our own hub.
+
+## 2026-11-09: Alert emails from Beszel through HTW's mail server
+- First use of email in Ocean, to be reused by the planned inactive-database cleanup. Infra alerts came first because Beszel already has alerting and only needed a mail server, so the whole mail path could be proven before writing anything that deletes user data.
+- No mail server of our own: Beszel sends straight to HTW's mail server (`mail1.rz.htw-berlin.de:25`, no login, STARTTLS) as `ocean@f4.htw-berlin.de`. HTW IT's suggestion was Postfix on the VM, but it would only queue mail in front of the same server. A smoke test from a container on ops showed HTW accepts it and it lands in the inbox, not spam; external providers were ruled out. Limitation: only HTW recipients.
+- Alerts on all four VMs: down, disk > 85 % and RAM > 90 % for 10 min, CPU > 95 % for 60 min (catches a bad release, runaway query or miner). Beszel caps durations at 60 min because it keeps 1-minute samples for one hour only, so the wanted 3 h isn't possible.
+- Configured once in Beszel's UI, documented as a three-step runbook in the operations guide. Beszel keeps mail settings, recipients and rules in its own database, which survives redeploys. A first version set them through Beszel's API from Ansible on every deploy. It worked, but took about 110 lines of API calls for three settings forms, needed the hub API published on the VM, and silently overwrote any change made in the UI. That is a lot for the next maintainer to understand and debug, for settings that only need redoing when ops is rebuilt.
+
 ## 2026-11-06: Dozzle agents only accept our own hub
 - The Dozzle agents on app, pg and mongo used the certificate built into every Dozzle image, so anyone past the firewall could connect with a stock Dozzle and read logs, exec into containers or start and stop them. Hub and agents now share a cert pair of their own, and a stock hub is rejected (tested locally with the real images).
 - Same pattern as the Beszel key: Ansible generates the pair on ops on the first deploy and copies it to the agents in the same run, so there is no new CI variable or manual step; if ops is rebuilt, the next deploy rolls out a fresh pair. A CI variable or Secure File was the alternative (survives an ops rebuild, but one more secret to paste).
