@@ -19,6 +19,8 @@ GET           /v1/databases/:instanceId/roles              com.htwhub.ocean.cont
 GET           /v1/databases/:instanceId/invitations        com.htwhub.ocean.controllers.InvitationController.getInvitationsByInstanceId(instanceId: Long)
 POST          /v1/databases                                com.htwhub.ocean.controllers.DatabaseController.addDatabase()
 POST          /v1/databases/_availability_                 com.htwhub.ocean.controllers.DatabaseController.getDatabaseAvailability
+POST          /v1/databases/:id/renew                      com.htwhub.ocean.controllers.DatabaseController.renewDatabase(id: Long)
+PUT           /v1/databases/:id/expiry                     com.htwhub.ocean.controllers.DatabaseController.setDatabaseExpiry(id: Long)
 DELETE        /v1/databases/:id/_permission_               com.htwhub.ocean.controllers.DatabaseController.deleteDatabaseWithPermission(id: Long)
 DELETE        /v1/databases/:id                            com.htwhub.ocean.controllers.DatabaseController.deleteDatabase(id: Long)
 

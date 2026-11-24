@@ -1,5 +1,10 @@
 # Ocean — Work Log B
 
+## 2026-11-17: Database expiry, part 1: expiry dates and renew API
+- Every database now has an expiry date (creation + 180 days, configurable) and a count of reminders sent. Existing databases get 180 days from the deploy, hard-coded in the migration because migrations can't read the app config.
+- Owners can renew a database (a full lifetime from now); admins can mark one as never expiring and switch it back. Both reset the reminder count, so a renewed database goes through the full warning sequence again. Renewing a never-expiring database changes nothing, so owners can't undo an admin's exemption.
+- Nothing is deleted or emailed yet; that comes with the mail service and the daily job.
+
 ## 2026-11-17: Planned automatic database expiry
 - Planned the professor's "auto-delete old databases" admin feature (plan in `docs/plans/db-expiry.md`). Each database gets an expiry date (6 months, configurable) that the owner can renew. Owners get reminder emails 30, 7 and 1 day(s) before deletion through the HTW mail server already proven with Beszel, and admins can exempt databases.
 - Chose age-plus-renew over detecting inactivity: Postgres and MongoDB don't record a "last used" time, so inactivity would need daily snapshots of activity counters, which counter resets and Ocean's own traffic make unreliable. Inactivity detection can come later as an automatic renew without changing the design.

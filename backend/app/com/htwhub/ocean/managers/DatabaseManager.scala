@@ -1,5 +1,6 @@
 package com.htwhub.ocean.managers
 
+import com.htwhub.ocean.cleanup.CleanupConfig
 import com.htwhub.ocean.engines.MongoDBEngine
 import com.htwhub.ocean.engines.PostgreSQLEngine
 import com.htwhub.ocean.managers.exceptions.ManagerException
@@ -32,7 +33,8 @@ class DatabaseManager @Inject() (
   userService: UserService,
   postgreSQLEngine: PostgreSQLEngine,
   mongoDBEngine: MongoDBEngine,
-  roleManager: RoleManager
+  roleManager: RoleManager,
+  cleanupConfig: CleanupConfig
 )(implicit
   ec: ExecutionContext
 ) {
@@ -60,12 +62,15 @@ class DatabaseManager @Inject() (
       .recoverWith { case e: ServiceException => serviceErrorMapper(e) }
 
   def addDatabase(createDatabaseRequest: CreateDatabaseRequest, user: User): Future[Instance] = {
+    val now = Instant.now
     val localInstance = Instance(
       InstanceId(0),
       user.id,
       createDatabaseRequest.name,
       createDatabaseRequest.engine,
-      Timestamp.from(Instant.now)
+      Timestamp.from(now),
+      Some(cleanupConfig.expiresAtFrom(now)),
+      0
     )
     for {
       instance <- instanceService
@@ -119,6 +124,26 @@ class DatabaseManager @Inject() (
       // a ready-to-use connection string without manually creating a Mongo user first.
       role <- roleManager.addRole(CreateRoleRequest(instance.id.value, instance.name), user)
     } yield role
+
+  /** Owner only: push the expiry date a full lifetime from now and restart the reminders. A never-expiring database is
+    * left as is, since only admins may switch it back.
+    */
+  def renewDatabase(instanceId: InstanceId, user: User): Future[Instance] =
+    (for {
+      instance <- instanceService.getUserInstanceById(instanceId, user.id)
+      renewed <-
+        if (instance.expiresAt.isEmpty) Future.successful(instance)
+        else instanceService.updateExpiry(instance.id, Some(cleanupConfig.expiresAtFrom(Instant.now)))
+    } yield renewed).recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+
+  /** Admins only. Switching back to expiring starts a full lifetime from now. */
+  def setDatabaseNeverExpires(instanceId: InstanceId, neverExpires: Boolean, user: User): Future[Instance] = {
+    val expiresAt = if (neverExpires) None else Some(cleanupConfig.expiresAtFrom(Instant.now))
+    (for {
+      instance <- instanceService.getUserInstanceWithPermission(instanceId, user)
+      updated <- instanceService.updateExpiry(instance.id, expiresAt)
+    } yield updated).recoverWith { case e: ServiceException => serviceErrorMapper(e) }
+  }
 
   def deleteDatabase(instanceId: InstanceId, user: User): Future[List[Int]] =
     for {

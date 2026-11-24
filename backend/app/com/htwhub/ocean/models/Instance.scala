@@ -7,15 +7,14 @@ import java.sql.Timestamp
 import play.api.libs.functional.syntax.toInvariantFunctorOps
 import play.api.libs.json.Format
 import play.api.libs.json.Json
+import play.api.libs.json.JsonConfiguration
 import play.api.libs.json.OFormat
+import play.api.libs.json.OptionHandlers
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.annotation.meta.field
 import slick.jdbc.PostgresProfile._
 import slick.jdbc.PostgresProfile.api.longColumnType
-//import slick.lifted.MappedTo
-//import slick.jdbc.PostgresProfile.api.longColumnType
-//import slick.memory.MemoryProfile.MappedColumnType
 
 @ApiModel("Instance")
 final case class Instance(
@@ -23,7 +22,9 @@ final case class Instance(
   @(ApiModelProperty @field) userId: UserId,
   @(ApiModelProperty @field) name: String,
   @(ApiModelProperty @field) engine: EngineType,
-  @(ApiModelProperty @field) createdAt: Timestamp
+  @(ApiModelProperty @field) createdAt: Timestamp,
+  @(ApiModelProperty @field) expiresAt: Option[Timestamp],
+  @(ApiModelProperty @field) remindersSent: Int
 )
 
 object Instance {
@@ -34,7 +35,9 @@ object Instance {
   implicit val timestampWrites: Writes[Timestamp] =
     implicitly[Writes[Long]].contramap(_.getTime)
 
-  implicit lazy val instanceFormat: OFormat[Instance] = Json.format[Instance]
+  // WritesNull so `expiresAt` is sent as `null` (never expires) instead of being omitted.
+  implicit lazy val instanceFormat: OFormat[Instance] =
+    Json.configured(JsonConfiguration(optionHandlers = OptionHandlers.WritesNull)).format[Instance]
 
   type EngineType = String
   val PostgreSQLEngineType: EngineType = "P"

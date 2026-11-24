@@ -10,6 +10,7 @@ import com.htwhub.ocean.service.exceptions.ServiceException
 import com.htwhub.ocean.service.InstanceService.Exceptions.AccessDenied
 import com.htwhub.ocean.service.InstanceService.Exceptions.InternalError
 import com.htwhub.ocean.service.InstanceService.Exceptions.NotFound
+import java.sql.Timestamp
 import javax.inject.Inject
 import play.api.Logger
 import scala.concurrent.ExecutionContext
@@ -87,6 +88,19 @@ class InstanceService @Inject() (instanceRepository: InstanceRepository)(implici
         internalError(t.getMessage)
       }
       .flatMap(instanceId => getUserInstanceById(instanceId, userId))
+
+  /** Callers check permissions first. */
+  def updateExpiry(instanceId: InstanceId, expiresAt: Option[Timestamp]): Future[Instance] =
+    instanceRepository
+      .updateExpiry(instanceId, expiresAt)
+      .flatMap(_ => instanceRepository.getInstanceById(instanceId))
+      .recoverWith { case t: Throwable =>
+        internalError(t.getMessage)
+      }
+      .flatMap {
+        case Some(instance) => Future.successful(instance)
+        case None           => Future.failed(NotFound())
+      }
 
   def deleteInstance(instanceId: InstanceId, userId: UserId): Future[Int] =
     getUserInstanceById(instanceId, userId)

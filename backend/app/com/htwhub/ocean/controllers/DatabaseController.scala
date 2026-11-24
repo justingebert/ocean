@@ -11,6 +11,8 @@ import com.htwhub.ocean.serializers.database.AvailabilityDatabaseResponse
 import com.htwhub.ocean.serializers.database.AvailabilityDatabaseSerializer
 import com.htwhub.ocean.serializers.database.CreateDatabaseRequest
 import com.htwhub.ocean.serializers.database.CreateDatabaseSerializer
+import com.htwhub.ocean.serializers.database.ExpiryDatabaseRequest
+import com.htwhub.ocean.serializers.database.ExpiryDatabaseSerializer
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiImplicitParam
 import io.swagger.annotations.ApiImplicitParams
@@ -166,6 +168,65 @@ class DatabaseController @Inject() (cc: ControllerComponents, userAction: UserAc
         .recoverWith { case e: DatabaseManagerException => exceptionToResult(e) }
 
     CreateDatabaseSerializer.constraints.bindFromRequest().fold(failure, success)
+  }
+
+  @ApiOperation(
+    value = "Renew Database",
+    notes = "Push the expiry date of a database a full lifetime from now. Owner only.",
+    httpMethod = "POST",
+    response = classOf[Instance]
+  )
+  @ApiResponses(
+    value = Array(
+      new ApiResponse(code = 400, message = "InternalError", response = classOf[String]),
+      new ApiResponse(code = 403, message = "Forbidden", response = classOf[String]),
+      new ApiResponse(code = 404, message = "Invalid ID supplied", response = classOf[String])
+    )
+  )
+  def renewDatabase(
+    @ApiParam(value = "ID of database that needs to be renewed", required = true) id: Long
+  ): Action[AnyContent] = userAction.async { implicit request: UserRequest[AnyContent] =>
+    databaseManager
+      .renewDatabase(InstanceId(id), request.user)
+      .map(instance => Ok(Json.toJson(instance)))
+      .recoverWith { case e: DatabaseManagerException => exceptionToResult(e) }
+  }
+
+  @ApiOperation(
+    value = "Set Database expiry",
+    notes = "Mark a database as never expiring, or make it expire again. Admins only.",
+    httpMethod = "PUT",
+    response = classOf[Instance]
+  )
+  @ApiImplicitParams(
+    Array(
+      new ApiImplicitParam(
+        value = "Database expiry request",
+        required = true,
+        dataTypeClass = classOf[ExpiryDatabaseRequest],
+        paramType = "body"
+      )
+    )
+  )
+  @ApiResponses(
+    value = Array(
+      new ApiResponse(code = 400, message = "InternalError", response = classOf[String]),
+      new ApiResponse(code = 403, message = "Forbidden", response = classOf[String])
+    )
+  )
+  def setDatabaseExpiry(
+    @ApiParam(value = "ID of database whose expiry is set", required = true) id: Long
+  ): Action[AnyContent] = userAction.async { implicit request: UserRequest[AnyContent] =>
+    def failure(badForm: Form[ExpiryDatabaseRequest]): Future[Result] =
+      Future.successful(BadRequest(badForm.errorsAsJson))
+
+    def success(expiry: ExpiryDatabaseRequest): Future[Result] =
+      databaseManager
+        .setDatabaseNeverExpires(InstanceId(id), expiry.neverExpires, request.user)
+        .map(instance => Ok(Json.toJson(instance)))
+        .recoverWith { case e: DatabaseManagerException => exceptionToResult(e) }
+
+    ExpiryDatabaseSerializer.constraints.bindFromRequest().fold(failure, success)
   }
 
   @ApiOperation(

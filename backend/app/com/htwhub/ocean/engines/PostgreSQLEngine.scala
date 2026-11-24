@@ -1,15 +1,9 @@
 package com.htwhub.ocean.engines
 
-import com.typesafe.config.ConfigFactory
-import javax.inject.Inject
-import javax.inject.Singleton
 import play.api.Configuration
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.Await
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import scala.util.Failure
-import scala.util.Success
+
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class PostgreSQLEngine @Inject() (config: Configuration)(implicit ec: ExecutionContext) {
@@ -160,58 +154,4 @@ class PostgreSQLEngine @Inject() (config: Configuration)(implicit ec: ExecutionC
       dbCon.close
       res
     }
-  /*
-    val serverName = Future {
-      config.getOptional[String]("pg_cluster.properties.serverName")
-    } flatMap {
-      case Some(value) => Future.successful(value)
-      case None        => Future.failed(new Error())
-    }
-
-    val portNumber = Future {
-      config.getOptional[String]("pg_cluster.properties.portNumber")
-    } flatMap {
-      case Some(value) => Future.successful(value)
-      case None        => Future.failed(new Error())
-    }
-
-    val userName= Future {
-      config.getOptional[String]("pg_cluster.properties.user")
-    } flatMap {
-      case Some(value) => Future.successful(value)
-      case None        => Future.failed(new Error())
-    }
-
-    val userPassword = Future {
-      config.getOptional[String]("pg_cluster.properties.password")
-    } flatMap {
-      case Some(value) => Future.successful(value)
-      case None        => Future.failed(new Error())
-    }
-
-    val x: Future[Future[Vector[Int]]] = for{
-      server <- serverName
-      port <- portNumber
-      user <- userName
-      password <- userPassword
-    } yield {
-
-      val dbURL = s"jdbc:postgresql://${server}:${port}/${dbName}?user=${user}&password=${password}"
-      val db = Database.forURL(dbURL)
-      val accessPublicSchemaStatement = sql"""GRANT CREATE,USAGE ON SCHEMA public TO public"""
-      val f: Future[Vector[Int]] = db.run(accessPublicSchemaStatement.as[Int])
-      Await.result(f, 5.second)
-      db.close
-      f
-      /*
-      f.onComplete {
-        case Success(_) => db.close; Vector(1)
-        case Failure(error) => db.close; Failure(new Error)
-      }
-      //db.close
-      f*/
-
-    }
-    x
-  }*/
 }

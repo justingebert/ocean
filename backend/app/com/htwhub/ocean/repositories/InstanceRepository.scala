@@ -33,7 +33,12 @@ class InstanceRepository @Inject() (dbConfigProvider: DatabaseConfigProvider, us
       "created_at",
       SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP")
     )
-    def * = (id, userId, name, engine, createdAt) <> ((Instance.apply _).tupled, Instance.unapply)
+    def expiresAt = column[Option[Timestamp]]("expires_at")
+    def remindersSent = column[Int]("reminders_sent")
+    def * = (id, userId, name, engine, createdAt, expiresAt, remindersSent) <> (
+      (Instance.apply _).tupled,
+      Instance.unapply
+    )
     def idx_name_engine = index("idx_name_engine", (name, engine), unique = true)
     // TODO: fix Compilation error[private value userRepository escapes its defining scope
     foreignKey("fk_instance_user", userId, TableQuery[userRepository.UserTable])(
@@ -65,6 +70,12 @@ class InstanceRepository @Inject() (dbConfigProvider: DatabaseConfigProvider, us
   def addInstance(instance: Instance): Future[InstanceId] =
     dbConfig.db.run(
       instances.returning(instances.map(_.id)) += instance
+    )
+
+  /** Sets a new expiry date (`None` = never expires) and restarts the reminder sequence. */
+  def updateExpiry(instanceId: InstanceId, expiresAt: Option[Timestamp]): Future[Int] =
+    dbConfig.db.run(
+      instances.filter(_.id === instanceId).map(i => (i.expiresAt, i.remindersSent)).update((expiresAt, 0))
     )
 
   def deleteInstanceById(instanceId: InstanceId): Future[Int] =

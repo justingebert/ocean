@@ -1,4 +1,5 @@
 package com.htwhub.ocean.managers
+import com.htwhub.ocean.cleanup.CleanupConfig
 import com.htwhub.ocean.engines.MongoDBEngine
 import com.htwhub.ocean.engines.PostgreSQLEngine
 import com.htwhub.ocean.managers.DatabaseManager.Exceptions.DatabaseManagerException
@@ -19,7 +20,9 @@ import com.htwhub.ocean.service.InvitationService
 import com.htwhub.ocean.service.RoleService
 import com.htwhub.ocean.service.UserService
 import java.sql.Timestamp
+import java.time.Duration
 import java.time.Instant
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mockito.never
@@ -29,6 +32,7 @@ import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.Configuration
 import scala.concurrent.Future
 
 class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar {
@@ -40,6 +44,7 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
   val defaultPostgreSQLEngine: PostgreSQLEngine = mock[PostgreSQLEngine]
   val defaultMongoDBEngine: MongoDBEngine = mock[MongoDBEngine]
   val defaultRoleManager: RoleManager = mock[RoleManager]
+  val cleanupConfig = new CleanupConfig(Configuration("ocean.cleanup.lifetime-days" -> 180))
 
   private def createDatabaseManager(
     instanceService: InstanceService = defaultInstanceService,
@@ -57,7 +62,8 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
       userService,
       postgreSQLEngine,
       mongoDBEngine,
-      roleManager
+      roleManager,
+      cleanupConfig
     )
 
   "DatabaseManager" when {
@@ -66,7 +72,7 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
       "return user instances" in {
         // Arrange
         val instances: Seq[Instance] = Seq(
-          Instance(InstanceId(1), UserId(1), "name", PostgreSQLEngineType, Timestamp.from(Instant.now))
+          Instance(InstanceId(1), UserId(1), "name", PostgreSQLEngineType, Timestamp.from(Instant.now), None, 0)
         )
         val instanceService = mock[InstanceService]
         when(instanceService.getUserInstances(UserId(anyLong()))).thenReturn(Future(instances))
@@ -103,7 +109,8 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
       val user = User(UserId(1), "username", "firstName", "lastName", "mail", "Unknown")
       "create a database with engine type postgresql" in {
         // Arrange
-        val instance = Instance(InstanceId(1), user.id, "name", PostgreSQLEngineType, Timestamp.from(Instant.now))
+        val instance =
+          Instance(InstanceId(1), user.id, "name", PostgreSQLEngineType, Timestamp.from(Instant.now), None, 0)
         val instanceService = mock[InstanceService]
         when(instanceService.addInstance(any[Instance], UserId(anyLong()))).thenReturn(Future(instance))
 
@@ -138,7 +145,8 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
       }
       "create a database with engine type mongodb" in {
         // Arrange
-        val instance = Instance(InstanceId(1), user.id, "name", MongoDBSQLEngineType, Timestamp.from(Instant.now))
+        val instance =
+          Instance(InstanceId(1), user.id, "name", MongoDBSQLEngineType, Timestamp.from(Instant.now), None, 0)
         val instanceService = mock[InstanceService]
         when(instanceService.addInstance(any[Instance], UserId(anyLong()))).thenReturn(Future(instance))
 
@@ -181,7 +189,8 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
         // Entities
         val user = User(UserId(1), "user", "firstName", "lastName", "mail", "unknown")
         val invitedUser = User(UserId(2), "invitedUser", "firstName", "lastName", "mail", "unknown")
-        val instance = Instance(InstanceId(1), user.id, "name", PostgreSQLEngineType, Timestamp.from(Instant.now))
+        val instance =
+          Instance(InstanceId(1), user.id, "name", PostgreSQLEngineType, Timestamp.from(Instant.now), None, 0)
         val roles: List[Role] = List(
           Role(RoleId(1), instance.id, "alice", "password"),
           Role(RoleId(2), instance.id, "bob", "password"),
@@ -246,7 +255,8 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
         // Arrange
 
         val user = User(UserId(1), "user", "firstName", "lastName", "mail", "unknown")
-        val instance = Instance(InstanceId(1), user.id, "mongo_docs", MongoDBSQLEngineType, Timestamp.from(Instant.now))
+        val instance =
+          Instance(InstanceId(1), user.id, "mongo_docs", MongoDBSQLEngineType, Timestamp.from(Instant.now), None, 0)
         val roles: List[Role] = List(
           Role(RoleId(1), instance.id, "mongo_docs", "password"),
           Role(RoleId(2), instance.id, "mongo_docs_reader", "password")
@@ -284,6 +294,115 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
           verify(instanceService, times(1)).deleteInstance(instance.id, user.id)
           verify(postgreSQLEngine, never()).deleteDatabase(any[String])
           actual shouldBe List(1, 1, 1)
+        }
+      }
+    }
+
+    "expiry" should {
+      val owner = User(UserId(1), "owner", "firstName", "lastName", "mail", "Student")
+      val staff = User(UserId(2), "staff", "firstName", "lastName", "mail", "Staff")
+      val instance =
+        Instance(InstanceId(1), owner.id, "name", PostgreSQLEngineType, Timestamp.from(Instant.now), None, 0)
+
+      def isAboutOneLifetimeFromNow(expiresAt: Option[Timestamp]): Boolean =
+        expiresAt.exists { t =>
+          val expected = Instant.now.plus(Duration.ofDays(180))
+          Duration.between(t.toInstant, expected).abs.compareTo(Duration.ofMinutes(1)) < 0
+        }
+
+      def captureExpiry(instanceService: InstanceService): Option[Timestamp] = {
+        val captor: ArgumentCaptor[Option[Timestamp]] = ArgumentCaptor.forClass(classOf[Option[Timestamp]])
+        verify(instanceService).updateExpiry(InstanceId(anyLong()), captor.capture())
+        captor.getValue
+      }
+
+      "set the expiry date one lifetime from now when a database is created" in {
+        val instanceService = mock[InstanceService]
+        when(instanceService.addInstance(any[Instance], UserId(anyLong()))).thenReturn(Future(instance))
+        val postgreSQLEngine = mock[PostgreSQLEngine]
+        when(postgreSQLEngine.createDatabase(any[String])).thenReturn(Future(Vector(1)))
+        when(postgreSQLEngine.revokePublicAccess(any[String])).thenReturn(Future(Vector(1)))
+        when(postgreSQLEngine.grantDatabaseAccess(any[String], any[String])).thenReturn(Future(Vector(1)))
+        when(postgreSQLEngine.grantAccessToPublicSchema(any[String])).thenReturn(Future(Vector(1)))
+        val databaseManager =
+          createDatabaseManager(instanceService = instanceService, postgreSQLEngine = postgreSQLEngine)
+
+        databaseManager.addDatabase(CreateDatabaseRequest("name", PostgreSQLEngineType), owner).map { _ =>
+          val captor: ArgumentCaptor[Instance] = ArgumentCaptor.forClass(classOf[Instance])
+          verify(instanceService).addInstance(captor.capture(), UserId(anyLong()))
+          isAboutOneLifetimeFromNow(captor.getValue.expiresAt) shouldBe true
+          captor.getValue.remindersSent shouldBe 0
+        }
+      }
+
+      "renew a database for its owner" in {
+        val expiring = instance.copy(expiresAt = Some(Timestamp.from(Instant.now.plus(Duration.ofDays(3)))))
+        val instanceService = mock[InstanceService]
+        when(instanceService.getUserInstanceById(InstanceId(anyLong()), UserId(anyLong()))).thenReturn(Future(expiring))
+        when(instanceService.updateExpiry(InstanceId(anyLong()), any[Option[Timestamp]])).thenReturn(Future(expiring))
+        val databaseManager = createDatabaseManager(instanceService = instanceService)
+
+        databaseManager.renewDatabase(expiring.id, owner).map { _ =>
+          isAboutOneLifetimeFromNow(captureExpiry(instanceService)) shouldBe true
+        }
+      }
+
+      "leave a never expiring database untouched when its owner renews it" in {
+        val instanceService = mock[InstanceService]
+        when(instanceService.getUserInstanceById(InstanceId(anyLong()), UserId(anyLong()))).thenReturn(Future(instance))
+        val databaseManager = createDatabaseManager(instanceService = instanceService)
+
+        databaseManager.renewDatabase(instance.id, owner).map { result =>
+          verify(instanceService, never()).updateExpiry(InstanceId(anyLong()), any[Option[Timestamp]])
+          result.expiresAt shouldBe None
+        }
+      }
+
+      "not renew a database for anyone but its owner" in {
+        val instanceService = mock[InstanceService]
+        when(instanceService.getUserInstanceById(InstanceId(anyLong()), UserId(anyLong())))
+          .thenReturn(Future.failed(InstanceService.Exceptions.AccessDenied()))
+        val databaseManager = createDatabaseManager(instanceService = instanceService)
+
+        databaseManager.renewDatabase(instance.id, staff).failed.map { error =>
+          verify(instanceService, never()).updateExpiry(InstanceId(anyLong()), any[Option[Timestamp]])
+          error shouldBe DatabaseManager.Exceptions.AccessDenied()
+        }
+      }
+
+      "clear the expiry date when an admin sets never expires" in {
+        val instanceService = mock[InstanceService]
+        when(instanceService.getUserInstanceWithPermission(InstanceId(anyLong()), any[User]))
+          .thenReturn(Future(instance))
+        when(instanceService.updateExpiry(InstanceId(anyLong()), any[Option[Timestamp]])).thenReturn(Future(instance))
+        val databaseManager = createDatabaseManager(instanceService = instanceService)
+
+        databaseManager.setDatabaseNeverExpires(instance.id, neverExpires = true, staff).map { _ =>
+          captureExpiry(instanceService) shouldBe None
+        }
+      }
+
+      "restart a full lifetime when an admin switches never expires off" in {
+        val instanceService = mock[InstanceService]
+        when(instanceService.getUserInstanceWithPermission(InstanceId(anyLong()), any[User]))
+          .thenReturn(Future(instance))
+        when(instanceService.updateExpiry(InstanceId(anyLong()), any[Option[Timestamp]])).thenReturn(Future(instance))
+        val databaseManager = createDatabaseManager(instanceService = instanceService)
+
+        databaseManager.setDatabaseNeverExpires(instance.id, neverExpires = false, staff).map { _ =>
+          isAboutOneLifetimeFromNow(captureExpiry(instanceService)) shouldBe true
+        }
+      }
+
+      "not let non-admins set never expires" in {
+        val instanceService = mock[InstanceService]
+        when(instanceService.getUserInstanceWithPermission(InstanceId(anyLong()), any[User]))
+          .thenReturn(Future.failed(InstanceService.Exceptions.AccessDenied()))
+        val databaseManager = createDatabaseManager(instanceService = instanceService)
+
+        databaseManager.setDatabaseNeverExpires(instance.id, neverExpires = true, owner).failed.map { error =>
+          verify(instanceService, never()).updateExpiry(InstanceId(anyLong()), any[Option[Timestamp]])
+          error shouldBe DatabaseManager.Exceptions.AccessDenied()
         }
       }
     }
