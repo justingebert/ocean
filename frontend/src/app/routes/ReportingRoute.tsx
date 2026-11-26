@@ -80,7 +80,7 @@ const ReportingRoute = () => {
         ) : metricsQuery.isError ? (
           <ErrorState title="Couldn't load metrics" onRetry={() => metricsQuery.refetch()} />
         ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4">
             {stats.map((item) => (
               <Stats key={item.name} name={item.name} value={item.value} />
             ))}

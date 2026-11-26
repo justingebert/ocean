@@ -1,15 +1,16 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { render as rtlRender, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import { describe, it, expect } from "vitest";
 import EmptyState, { EmptyStateProps } from "./EmptyState";
 
-describe("EmptyState Component", () => {
-  const mockOnClick = vi.fn();
+const render = (ui: React.ReactElement) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 
+describe("EmptyState Component", () => {
   const props: EmptyStateProps = {
     title: "No Data Found",
     description: "It seems like there is no data available. Add new data to get started.",
     buttonText: "Add Data",
-    onClick: mockOnClick,
+    to: "/data/new",
   };
 
   it("renders correctly with given props", () => {
@@ -21,17 +22,13 @@ describe("EmptyState Component", () => {
       screen.getByText("It seems like there is no data available. Add new data to get started."),
     ).toBeInTheDocument();
 
-    expect(screen.getByRole("button", { name: /add data/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /add data/i })).toBeInTheDocument();
   });
 
-  it("calls the onClick handler when the button is clicked", () => {
+  it("links the button to the given path", () => {
     render(<EmptyState {...props} />);
 
-    const button = screen.getByRole("button", { name: /add data/i });
-
-    fireEvent.click(button);
-
-    expect(mockOnClick).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("link", { name: /add data/i })).toHaveAttribute("href", "/data/new");
   });
 
   it("uses the shared empty-state composition with decorative icons", () => {

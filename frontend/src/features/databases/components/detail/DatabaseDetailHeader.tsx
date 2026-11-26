@@ -25,7 +25,7 @@ export function DatabaseDetailHeader({ database, onDelete }: DatabaseDetailHeade
 
   return (
     <PageHeader
-      icon={<DatabaseEngineLogo className="size-8" engine={database.engine} />}
+      icon={<DatabaseEngineLogo className="size-8" engine={database.engine} alt="" />}
       title={database.name}
       description={getDatabaseEngineTitle(database.engine)}
       actions={<ActionDropdown onDelete={onDelete} />}

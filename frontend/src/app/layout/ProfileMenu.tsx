@@ -4,9 +4,9 @@ import { useTheme } from "next-themes";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -61,22 +61,13 @@ export function ProfileMenu({ user, loading, onLogout, onNavigate }: ProfileMenu
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem
-            closeOnClick={false}
-            role="menuitemcheckbox"
-            aria-checked={isDark}
-            onClick={() => setTheme(isDark ? "light" : "dark")}
+          <DropdownMenuCheckboxItem
+            checked={isDark}
+            onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
           >
             <MoonIcon />
             Dark mode
-            <Switch
-              checked={isDark}
-              size="sm"
-              tabIndex={-1}
-              aria-hidden="true"
-              className="pointer-events-none ml-auto"
-            />
-          </DropdownMenuItem>
+          </DropdownMenuCheckboxItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>

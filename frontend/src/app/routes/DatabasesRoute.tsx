@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { PlusIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -14,8 +14,6 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 
 const DatabasesRoute: React.FC = () => {
-  const navigate = useNavigate();
-
   const databasesQuery = useQuery({
     queryKey: ["databases"],
     queryFn: () => DatabaseClient.getUserDatabases(),
@@ -29,10 +27,12 @@ const DatabasesRoute: React.FC = () => {
       <PageHeader
         title="Databases"
         actions={
-          <Button render={<Link to={routePaths.createDatabase} />}>
-            <PlusIcon data-icon="inline-start" />
-            New database
-          </Button>
+          databases.length > 0 ? (
+            <Button render={<Link to={routePaths.createDatabase} />}>
+              <PlusIcon data-icon="inline-start" />
+              New database
+            </Button>
+          ) : undefined
         }
       />
       {databasesQuery.isPending ? (
@@ -40,7 +40,7 @@ const DatabasesRoute: React.FC = () => {
       ) : databasesQuery.isError ? (
         <ErrorState title="Couldn't load databases" onRetry={() => databasesQuery.refetch()} />
       ) : databases.length === 0 ? (
-        <EmptyState {...emptyDatabaseState} onClick={() => navigate(routePaths.createDatabase)} />
+        <EmptyState {...emptyDatabaseState} to={routePaths.createDatabase} />
       ) : (
         <DatabaseList databases={databases} getHref={routeBuilders.databaseDetail} />
       )}

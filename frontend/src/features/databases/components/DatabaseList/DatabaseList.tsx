@@ -44,7 +44,7 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, getHref }) => {
                 to={getHref(database.id)}
                 className="flex items-center gap-2 outline-none after:absolute after:inset-0 focus-visible:after:rounded-md focus-visible:after:ring-2 focus-visible:after:ring-ring"
               >
-                <DatabaseEngineLogo className="size-4" engine={database.engine} />
+                <DatabaseEngineLogo className="size-4" engine={database.engine} alt="" />
                 <span className="truncate">{database.name}</span>
               </Link>
             </TableCell>

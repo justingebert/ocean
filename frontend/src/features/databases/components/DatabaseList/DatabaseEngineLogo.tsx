@@ -9,6 +9,8 @@ import { cn } from "cn";
 interface DatabaseEngineLogoProps {
   engine: string;
   className?: string;
+  /** Pass "" where the engine or name is already shown as text. */
+  alt?: string;
 }
 
 interface DatabaseEngineLogoAsset {
@@ -34,7 +36,7 @@ const getDatabaseEngineLogo = (engine: string): DatabaseEngineLogoAsset | undefi
   return undefined;
 };
 
-const DatabaseEngineLogo: React.FC<DatabaseEngineLogoProps> = ({ engine, className }) => {
+const DatabaseEngineLogo: React.FC<DatabaseEngineLogoProps> = ({ engine, className, alt }) => {
   const logo = getDatabaseEngineLogo(engine);
 
   if (!logo) {
@@ -46,7 +48,13 @@ const DatabaseEngineLogo: React.FC<DatabaseEngineLogoProps> = ({ engine, classNa
     );
   }
 
-  return <img className={cn("shrink-0 object-contain", className)} src={logo.src} alt={logo.alt} />;
+  return (
+    <img
+      className={cn("shrink-0 object-contain", className)}
+      src={logo.src}
+      alt={alt ?? logo.alt}
+    />
+  );
 };
 
 export default DatabaseEngineLogo;

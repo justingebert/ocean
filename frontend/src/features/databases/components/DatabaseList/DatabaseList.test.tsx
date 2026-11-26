@@ -36,7 +36,7 @@ const mockData: readonly DatabaseProperties[] = [
 const href = (id: number) => `/databases/${id}`;
 
 describe("<DatabaseList />", () => {
-  it("renders a row per database with its engine and logo", () => {
+  it("renders a row per database with its engine", () => {
     render(
       <MemoryRouter>
         <DatabaseList databases={mockData} getHref={href} />
@@ -54,11 +54,12 @@ describe("<DatabaseList />", () => {
 
     expect(database1Row).toBeDefined();
     expect(within(database1Row!).getByText("PostgreSQL")).toBeInTheDocument();
-    expect(within(database1Row!).getByAltText("PostgreSQL logo")).toBeInTheDocument();
+    // The logo is decorative, so the link is named by the database alone.
+    expect(within(database1Row!).getByRole("link", { name: "Database 1" })).toBeInTheDocument();
 
     expect(database2Row).toBeDefined();
     expect(within(database2Row!).getByText("MongoDB")).toBeInTheDocument();
-    expect(within(database2Row!).getByAltText("MongoDB logo")).toBeInTheDocument();
+    expect(within(database2Row!).getByRole("link", { name: "Database 2" })).toBeInTheDocument();
 
     expect(database3Row).toBeDefined();
     expect(within(database3Row!).getByText("Unknown")).toBeInTheDocument();

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { DatabaseIcon, PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -15,10 +16,11 @@ export interface EmptyStateProps {
   title: string;
   description: string;
   buttonText: string;
-  onClick: () => void;
+  /** Where the button links to. */
+  to: string;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({ title, description, buttonText, onClick }) => {
+const EmptyState: React.FC<EmptyStateProps> = ({ title, description, buttonText, to }) => {
   return (
     <Empty>
       <EmptyHeader>
@@ -29,7 +31,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ title, description, buttonText,
         <EmptyDescription>{description}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button onClick={onClick}>
+        <Button render={<Link to={to} />}>
           <PlusIcon data-icon="inline-start" aria-hidden="true" />
           {buttonText}
         </Button>
