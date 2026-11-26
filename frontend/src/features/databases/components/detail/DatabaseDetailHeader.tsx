@@ -1,6 +1,7 @@
 import ActionDropdown from "./ActionDropdown.tsx";
 import DatabaseEngineLogo from "@/features/databases/components/DatabaseList/DatabaseEngineLogo";
 import { getDatabaseEngineTitle } from "@/features/databases/components/DatabaseList/databaseListFormat";
+import { PageHeader } from "@/components/common/PageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DatabaseProperties } from "@/features/databases/model/database.ts";
 
@@ -10,28 +11,24 @@ interface DatabaseDetailHeaderProps {
 }
 
 export function DatabaseDetailHeader({ database, onDelete }: DatabaseDetailHeaderProps) {
-  return (
-    <header className="mb-6 flex items-center gap-3">
-      {database ? (
-        <DatabaseEngineLogo className="size-8" engine={database.engine} />
-      ) : (
+  if (!database) {
+    return (
+      <div className="mb-6 flex items-center gap-3">
         <Skeleton className="size-8 rounded-md" />
-      )}
-      <div className="min-w-0 flex-1">
-        {database ? (
-          <h1 className="truncate font-heading text-xl font-semibold tracking-tight text-foreground">
-            {database.name}
-          </h1>
-        ) : (
+        <div>
           <Skeleton className="h-6 w-36" />
-        )}
-        {database ? (
-          <p className="text-sm text-muted-foreground">{getDatabaseEngineTitle(database.engine)}</p>
-        ) : (
           <Skeleton className="mt-1 h-4 w-24" />
-        )}
+        </div>
       </div>
-      <ActionDropdown onDelete={onDelete} />
-    </header>
+    );
+  }
+
+  return (
+    <PageHeader
+      icon={<DatabaseEngineLogo className="size-8" engine={database.engine} />}
+      title={database.name}
+      description={getDatabaseEngineTitle(database.engine)}
+      actions={<ActionDropdown onDelete={onDelete} />}
+    />
   );
 }

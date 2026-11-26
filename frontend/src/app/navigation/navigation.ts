@@ -1,10 +1,4 @@
-import {
-  CircleHelpIcon,
-  DatabaseIcon,
-  ShieldCheckIcon,
-  UserRoundIcon,
-  type LucideIcon,
-} from "lucide-react";
+import { CircleHelpIcon, DatabaseIcon, ShieldCheckIcon, type LucideIcon } from "lucide-react";
 
 import { routePaths } from "./routes.ts";
 
@@ -24,13 +18,6 @@ export const DatabasesNavigation: Navigation = {
   to: routePaths.databases,
   section: "primary",
   icon: DatabaseIcon,
-};
-
-export const ProfileNavigation: Navigation = {
-  name: "Profile",
-  to: routePaths.settings,
-  section: "secondary",
-  icon: UserRoundIcon,
 };
 
 export const HelpNavigation: Navigation = {

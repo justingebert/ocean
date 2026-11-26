@@ -54,9 +54,8 @@ const ReportingRoute = () => {
   const usernames = new Map(usersQuery.data?.map((user) => [user.id, user.username]));
 
   return (
-    <div className="flex flex-col gap-10">
+    <>
       <PageHeader
-        className="mb-0"
         title="Administration"
         actions={
           config.monitoringUrl
@@ -75,45 +74,47 @@ const ReportingRoute = () => {
             : undefined
         }
       />
-      {metricsQuery.isPending ? (
-        <ListSkeleton rows={2} />
-      ) : metricsQuery.isError ? (
-        <ErrorState title="Couldn't load metrics" onRetry={() => metricsQuery.refetch()} />
-      ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {stats.map((item) => (
-            <Stats key={item.name} name={item.name} value={item.value} />
-          ))}
-        </div>
-      )}
-      <section className="flex flex-col gap-4">
-        <SectionHeading>Databases</SectionHeading>
-        {databasesQuery.isPending ? (
-          <ListSkeleton rows={4} />
-        ) : databasesQuery.isError ? (
-          <ErrorState title="Couldn't load databases" onRetry={() => databasesQuery.refetch()} />
+      <div className="flex flex-col gap-10">
+        {metricsQuery.isPending ? (
+          <ListSkeleton rows={2} />
+        ) : metricsQuery.isError ? (
+          <ErrorState title="Couldn't load metrics" onRetry={() => metricsQuery.refetch()} />
         ) : (
-          <DatabaseAdminList
-            databases={databasesQuery.data}
-            getOwnerName={(userId) => usernames.get(userId)}
-            onDelete={(database) => deleteDatabaseWithPermissionMutation.mutateAsync(database.id)}
-            onNeverExpiresChange={(database, neverExpires) =>
-              setNeverExpiresMutation.mutate({ id: database.id, neverExpires })
-            }
-          />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {stats.map((item) => (
+              <Stats key={item.name} name={item.name} value={item.value} />
+            ))}
+          </div>
         )}
-      </section>
-      <section className="flex flex-col gap-4">
-        <SectionHeading>Users</SectionHeading>
-        {usersQuery.isPending ? (
-          <ListSkeleton rows={4} />
-        ) : usersQuery.isError ? (
-          <ErrorState title="Couldn't load users" onRetry={() => usersQuery.refetch()} />
-        ) : (
-          <UserAdminList users={usersQuery.data} />
-        )}
-      </section>
-    </div>
+        <section className="flex flex-col gap-4">
+          <SectionHeading>Databases</SectionHeading>
+          {databasesQuery.isPending ? (
+            <ListSkeleton rows={4} />
+          ) : databasesQuery.isError ? (
+            <ErrorState title="Couldn't load databases" onRetry={() => databasesQuery.refetch()} />
+          ) : (
+            <DatabaseAdminList
+              databases={databasesQuery.data}
+              getOwnerName={(userId) => usernames.get(userId)}
+              onDelete={(database) => deleteDatabaseWithPermissionMutation.mutateAsync(database.id)}
+              onNeverExpiresChange={(database, neverExpires) =>
+                setNeverExpiresMutation.mutate({ id: database.id, neverExpires })
+              }
+            />
+          )}
+        </section>
+        <section className="flex flex-col gap-4">
+          <SectionHeading>Users</SectionHeading>
+          {usersQuery.isPending ? (
+            <ListSkeleton rows={4} />
+          ) : usersQuery.isError ? (
+            <ErrorState title="Couldn't load users" onRetry={() => usersQuery.refetch()} />
+          ) : (
+            <UserAdminList users={usersQuery.data} />
+          )}
+        </section>
+      </div>
+    </>
   );
 };
 

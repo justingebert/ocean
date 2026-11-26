@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
-import { ProfileNavigation } from "@/app/navigation/navigation.ts";
+import { routePaths } from "@/app/navigation/routes.ts";
 import { User, UserProperties } from "@/types/user.ts";
 import { getUserInitials } from "@/app/layout/utils.ts";
 
@@ -30,7 +30,7 @@ export function ProfileMenu({ user, loading, onLogout, onNavigate }: ProfileMenu
   const { resolvedTheme, setTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
-  if (loading && !user) {
+  if (loading) {
     return (
       <div className="flex items-center gap-2 p-2">
         <Skeleton className="size-8 rounded-full" />
@@ -54,7 +54,7 @@ export function ProfileMenu({ user, loading, onLogout, onNavigate }: ProfileMenu
       <DropdownMenuContent side="top" align="start" className="w-(--anchor-width) min-w-56">
         <DropdownMenuGroup>
           <DropdownMenuLabel className="truncate">{user?.username}</DropdownMenuLabel>
-          <DropdownMenuItem render={<Link to={ProfileNavigation.to} onClick={onNavigate} />}>
+          <DropdownMenuItem render={<Link to={routePaths.settings} onClick={onNavigate} />}>
             <UserRoundIcon />
             Profile
           </DropdownMenuItem>

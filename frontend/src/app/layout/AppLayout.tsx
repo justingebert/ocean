@@ -1,4 +1,3 @@
-import type React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Outlet } from "react-router-dom";
 
@@ -25,15 +24,11 @@ const AppLayout = () => {
   const navigationWithPermission = getNavigationForUser(user);
 
   return (
-    <SidebarProvider
-      open
-      className="h-svh min-h-0 overflow-hidden"
-      style={{ "--sidebar-width": "15rem" } as React.CSSProperties}
-    >
+    <SidebarProvider open className="h-svh min-h-0 overflow-hidden">
       <AppSidebar
         navigationItems={navigationWithPermission}
         user={user}
-        userLoading={userQuery.isFetching}
+        userLoading={userQuery.isPending}
         onLogout={onLogout}
       />
       <div className="flex min-w-0 flex-1 flex-col overflow-auto focus:outline-none">

@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   AdministrationNavigation,
+  DatabasesNavigation,
   HelpNavigation,
-  ProfileNavigation,
 } from "@/app/navigation/navigation.ts";
 import { UserProperties } from "@/types/user.ts";
 import { getNavigationForUser, getNavigationSection, getUserInitials } from "./utils.ts";
@@ -31,11 +31,12 @@ describe("AppLayout utilities", () => {
   });
 
   it("splits navigation by section", () => {
-    expect(getNavigationSection([ProfileNavigation, HelpNavigation], "secondary")).toEqual([
-      ProfileNavigation,
+    const items = [DatabasesNavigation, HelpNavigation, AdministrationNavigation];
+    expect(getNavigationSection(items, "primary")).toEqual([DatabasesNavigation]);
+    expect(getNavigationSection(items, "secondary")).toEqual([
       HelpNavigation,
+      AdministrationNavigation,
     ]);
-    expect(getNavigationSection([ProfileNavigation, HelpNavigation], "primary")).toEqual([]);
   });
 
   it("builds user initials with a fallback", () => {

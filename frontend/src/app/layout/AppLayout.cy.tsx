@@ -5,7 +5,7 @@ import AppLayout from "./AppLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "@/features/auth/AuthProvider";
-import { navigation, ProfileNavigation } from "@/app/navigation/navigation";
+import { navigation } from "@/app/navigation/navigation";
 import { routePaths } from "@/app/navigation/routes";
 import { ThemeProvider } from "@/app/theme-provider";
 
@@ -93,10 +93,10 @@ describe("AppLayout Tests", () => {
   it("handles profile dropdown actions", () => {
     cy.contains("button", "Open user menu").click();
 
-    cy.contains("Profile").should("exist").and("have.attr", "href", ProfileNavigation.to);
+    cy.contains("Profile").should("exist").and("have.attr", "href", routePaths.settings);
 
     cy.contains("Profile").click({ force: true });
-    cy.url().should("include", ProfileNavigation.to);
+    cy.url().should("include", routePaths.settings);
     cy.contains("button", "Open user menu").click();
 
     cy.contains("Sign out").should("exist").click();
