@@ -1,8 +1,8 @@
 import { useId, useState } from "react";
-import { CopyIcon, EyeIcon, EyeOffIcon, KeyRoundIcon, PlusIcon } from "lucide-react";
-import { toast } from "sonner";
+import { EyeIcon, EyeOffIcon, KeyRoundIcon, PlusIcon } from "lucide-react";
 
 import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteDialog";
+import { CopyButton } from "@/components/common/CopyButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -116,15 +116,6 @@ function RoleTableRow({
   const [showPassword, setShowPassword] = useState(false);
   const passwordId = useId();
 
-  const copyPassword = async () => {
-    try {
-      await navigator.clipboard.writeText(role.password);
-      toast.success("Password copied");
-    } catch {
-      toast.error("Couldn't copy password");
-    }
-  };
-
   return (
     <TableRow>
       <TableCell className="font-medium">{role.name}</TableCell>
@@ -150,14 +141,11 @@ function RoleTableRow({
             >
               {showPassword ? <EyeOffIcon /> : <EyeIcon />}
             </InputGroupButton>
-            <InputGroupButton
-              size="icon-xs"
+            <CopyButton
+              value={role.password}
               aria-label={`Copy password for ${role.name}`}
               title="Copy password"
-              onClick={copyPassword}
-            >
-              <CopyIcon />
-            </InputGroupButton>
+            />
           </InputGroupAddon>
         </InputGroup>
       </TableCell>

@@ -1,5 +1,10 @@
 # Ocean — Work Log B
 
+## 2026-11-26: UI polish: greeting, relative expiry, copy confirmation
+- The databases page greets by name ("Good morning, …") with one status line: how many databases, and how many expire within 30 days.
+- Expiry is shown as relative time ("in 6 months") with a status dot that turns amber within 30 days and red once past; the exact date is in a tooltip. This replaces red date text in the list, admin list and overview.
+- Copy buttons confirm in place: the icon turns into a check for 1.5 s instead of a success toast; only a failure still toasts. shadcn has no standalone copy component. Its new code-block has one, but it pulls in the shiki highlighter, so a small own CopyButton modelled on it was written instead.
+
 ## 2026-11-26: Review follow-ups for the UI cleanup
 - All delete confirmations now behave the same: the dialog shows a spinner until the delete finishes, then closes, and failures are toasted. Before, only the detail page waited; the admin list and the users panel closed at once, and a failed admin delete was silent.
 - People are shown by full name everywhere (account menu, admin users, invitations) instead of a mix with "F. Last".

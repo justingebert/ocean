@@ -1,14 +1,7 @@
 import { useState } from "react";
-import {
-  CopyIcon,
-  DownloadIcon,
-  ExternalLinkIcon,
-  EyeIcon,
-  EyeOffIcon,
-  RefreshCwIcon,
-} from "lucide-react";
-import { toast } from "sonner";
+import { DownloadIcon, ExternalLinkIcon, EyeIcon, EyeOffIcon, RefreshCwIcon } from "lucide-react";
 
+import { CopyButton } from "@/components/common/CopyButton";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -58,15 +51,6 @@ export function DatabaseOverviewPanel({
 
   const adminToolUrl = isMongo ? connectionString : database?.adminUrl || "#";
 
-  const copyConnectionString = async () => {
-    try {
-      await navigator.clipboard.writeText(connectionString);
-      toast.success("Connection string copied");
-    } catch {
-      toast.error("Couldn't copy connection string");
-    }
-  };
-
   return (
     <Card>
       <CardContent className="flex flex-col gap-6">
@@ -94,14 +78,11 @@ export function DatabaseOverviewPanel({
                     {revealed ? <EyeOffIcon /> : <EyeIcon />}
                   </InputGroupButton>
                 ) : null}
-                <InputGroupButton
-                  size="icon-xs"
+                <CopyButton
+                  value={connectionString}
                   aria-label="Copy connection string"
                   title="Copy connection string"
-                  onClick={copyConnectionString}
-                >
-                  <CopyIcon />
-                </InputGroupButton>
+                />
               </InputGroupAddon>
             </InputGroup>
           ) : (
