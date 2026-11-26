@@ -1,5 +1,10 @@
 # Ocean — Work Log B
 
+## 2026-11-26: Clearer new-database form
+- Each engine option now carries a one-line hint ("Relational, SQL" / "Documents, JSON") so students who do not know the engines can choose.
+- A note under the create button says databases expire after 6 months and can be renewed. The text is fixed; the backend lifetime is configurable (`OCEAN_DB_LIFETIME_DAYS`, default 180 days), so the two must be kept in step.
+- The name error no longer repeats the hint above the field: it names the specific problem ("Start with a lowercase letter" / "Only lowercase letters, digits and underscores").
+
 ## 2026-11-26: Legal links on the sign-in page
 - Added subtle footer links to the HTW legal notice (Impressum) and privacy policy (Datenschutz) on the sign-in page so they are reachable before logging in, as required by the university.
 

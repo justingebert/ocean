@@ -6,6 +6,7 @@ export interface DatabaseEngineOption {
   id: number;
   value: EngineTypeValues;
   label: string;
+  description: string;
   imageSrc: string;
 }
 
@@ -13,12 +14,14 @@ export const engineOptions: ReadonlyArray<DatabaseEngineOption> = [
   {
     id: 1,
     label: "PostgreSQL",
+    description: "Relational, SQL",
     value: "P",
     imageSrc: postgresqlLogo,
   },
   {
     id: 2,
     label: "MongoDB",
+    description: "Documents, JSON",
     value: "M",
     imageSrc: mongodbLogo,
   },

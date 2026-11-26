@@ -39,7 +39,12 @@ export const EngineGroup: React.FC<EngineSelectorProps> = ({
           className="h-auto w-full justify-start gap-3 p-3 aria-pressed:border-primary aria-pressed:bg-primary/5"
         >
           <img className="size-6" src={engineOption.imageSrc} alt="" aria-hidden="true" />
-          <span>{engineOption.label}</span>
+          <span className="flex flex-col items-start">
+            <span>{engineOption.label}</span>
+            <span className="text-xs font-normal text-muted-foreground">
+              {engineOption.description}
+            </span>
+          </span>
         </ToggleGroupItem>
       ))}
     </ToggleGroup>

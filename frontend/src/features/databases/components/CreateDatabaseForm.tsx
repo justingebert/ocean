@@ -33,10 +33,8 @@ const databaseNameSchema = z
   .string()
   .min(1, "Name is required")
   .max(32, "Name must be at most 32 characters long")
-  .regex(
-    /^[a-z][a-z0-9_]*$/,
-    "Name must begin with a letter (a-z). Subsequent characters in a name can be letters, digits (0-9), or underscores.",
-  );
+  .regex(/^[a-z]/, "Start with a lowercase letter")
+  .regex(/^[a-z0-9_]*$/, "Only lowercase letters, digits and underscores");
 
 const createDatabaseSchema = z.object({
   name: databaseNameSchema,
@@ -166,6 +164,9 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onS
               {processing && <Spinner data-icon="inline-start" />}
               {processing ? "Creating database..." : "Create database"}
             </Button>
+            <FieldDescription>
+              Databases expire after 6 months. You can renew them.
+            </FieldDescription>
           </Field>
         </FieldGroup>
       </form>

@@ -11,11 +11,11 @@ describe("<EngineGroup />", () => {
     render(<EngineGroup engineOptions={engineOptions} selectedValue={EngineType.PostgreSQL} />);
 
     expect(screen.getByRole("group", { name: /database engine/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "PostgreSQL" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: /^PostgreSQL/ })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
-    expect(screen.getByRole("button", { name: "MongoDB" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: /^MongoDB/ })).toHaveAttribute(
       "aria-pressed",
       "false",
     );
@@ -33,7 +33,7 @@ describe("<EngineGroup />", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "MongoDB" }));
+    await user.click(screen.getByRole("button", { name: /^MongoDB/ }));
 
     expect(onSelect).toHaveBeenCalledWith(EngineType.MongoDB);
   });

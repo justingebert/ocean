@@ -47,13 +47,20 @@ describe("CreateDatabaseForm", () => {
 
     fireEvent.change(nameInput, { target: { value: "1invalid" } });
     await waitFor(() =>
-      expect(screen.getByText(/Name must begin with a letter/)).toBeInTheDocument(),
+      expect(screen.getByText("Start with a lowercase letter")).toBeInTheDocument(),
     );
     expect(nameInput).toHaveAttribute("aria-invalid", "true");
 
+    fireEvent.change(nameInput, { target: { value: "bad-name" } });
+    await waitFor(() =>
+      expect(
+        screen.getByText("Only lowercase letters, digits and underscores"),
+      ).toBeInTheDocument(),
+    );
+
     fireEvent.change(nameInput, { target: { value: "valid_name" } });
     await waitFor(() =>
-      expect(screen.queryByText(/Name must begin with a letter/)).not.toBeInTheDocument(),
+      expect(screen.queryByText("Start with a lowercase letter")).not.toBeInTheDocument(),
     );
     expect(nameInput).toHaveAttribute("aria-invalid", "false");
   });
@@ -98,7 +105,7 @@ describe("CreateDatabaseForm", () => {
     await user.type(nameInput, "Bad-name");
 
     await waitFor(() =>
-      expect(screen.getByText(/Name must begin with a letter/)).toBeInTheDocument(),
+      expect(screen.getByText("Start with a lowercase letter")).toBeInTheDocument(),
     );
     expect(spyApi).not.toHaveBeenCalled();
     expect(toast.error).not.toHaveBeenCalled();
@@ -160,7 +167,7 @@ describe("CreateDatabaseForm", () => {
 
     render(<CreateDatabaseForm {...defaultProps} />);
 
-    await user.click(screen.getByRole("button", { name: "MongoDB" }));
+    await user.click(screen.getByRole("button", { name: /^MongoDB/ }));
     fireEvent.change(screen.getByLabelText(/database name/i), {
       target: { value: "mongo_database" },
     });
