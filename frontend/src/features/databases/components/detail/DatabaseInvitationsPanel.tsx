@@ -11,7 +11,6 @@ import {
 import { Field, FieldLabel } from "@/components/ui/field.tsx";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Empty,
   EmptyDescription,
@@ -46,63 +45,55 @@ export function DatabaseInvitationsPanel({
   onDeselectUser,
 }: DatabaseInvitationsPanelProps) {
   return (
-    <Card>
-      <CardContent className="flex flex-col gap-6">
-        <p className="text-sm text-muted-foreground">
-          Invited people can see this database and connect to it with their own account.
-        </p>
-        <InvitationUserSelector
-          users={users}
-          selectedUserIds={selectedUserIds}
-          onSelect={onSelectUser}
-          onDeselect={onDeselectUser}
-        />
-        {invitedUsers.length === 0 ? (
-          <Empty className="border">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <UsersIcon aria-hidden="true" />
-              </EmptyMedia>
-              <EmptyTitle>Not shared with anyone</EmptyTitle>
-              <EmptyDescription>
-                Invite people to give them access to this database.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Username</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead className="w-0">
-                  <span className="sr-only">Action</span>
-                </TableHead>
+    <div className="flex flex-col gap-6">
+      <p className="text-sm text-muted-foreground">
+        Invited people can see this database and connect to it with their own account.
+      </p>
+      <InvitationUserSelector
+        users={users}
+        selectedUserIds={selectedUserIds}
+        onSelect={onSelectUser}
+        onDeselect={onDeselectUser}
+      />
+      {invitedUsers.length === 0 ? (
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <UsersIcon aria-hidden="true" />
+            </EmptyMedia>
+            <EmptyTitle>Not shared with anyone</EmptyTitle>
+            <EmptyDescription>Invite people to give them access to this database.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Username</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead className="w-0">
+                <span className="sr-only">Action</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {invitedUsers.map((invitedUser) => (
+              <TableRow key={invitedUser.invitationId}>
+                <TableCell className="font-medium">{invitedUser.username}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  {User.getDisplayName(invitedUser)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="sm" onClick={() => onDeselectUser(invitedUser.id)}>
+                    Remove
+                  </Button>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {invitedUsers.map((invitedUser) => (
-                <TableRow key={invitedUser.invitationId}>
-                  <TableCell className="font-medium">{invitedUser.username}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {User.getDisplayName(invitedUser)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onDeselectUser(invitedUser.id)}
-                    >
-                      Remove
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-    </Card>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
   );
 }
 
