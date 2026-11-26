@@ -65,9 +65,9 @@ export function DatabaseOverviewPanel({
   const copyConnectionString = async () => {
     try {
       await navigator.clipboard.writeText(connectionString);
-      toast.success("Copied to clipboard");
+      toast.success("Connection string copied");
     } catch {
-      toast.error("Could not copy connection string");
+      toast.error("Couldn't copy connection string");
     }
   };
 

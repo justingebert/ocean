@@ -32,7 +32,7 @@ const ReportingRoute = () => {
     },
   });
   const setNeverExpiresMutation = useSetDatabaseNeverExpiresMutation({
-    onError: () => toast.error("Something went wrong", { description: "Expiry was not changed" }),
+    onError: () => toast.error("Couldn't change expiry"),
     onSettled: () => databasesQuery.refetch(),
   });
   const usersQuery = useUsersQuery();

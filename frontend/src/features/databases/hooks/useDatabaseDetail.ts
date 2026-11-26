@@ -50,15 +50,11 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
     mutationFn: (role: UpstreamCreateRoleProperties) => RoleClient.createRoleForDatabase(role),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
-      toast.success("Successfully created!", {
-        description: "User was added to the database",
-      });
+      toast.success("User added");
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
-      toast.error("Something went wrong", {
-        description: "User was not added to the database",
-      });
+      toast.error("Couldn't add user");
     },
   });
 
@@ -66,15 +62,11 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
     mutationFn: (roleId: number) => RoleClient.deleteRoleForDatabase(roleId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
-      toast.success("Successfully deleted!", {
-        description: "User was deleted",
-      });
+      toast.success("User deleted");
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ["roles"] });
-      toast.error("Something went wrong", {
-        description: "User was not deleted from the database",
-      });
+      toast.error("Couldn't delete user");
     },
   });
 
@@ -83,15 +75,11 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
       InvitationClient.createInvitationForDatabase(invitation),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invitations"] });
-      toast.success("Successfully created!", {
-        description: "Invitation was added to the database",
-      });
+      toast.success("Invitation added");
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ["invitations"] });
-      toast.error("Something went wrong", {
-        description: "Invitation was not added to the database",
-      });
+      toast.error("Couldn't add invitation");
     },
   });
 
@@ -100,15 +88,11 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
       InvitationClient.deleteInvitationForDatabase(invitationId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invitations"] });
-      toast.success("Successfully deleted!", {
-        description: "Invitation was deleted from the database",
-      });
+      toast.success("Invitation removed");
     },
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ["invitations"] });
-      toast.error("Something went wrong", {
-        description: "Invitation was not deleted from the database",
-      });
+      toast.error("Couldn't remove invitation");
     },
   });
 
@@ -119,9 +103,7 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
       options.onDeleted?.();
     },
     onError: () => {
-      toast.error("Something went wrong", {
-        description: "Database was not deleted",
-      });
+      toast.error("Couldn't delete database");
     },
   });
 
@@ -135,9 +117,7 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
       });
     },
     onError: () => {
-      toast.error("Something went wrong", {
-        description: "Database was not renewed",
-      });
+      toast.error("Couldn't renew database");
     },
   });
 

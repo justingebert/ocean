@@ -115,7 +115,7 @@ function RoleTableRow({
       await navigator.clipboard.writeText(role.password);
       toast.success("Password copied");
     } catch {
-      toast.error("Could not copy password");
+      toast.error("Couldn't copy password");
     }
   };
 
