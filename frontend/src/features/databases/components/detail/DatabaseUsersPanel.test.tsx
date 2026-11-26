@@ -55,7 +55,7 @@ describe("<DatabaseUsersPanel />", () => {
     expect(password).toHaveAttribute("type", "password");
   });
 
-  it("deletes the selected role with a button", async () => {
+  it("deletes the selected role after confirming", async () => {
     const user = userEvent.setup();
     const onDeleteRole = vi.fn();
 
@@ -69,6 +69,10 @@ describe("<DatabaseUsersPanel />", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Delete" }));
+    expect(onDeleteRole).not.toHaveBeenCalled();
+
+    const dialog = await screen.findByRole("alertdialog");
+    await user.click(within(dialog).getByRole("button", { name: "Delete" }));
 
     expect(onDeleteRole).toHaveBeenCalledWith(7);
   });

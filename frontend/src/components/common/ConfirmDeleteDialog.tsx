@@ -1,6 +1,6 @@
+import type { ReactNode } from "react";
 import { TriangleAlertIcon } from "lucide-react";
 
-import { deleteModalContent } from "@/features/databases/constants/modals";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,21 +11,26 @@ import {
   AlertDialogHeader,
   AlertDialogMedia,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog.tsx";
+} from "@/components/ui/alert-dialog";
 
-interface DeleteDatabaseAlertDialogProps {
+export interface ConfirmDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  title: string;
+  description: ReactNode;
   onConfirm: () => void;
   processing?: boolean;
 }
 
-export function DeleteDatabaseAlertDialog({
+/** Asks before an irreversible delete. Stays open on confirm; the caller closes it. */
+export function ConfirmDeleteDialog({
   open,
   onOpenChange,
+  title,
+  description,
   onConfirm,
   processing = false,
-}: DeleteDatabaseAlertDialogProps) {
+}: ConfirmDeleteDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -33,12 +38,12 @@ export function DeleteDatabaseAlertDialog({
           <AlertDialogMedia className="bg-destructive/10 text-destructive">
             <TriangleAlertIcon aria-hidden="true" />
           </AlertDialogMedia>
-          <AlertDialogTitle>{deleteModalContent.title}</AlertDialogTitle>
-          <AlertDialogDescription>{deleteModalContent.description}</AlertDialogDescription>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel variant="outline" size="default" disabled={processing}>
-            {deleteModalContent.cancelText}
+            Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
@@ -49,7 +54,7 @@ export function DeleteDatabaseAlertDialog({
               onConfirm();
             }}
           >
-            {deleteModalContent.submitText}
+            Delete
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

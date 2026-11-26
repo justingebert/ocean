@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { compareDesc } from "date-fns";
 
 import {
@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Switch } from "@/components/ui/switch";
+import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteDialog";
 import { cn } from "cn";
 import { Database } from "@/features/databases/model/database.ts";
 import {
@@ -32,6 +33,7 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
   onDelete,
   onNeverExpiresChange,
 }) => {
+  const [databaseToDelete, setDatabaseToDelete] = useState<Database>();
   const sortedDatabases = databases
     .slice(0)
     .sort((left, right) => compareDesc(left.createdAt, right.createdAt));
@@ -79,7 +81,7 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
                 />
               </TableCell>
               <TableCell className="text-right">
-                <Button variant="destructive" size="sm" onClick={() => onDelete?.(database)}>
+                <Button variant="destructive" size="sm" onClick={() => setDatabaseToDelete(database)}>
                   Delete
                 </Button>
               </TableCell>
@@ -87,6 +89,16 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
           ))}
         </TableBody>
       </Table>
+      <ConfirmDeleteDialog
+        open={databaseToDelete !== undefined}
+        onOpenChange={(open) => !open && setDatabaseToDelete(undefined)}
+        title={`Delete ${databaseToDelete?.name ?? "database"}?`}
+        description="All data in this database is permanently removed. This can't be undone."
+        onConfirm={() => {
+          if (databaseToDelete) onDelete?.(databaseToDelete);
+          setDatabaseToDelete(undefined);
+        }}
+      />
     </div>
   );
 };

@@ -46,7 +46,7 @@ describe("<DatabaseAdminList />", () => {
     expect(rows).toHaveLength(0);
   });
 
-  it("calls onDelete with the correct database when 'Delete' is clicked", async () => {
+  it("calls onDelete only after the delete is confirmed", async () => {
     const mockOnDelete = vi.fn();
 
     render(<DatabaseAdminList databases={mockData} onDelete={mockOnDelete} />);
@@ -55,8 +55,11 @@ describe("<DatabaseAdminList />", () => {
       .getAllByRole("row")
       .find((row) => within(row).queryByText("Database 1"));
 
-    const deleteAction = within(database1Row!).getByText("Delete");
-    await userEvent.click(deleteAction);
+    await userEvent.click(within(database1Row!).getByRole("button", { name: "Delete" }));
+    expect(mockOnDelete).not.toHaveBeenCalled();
+
+    const dialog = await screen.findByRole("alertdialog");
+    await userEvent.click(within(dialog).getByRole("button", { name: "Delete" }));
 
     expect(mockOnDelete).toHaveBeenCalledWith(mockData[0]);
   });

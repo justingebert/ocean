@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 import { CopyIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import { toast } from "sonner";
 
+import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteDialog";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,6 +35,8 @@ export function DatabaseUsersPanel({
   onAddUser,
   onDeleteRole,
 }: DatabaseUsersPanelProps) {
+  const [roleToDelete, setRoleToDelete] = useState<RoleProperties>();
+
   return (
     <Card>
       <CardContent className="flex flex-col gap-6">
@@ -60,11 +63,21 @@ export function DatabaseUsersPanel({
           </TableHeader>
           <TableBody>
             {roles.map((role) => (
-              <RoleTableRow key={role.id} role={role} onDelete={onDeleteRole} />
+              <RoleTableRow key={role.id} role={role} onDelete={setRoleToDelete} />
             ))}
           </TableBody>
         </Table>
       </CardContent>
+      <ConfirmDeleteDialog
+        open={roleToDelete !== undefined}
+        onOpenChange={(open) => !open && setRoleToDelete(undefined)}
+        title={`Delete ${roleToDelete?.name ?? "user"}?`}
+        description="Anything connecting as this user loses access. This can't be undone."
+        onConfirm={() => {
+          if (roleToDelete) onDeleteRole(roleToDelete.id);
+          setRoleToDelete(undefined);
+        }}
+      />
     </Card>
   );
 }
@@ -74,7 +87,7 @@ function RoleTableRow({
   onDelete,
 }: {
   role: RoleProperties;
-  onDelete: (roleId: number) => void;
+  onDelete: (role: RoleProperties) => void;
 }) {
   const [showPassword, setShowPassword] = useState(false);
   const passwordId = useId();
@@ -125,7 +138,7 @@ function RoleTableRow({
         </InputGroup>
       </TableCell>
       <TableCell className="text-right">
-        <Button variant="destructive" size="sm" onClick={() => onDelete(role.id)}>
+        <Button variant="destructive" size="sm" onClick={() => onDelete(role)}>
           Delete
         </Button>
       </TableCell>
