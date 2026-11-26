@@ -116,7 +116,7 @@ const CreateRoleForm: React.FC<CreateRoleFormProps> = ({ database, onSubmit, onC
             type="submit"
             disabled={!database || (form.formState.isValid && availabilityStatus !== "available")}
           >
-            Create
+            Add user
           </Button>
         </DialogFooter>
       </FieldGroup>

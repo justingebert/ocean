@@ -1,9 +1,8 @@
 import { useId, useState } from "react";
-import { CopyIcon, EyeIcon, EyeOffIcon, KeyRoundIcon } from "lucide-react";
+import { CopyIcon, EyeIcon, EyeOffIcon, KeyRoundIcon, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteDialog";
-import { SectionHeading } from "@/components/common/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -47,16 +46,14 @@ export function DatabaseUsersPanel({
   return (
     <Card>
       <CardContent className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap">
-          <div>
-            <SectionHeading>Users</SectionHeading>
-            <p className="mt-1 text-sm text-muted-foreground">Only for this database</p>
-          </div>
-          <div className="flex-shrink-0">
-            <Button className="relative" disabled={isCreatingRole} onClick={onAddUser}>
-              Add new user
-            </Button>
-          </div>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground">
+            Each user logs in to this database with its own password.
+          </p>
+          <Button disabled={isCreatingRole} onClick={onAddUser}>
+            <PlusIcon data-icon="inline-start" />
+            Add user
+          </Button>
         </div>
         {roles.length === 0 ? (
           <Empty className="border">
@@ -159,7 +156,7 @@ function RoleTableRow({
         </InputGroup>
       </TableCell>
       <TableCell className="text-right">
-        <Button variant="destructive" size="sm" onClick={() => onDelete(role)}>
+        <Button variant="ghost" size="sm" onClick={() => onDelete(role)}>
           Delete
         </Button>
       </TableCell>

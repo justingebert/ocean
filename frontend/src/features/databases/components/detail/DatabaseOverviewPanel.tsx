@@ -17,6 +17,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "cn";
 import {
@@ -73,51 +74,8 @@ export function DatabaseOverviewPanel({
   return (
     <Card>
       <CardContent className="flex flex-col gap-6">
-        <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
-          <DetailField label="Host" value={database?.hostname} skeletonWidth="w-40" />
-          <DetailField
-            label="Port"
-            value={database ? database.port.toString() : undefined}
-            skeletonWidth="w-16"
-          />
-          <div className="sm:col-span-2">
-            <dt className="text-sm font-medium text-muted-foreground">Expiry</dt>
-            {database ? (
-              <dd className="mt-1 flex flex-wrap items-center gap-3 text-sm">
-                {database.expiresAt === null ? (
-                  <span className="text-foreground">Never expires</span>
-                ) : (
-                  <>
-                    <span
-                      className={cn(
-                        "text-foreground",
-                        isExpiringSoon(database.expiresAt) && "font-medium text-destructive",
-                      )}
-                    >
-                      Expires on{" "}
-                      <time dateTime={new Date(database.expiresAt).toISOString()}>
-                        {formatDate(database.expiresAt)}
-                      </time>
-                    </span>
-                    {canRenew ? (
-                      <Button variant="outline" size="sm" onClick={onRenew} disabled={isRenewing}>
-                        <RefreshCwIcon />
-                        Renew
-                      </Button>
-                    ) : null}
-                  </>
-                )}
-              </dd>
-            ) : (
-              <dd className="mt-1">
-                <Skeleton className="h-5 w-40" />
-              </dd>
-            )}
-          </div>
-        </dl>
-
-        <div>
-          <div className="mb-1.5 text-sm font-medium text-muted-foreground">Connection string</div>
+        <div className="flex flex-col gap-2">
+          <h2 className="text-sm font-medium text-foreground">Connection string</h2>
           {database && user ? (
             <InputGroup>
               <InputGroupInput
@@ -151,38 +109,80 @@ export function DatabaseOverviewPanel({
               </InputGroupAddon>
             </InputGroup>
           ) : (
-            <Skeleton className="h-9 w-full" />
+            <Skeleton className="h-8 w-full" />
           )}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {database ? (
-            <>
-              <a
-                href={adminToolUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={buttonVariants({ variant: "outline", size: "sm" })}
-              >
-                <ExternalLinkIcon />
-                Open {database.adminToolName}
-              </a>
-              {isMongo ? (
+          <div className="flex flex-wrap items-center gap-2">
+            {database ? (
+              <>
                 <a
-                  href={MONGODB_COMPASS_DOWNLOAD_URL}
+                  href={adminToolUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={buttonVariants({ variant: "ghost", size: "sm" })}
+                  className={buttonVariants({ variant: "outline", size: "sm" })}
                 >
-                  <DownloadIcon />
-                  Download Compass
+                  <ExternalLinkIcon data-icon="inline-start" />
+                  Open {database.adminToolName}
                 </a>
-              ) : null}
-            </>
-          ) : (
-            <Skeleton className="h-8 w-32" />
-          )}
+                {isMongo ? (
+                  <a
+                    href={MONGODB_COMPASS_DOWNLOAD_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={buttonVariants({ variant: "ghost", size: "sm" })}
+                  >
+                    <DownloadIcon data-icon="inline-start" />
+                    Download Compass
+                  </a>
+                ) : null}
+              </>
+            ) : (
+              <Skeleton className="h-7 w-32" />
+            )}
+          </div>
         </div>
+
+        <Separator />
+
+        <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
+          <DetailField label="Host" value={database?.hostname} skeletonWidth="w-40" />
+          <DetailField
+            label="Port"
+            value={database ? database.port.toString() : undefined}
+            skeletonWidth="w-16"
+          />
+          <div className="col-span-2 sm:col-span-1">
+            <dt className="text-sm text-muted-foreground">Expires</dt>
+            {database ? (
+              <dd className="mt-1 flex flex-wrap items-center gap-2 text-sm">
+                {database.expiresAt === null ? (
+                  <span className="text-foreground">Never expires</span>
+                ) : (
+                  <>
+                    <time
+                      dateTime={new Date(database.expiresAt).toISOString()}
+                      className={cn(
+                        "text-foreground tabular-nums",
+                        isExpiringSoon(database.expiresAt) && "font-medium text-destructive",
+                      )}
+                    >
+                      {formatDate(database.expiresAt)}
+                    </time>
+                    {canRenew ? (
+                      <Button variant="outline" size="xs" onClick={onRenew} disabled={isRenewing}>
+                        <RefreshCwIcon data-icon="inline-start" />
+                        Renew
+                      </Button>
+                    ) : null}
+                  </>
+                )}
+              </dd>
+            ) : (
+              <dd className="mt-1">
+                <Skeleton className="h-5 w-40" />
+              </dd>
+            )}
+          </div>
+        </dl>
       </CardContent>
     </Card>
   );
@@ -199,7 +199,7 @@ function DetailField({
 }) {
   return (
     <div>
-      <dt className="text-sm font-medium text-muted-foreground">{label}</dt>
+      <dt className="text-sm text-muted-foreground">{label}</dt>
       {value !== undefined ? (
         <dd className="mt-1 text-sm text-foreground">{value}</dd>
       ) : (

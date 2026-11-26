@@ -20,7 +20,7 @@ export function CreateRoleDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create a user</DialogTitle>
+          <DialogTitle>Add user</DialogTitle>
         </DialogHeader>
         <CreateRoleForm
           database={database}

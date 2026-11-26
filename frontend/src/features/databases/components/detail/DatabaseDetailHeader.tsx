@@ -11,33 +11,27 @@ interface DatabaseDetailHeaderProps {
 
 export function DatabaseDetailHeader({ database, onDelete }: DatabaseDetailHeaderProps) {
   return (
-    <div className="mb-4 flex gap-3">
-      <div className="shrink-0">
-        {database ? (
-          <DatabaseEngineLogo className="size-10" engine={database.engine} />
-        ) : (
-          <Skeleton className="size-10 rounded-full" />
-        )}
-      </div>
+    <header className="mb-6 flex items-center gap-3">
+      {database ? (
+        <DatabaseEngineLogo className="size-8" engine={database.engine} />
+      ) : (
+        <Skeleton className="size-8 rounded-md" />
+      )}
       <div className="min-w-0 flex-1">
         {database ? (
-          <div className="font-heading text-xl font-semibold tracking-tight text-foreground sm:truncate">
+          <h1 className="truncate font-heading text-xl font-semibold tracking-tight text-foreground">
             {database.name}
-          </div>
+          </h1>
         ) : (
-          <Skeleton className="mt-1 h-6 w-36" />
+          <Skeleton className="h-6 w-36" />
         )}
         {database ? (
-          <div className="text-sm text-muted-foreground">
-            {getDatabaseEngineTitle(database.engine)}
-          </div>
+          <p className="text-sm text-muted-foreground">{getDatabaseEngineTitle(database.engine)}</p>
         ) : (
           <Skeleton className="mt-1 h-4 w-24" />
         )}
       </div>
-      <div className="flex shrink-0 self-center">
-        <ActionDropdown onDelete={onDelete} />
-      </div>
-    </div>
+      <ActionDropdown onDelete={onDelete} />
+    </header>
   );
 }

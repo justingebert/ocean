@@ -46,7 +46,7 @@ describe("DatabaseInvitationsPanel", () => {
     const user = userEvent.setup();
     renderPanel();
 
-    const input = screen.getByRole("combobox", { name: "Select to invite" });
+    const input = screen.getByRole("combobox", { name: "Invite people" });
     await user.click(input);
     await user.type(input, "grace");
 
@@ -58,7 +58,7 @@ describe("DatabaseInvitationsPanel", () => {
     const user = userEvent.setup();
     const { onSelectUser, onDeselectUser } = renderPanel();
 
-    await user.click(screen.getByRole("combobox", { name: "Select to invite" }));
+    await user.click(screen.getByRole("combobox", { name: "Invite people" }));
     await user.click(await screen.findByRole("option", { name: /A\. Lovelace ada/ }));
 
     expect(onSelectUser).toHaveBeenCalledWith(1);
@@ -69,7 +69,7 @@ describe("DatabaseInvitationsPanel", () => {
     const user = userEvent.setup();
     const { onSelectUser, onDeselectUser } = renderPanel({ selectedUserIds: [1] });
 
-    await user.click(screen.getByRole("combobox", { name: "Select to invite" }));
+    await user.click(screen.getByRole("combobox", { name: "Invite people" }));
     await user.click(await screen.findByRole("option", { name: /A\. Lovelace ada/ }));
 
     expect(onDeselectUser).toHaveBeenCalledWith(1);

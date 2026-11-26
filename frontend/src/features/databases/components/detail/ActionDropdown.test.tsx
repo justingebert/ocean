@@ -9,8 +9,8 @@ describe("ActionDropdown", () => {
     const onDelete = vi.fn();
     render(<ActionDropdown onDelete={onDelete} />);
 
-    await userEvent.click(screen.getByRole("button", { name: /actions/i }));
-    await userEvent.click(await screen.findByText(/delete/i));
+    await userEvent.click(screen.getByRole("button", { name: "Database actions" }));
+    await userEvent.click(await screen.findByText("Delete database"));
 
     expect(onDelete).toHaveBeenCalledTimes(1);
   });

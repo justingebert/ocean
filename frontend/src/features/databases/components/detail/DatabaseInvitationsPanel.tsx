@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/combobox.tsx";
 import { Field, FieldLabel } from "@/components/ui/field.tsx";
 
-import { SectionHeading } from "@/components/common/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -49,16 +48,15 @@ export function DatabaseInvitationsPanel({
   return (
     <Card>
       <CardContent className="flex flex-col gap-6">
+        <p className="text-sm text-muted-foreground">
+          Invited people can see this database and connect to it with their own account.
+        </p>
         <InvitationUserSelector
           users={users}
           selectedUserIds={selectedUserIds}
           onSelect={onSelectUser}
           onDeselect={onDeselectUser}
         />
-        <div>
-          <SectionHeading>Invitations</SectionHeading>
-          <p className="mt-1 text-sm text-muted-foreground">Invite other people</p>
-        </div>
         {invitedUsers.length === 0 ? (
           <Empty className="border">
             <EmptyHeader>
@@ -91,11 +89,11 @@ export function DatabaseInvitationsPanel({
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
-                      variant="destructive"
+                      variant="ghost"
                       size="sm"
                       onClick={() => onDeselectUser(invitedUser.id)}
                     >
-                      Delete
+                      Remove
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -135,7 +133,7 @@ function InvitationUserSelector({
 
   return (
     <Field>
-      <FieldLabel htmlFor="invitation-user">Select to invite</FieldLabel>
+      <FieldLabel htmlFor="invitation-user">Invite people</FieldLabel>
       <Combobox
         multiple
         items={users}
@@ -150,7 +148,7 @@ function InvitationUserSelector({
         <ComboboxInput
           id="invitation-user"
           className="w-full"
-          placeholder="Search users..."
+          placeholder="Search by name or username"
           autoComplete="off"
         />
         <ComboboxContent>

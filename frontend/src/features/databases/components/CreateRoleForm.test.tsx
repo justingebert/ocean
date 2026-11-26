@@ -38,14 +38,14 @@ describe("CreateRoleForm", () => {
     render(<CreateRoleForm {...defaultProps} />);
 
     expect(screen.getByRole("textbox", { name: /username/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /create/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add user" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
   });
 
   it("shows validation errors for invalid input", async () => {
     render(<CreateRoleForm {...defaultProps} />);
 
-    fireEvent.click(screen.getByText(/create/i));
+    fireEvent.click(screen.getByRole("button", { name: "Add user" }));
 
     await waitFor(() => {
       expect(screen.getByText(/name is required/i)).toBeInTheDocument();
