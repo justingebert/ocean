@@ -1,4 +1,4 @@
-import { differenceInCalendarDays, format, formatDistance } from "date-fns";
+import { differenceInCalendarDays, format } from "date-fns";
 
 export const getDatabaseEngineTitle = (value: string): string => {
   if (value === "P") {
@@ -10,15 +10,12 @@ export const getDatabaseEngineTitle = (value: string): string => {
   }
 };
 
-export const getDatabaseCreatedAt = (value: Date): string => {
-  return formatDistance(value, new Date(), { addSuffix: true });
-};
-
 /** Databases expiring within this many days are highlighted. */
 export const EXPIRY_WARNING_DAYS = 30;
 
-export const formatExpiryDate = (value: Date): string => {
-  return format(value, "dd.MM.yyyy");
+/** The one date format of the UI, e.g. "6 May 2027". */
+export const formatDate = (value: Date): string => {
+  return format(value, "d MMM yyyy");
 };
 
 export const isExpiringSoon = (expiresAt: Date | null, now: Date = new Date()): boolean => {

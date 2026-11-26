@@ -39,7 +39,7 @@ describe("<DatabaseOverviewPanel /> expiry", () => {
       />,
     );
 
-    expect(screen.getByText("06.05.2027")).toBeInTheDocument();
+    expect(screen.getByText("6 May 2027")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Renew" }));
     expect(onRenew).toHaveBeenCalledOnce();
   });

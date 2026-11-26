@@ -12,12 +12,7 @@ import {
 } from "@/components/ui/table.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
 import { cn } from "cn";
-import {
-  formatExpiryDate,
-  getDatabaseCreatedAt,
-  getDatabaseEngineTitle,
-  isExpiringSoon,
-} from "./databaseListFormat.ts";
+import { formatDate, getDatabaseEngineTitle, isExpiringSoon } from "./databaseListFormat.ts";
 import DatabaseEngineLogo from "./DatabaseEngineLogo.tsx";
 import { DatabaseProperties } from "@/features/databases/model/database.ts";
 
@@ -60,8 +55,8 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
               <Badge variant="secondary">{getDatabaseEngineTitle(database.engine)}</Badge>
             </TableCell>
             <TableCell className="hidden text-right text-muted-foreground md:table-cell">
-              <time dateTime={database.createdAt.toLocaleString()}>
-                {getDatabaseCreatedAt(database.createdAt)}
+              <time dateTime={new Date(database.createdAt).toISOString()}>
+                {formatDate(database.createdAt)}
               </time>
             </TableCell>
             <TableCell
@@ -87,7 +82,7 @@ export function ExpiryDate({ expiresAt }: { expiresAt: Date | null }) {
     return <>Never</>;
   }
 
-  return <time dateTime={new Date(expiresAt).toISOString()}>{formatExpiryDate(expiresAt)}</time>;
+  return <time dateTime={new Date(expiresAt).toISOString()}>{formatDate(expiresAt)}</time>;
 }
 
 export default DatabaseList;

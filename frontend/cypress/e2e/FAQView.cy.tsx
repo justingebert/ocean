@@ -45,14 +45,14 @@ describe("Login and Navigate to FAQ", () => {
     cy.url().should("include", "/faq");
     cy.contains("Frequently asked questions").should("be.visible");
 
-    cy.contains("button", "Wo finde ich die Datenschutzerklärung?").click();
+    cy.contains("button", "Where can I find the privacy policy?").click();
 
     cy.contains("https://www.htw-berlin.de/datenschutz/").should("be.visible");
 
-    cy.contains("button", "Wo finde ich die Datenschutzerklärung?").click();
+    cy.contains("button", "Where can I find the privacy policy?").click();
     cy.contains("https://www.htw-berlin.de/datenschutz/").should("not.be.visible");
 
-    cy.contains("button", "Wo finde ich das Impressum?").click();
+    cy.contains("button", "Where can I find the legal notice (Impressum)?").click();
 
     cy.contains("https://www.htw-berlin.de/impressum/").should("be.visible");
   });

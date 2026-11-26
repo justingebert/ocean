@@ -16,7 +16,7 @@ import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteDialog";
 import { cn } from "cn";
 import { Database } from "@/features/databases/model/database.ts";
 import {
-  getDatabaseCreatedAt,
+  formatDate,
   getDatabaseEngineTitle,
   isExpiringSoon,
 } from "@/features/databases/components/DatabaseList/databaseListFormat";
@@ -61,8 +61,8 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
                 <Badge variant="secondary">{getDatabaseEngineTitle(database.engine)}</Badge>
               </TableCell>
               <TableCell className="text-muted-foreground">
-                <time dateTime={database.createdAt.toLocaleString()}>
-                  {getDatabaseCreatedAt(database.createdAt)}
+                <time dateTime={new Date(database.createdAt).toISOString()}>
+                  {formatDate(database.createdAt)}
                 </time>
               </TableCell>
               <TableCell
@@ -81,7 +81,11 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
                 />
               </TableCell>
               <TableCell className="text-right">
-                <Button variant="destructive" size="sm" onClick={() => setDatabaseToDelete(database)}>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setDatabaseToDelete(database)}
+                >
                   Delete
                 </Button>
               </TableCell>

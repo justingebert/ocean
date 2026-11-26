@@ -111,7 +111,7 @@ describe("<DatabaseList />", () => {
     const database1Row = rows.find((row) => within(row).queryByText("Database 1"));
     const database2Row = rows.find((row) => within(row).queryByText("Database 2"));
 
-    expect(within(database1Row!).getByText("06.05.2027")).toBeInTheDocument();
+    expect(within(database1Row!).getByText("6 May 2027")).toBeInTheDocument();
     expect(within(database2Row!).getByText("Never")).toBeInTheDocument();
   });
 });

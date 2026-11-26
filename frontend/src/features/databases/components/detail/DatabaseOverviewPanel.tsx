@@ -20,7 +20,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "cn";
 import {
-  formatExpiryDate,
+  formatDate,
   isExpiringSoon,
 } from "@/features/databases/components/DatabaseList/databaseListFormat";
 import { Database } from "@/features/databases/model/database.ts";
@@ -96,7 +96,7 @@ export function DatabaseOverviewPanel({
                     >
                       Expires on{" "}
                       <time dateTime={new Date(database.expiresAt).toISOString()}>
-                        {formatExpiryDate(database.expiresAt)}
+                        {formatDate(database.expiresAt)}
                       </time>
                     </span>
                     {canRenew ? (

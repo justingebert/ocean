@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { formatExpiryDate, isExpiringSoon } from "./databaseListFormat";
+import { formatDate, isExpiringSoon } from "./databaseListFormat";
 
-describe("formatExpiryDate", () => {
+describe("formatDate", () => {
   it("formats as DD.MM.YYYY", () => {
-    expect(formatExpiryDate(new Date(2027, 4, 6))).toBe("06.05.2027");
+    expect(formatDate(new Date(2027, 4, 6))).toBe("6 May 2027");
   });
 });
 

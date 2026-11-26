@@ -10,19 +10,19 @@ import { PageHeader } from "@/components/common/PageHeader";
 
 const faqs = [
   {
-    question: "Wo finde ich die Datenschutzerklärung?",
+    question: "Where can I find the privacy policy?",
     answer: (
       <div>
-        Aufrufbar unter{" "}
+        On the HTW website:{" "}
         <a href="https://www.htw-berlin.de/datenschutz/">https://www.htw-berlin.de/datenschutz/</a>
       </div>
     ),
   },
   {
-    question: "Wo finde ich das Impressum?",
+    question: "Where can I find the legal notice (Impressum)?",
     answer: (
       <div>
-        Aufrufbar unter{" "}
+        On the HTW website:{" "}
         <a href="https://www.htw-berlin.de/impressum/">https://www.htw-berlin.de/impressum/</a>
       </div>
     ),

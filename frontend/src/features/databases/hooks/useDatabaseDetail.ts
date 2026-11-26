@@ -5,7 +5,7 @@ import { DatabaseClient } from "@/features/databases/api/databaseClient";
 import { InvitationClient } from "@/features/databases/api/invitationClient";
 import { RoleClient } from "@/features/databases/api/roleClient";
 import { UserClient } from "@/api/userClient.ts";
-import { formatExpiryDate } from "@/features/databases/components/DatabaseList/databaseListFormat";
+import { formatDate } from "@/features/databases/components/DatabaseList/databaseListFormat";
 import { Database } from "@/features/databases/model/database.ts";
 import {
   Invitation,
@@ -131,9 +131,7 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
       queryClient.setQueryData(["database", databaseId], renewed);
       queryClient.invalidateQueries({ queryKey: ["databases"] });
       toast.success("Database renewed", {
-        description: renewed.expiresAt
-          ? `Expires on ${formatExpiryDate(renewed.expiresAt)}`
-          : undefined,
+        description: renewed.expiresAt ? `Expires on ${formatDate(renewed.expiresAt)}` : undefined,
       });
     },
     onError: () => {
