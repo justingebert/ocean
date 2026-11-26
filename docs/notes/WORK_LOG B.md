@@ -1,5 +1,15 @@
 # Ocean — Work Log B
 
+## 2026-11-26: Interactive sign-in artwork and HTW logo
+- Compared seven artwork directions for the sign-in panel in a throwaway preview page: swell, caustics, sea chart, halftone, and in a second round versions with Ocean's own schema and ports hidden in them. Chose the plain layered swell.
+- The swell is now drawn on a canvas so it can react: the waves follow the mouse at different depths, rise toward the cursor over the panel, get rougher when the mouse moves fast and calm down again, and ripple outward where the panel is clicked. With reduced motion turned on it shows one still frame.
+- The sign-in page shows the HTW Berlin logo top left, linking to htw-berlin.de, since Ocean is an HTW service. The SVG comes from Wikimedia Commons, which credits HTW's corporate-design site as its source; its viewBox was cropped to the mark so it can be shown small. In dark mode it is shown all white.
+
+## 2026-11-26: Split-screen sign-in page
+- The sign-in page follows the shadcn `login-04` block: one card with the form on the left and an image panel on the right, on a muted background. Only the layout was taken over; the block's email, social and sign-up parts don't apply (HTW account only), and the existing form with its validation stays.
+- The image panel is a generated SVG: layered waves, a sun and a few bubbles. The layers shift with the mouse at different depths for a light parallax effect, which is off when the OS asks for reduced motion. The panel is hidden on mobile.
+- The legal notice (Impressum) and privacy policy (Datenschutz) links stay below the card.
+
 ## 2026-11-26: Calmer database page
 - The connection card follows Supabase / Neon: a "String / Parameters" toggle switches between the connection string (now a wrapping code block, no longer cut off on mobile) and host, port, database and user as separate copyable rows for GUI clients like DBeaver or Compass. "Open Adminer" is now a filled button; the outline one was barely visible in light mode.
 - Expiry moved into a muted card footer: status dot, "Expires in 6 months", Renew button on the right.

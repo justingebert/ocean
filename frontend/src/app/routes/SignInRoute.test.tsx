@@ -15,6 +15,9 @@ vi.mock("@/features/auth/authContext", () => ({
   }),
 }));
 
+// Decorative canvas; jsdom has no 2D context to draw it with.
+vi.mock("@/features/auth/components/OceanGraphic", () => ({ OceanGraphic: () => null }));
+
 function renderSignIn(state?: unknown) {
   render(
     <MemoryRouter initialEntries={[{ pathname: "/login", state }]}>
@@ -57,5 +60,15 @@ describe("SignInRoute", () => {
     expect(privacyPolicy).toHaveAttribute("href", "https://www.htw-berlin.de/datenschutz/");
     expect(privacyPolicy).toHaveAttribute("target", "_blank");
     expect(privacyPolicy).toHaveAttribute("rel", "noopener noreferrer");
+  });
+
+  it("links the HTW Berlin logo to the university website", () => {
+    authStatus = "unauthenticated";
+    renderSignIn();
+
+    const htw = screen.getByRole("link", { name: "HTW Berlin" });
+    expect(htw).toHaveAttribute("href", "https://www.htw-berlin.de/");
+    expect(htw).toHaveAttribute("target", "_blank");
+    expect(htw).toHaveAttribute("rel", "noopener noreferrer");
   });
 });
