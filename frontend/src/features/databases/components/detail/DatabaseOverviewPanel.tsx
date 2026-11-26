@@ -20,10 +20,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "cn";
-import {
-  formatDate,
-  isExpiringSoon,
-} from "@/features/databases/components/DatabaseList/databaseListFormat";
+import { isExpiringSoon } from "@/features/databases/components/DatabaseList/databaseListFormat";
+import { formatDate } from "@/lib/format";
 import { Database } from "@/features/databases/model/database.ts";
 import { EngineType } from "@/features/databases/model/engine.ts";
 import { RoleProperties } from "@/features/databases/model/role";

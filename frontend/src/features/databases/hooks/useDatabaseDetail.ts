@@ -5,7 +5,7 @@ import { DatabaseClient } from "@/features/databases/api/databaseClient";
 import { InvitationClient } from "@/features/databases/api/invitationClient";
 import { RoleClient } from "@/features/databases/api/roleClient";
 import { UserClient } from "@/api/userClient.ts";
-import { formatDate } from "@/features/databases/components/DatabaseList/databaseListFormat";
+import { formatDate } from "@/lib/format";
 import { Database } from "@/features/databases/model/database.ts";
 import {
   Invitation,

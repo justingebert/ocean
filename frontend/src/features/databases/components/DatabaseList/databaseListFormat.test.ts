@@ -1,12 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatDate, isExpiringSoon } from "./databaseListFormat";
-
-describe("formatDate", () => {
-  it("formats as DD.MM.YYYY", () => {
-    expect(formatDate(new Date(2027, 4, 6))).toBe("6 May 2027");
-  });
-});
+import { isExpiringSoon } from "./databaseListFormat";
 
 describe("isExpiringSoon", () => {
   const now = new Date(2027, 0, 1, 12);

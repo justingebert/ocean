@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
-import { UserProperties } from "@/types/user.ts";
+import { User, UserProperties } from "@/types/user.ts";
 
 export interface UserAdminListProps {
   users: ReadonlyArray<UserProperties>;
@@ -33,9 +33,7 @@ export const UserAdminList: React.FC<UserAdminListProps> = ({ users }) => {
           {sortedUsers.map((user) => (
             <TableRow key={user.id}>
               <TableCell className="text-muted-foreground tabular-nums">{user.id}</TableCell>
-              <TableCell className="font-medium">
-                {user.firstName} {user.lastName}
-              </TableCell>
+              <TableCell className="font-medium">{User.getDisplayName(user)}</TableCell>
               <TableCell className="text-muted-foreground">{user.username}</TableCell>
               <TableCell>
                 <Badge variant="secondary" className="capitalize">

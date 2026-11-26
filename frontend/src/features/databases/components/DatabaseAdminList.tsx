@@ -15,10 +15,10 @@ import { cn } from "cn";
 import { Database } from "@/features/databases/model/database.ts";
 import { DeleteDatabaseDialog } from "@/features/databases/components/DeleteDatabaseDialog";
 import {
-  formatDate,
   getDatabaseEngineTitle,
   isExpiringSoon,
 } from "@/features/databases/components/DatabaseList/databaseListFormat";
+import { formatDate } from "@/lib/format";
 import { ExpiryDate } from "@/features/databases/components/DatabaseList/DatabaseList";
 
 export interface DatabaseAdminListProps {

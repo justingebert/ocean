@@ -85,7 +85,7 @@ export function DatabaseInvitationsPanel({
                 <TableRow key={invitedUser.invitationId}>
                   <TableCell className="font-medium">{invitedUser.username}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    {User.getDisplayName({ ...invitedUser, mail: "", employeeType: "" })}
+                    {User.getDisplayName(invitedUser)}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button

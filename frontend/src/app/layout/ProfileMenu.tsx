@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { ProfileNavigation } from "@/app/navigation/navigation.ts";
-import { UserProperties } from "@/types/user.ts";
+import { User, UserProperties } from "@/types/user.ts";
 import { getUserInitials } from "@/app/layout/utils.ts";
 
 type ProfileMenuProps = {
@@ -47,7 +47,7 @@ export function ProfileMenu({ user, loading, onLogout, onNavigate }: ProfileMenu
         </Avatar>
         <span className="min-w-0 flex-1 truncate text-left">
           <span className="sr-only">Open user menu for </span>
-          {user ? `${user.firstName} ${user.lastName}` : ""}
+          {user ? User.getDisplayName(user) : ""}
         </span>
         <ChevronsUpDownIcon className="text-muted-foreground" aria-hidden="true" />
       </DropdownMenuTrigger>

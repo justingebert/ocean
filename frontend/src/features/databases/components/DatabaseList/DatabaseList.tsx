@@ -11,7 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table.tsx";
 import { cn } from "cn";
-import { formatDate, getDatabaseEngineTitle, isExpiringSoon } from "./databaseListFormat.ts";
+import { formatDate } from "@/lib/format";
+import { getDatabaseEngineTitle, isExpiringSoon } from "./databaseListFormat.ts";
 import DatabaseEngineLogo from "./DatabaseEngineLogo.tsx";
 import { DatabaseProperties } from "@/features/databases/model/database.ts";
 
