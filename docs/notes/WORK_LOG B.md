@@ -1,9 +1,9 @@
 # Ocean — Work Log B
 
 ## 2026-11-26: Calmer database page
-- The connection string is now a wrapping code block instead of a one-line input, so it is no longer cut off on mobile. Host and port repeat what is in the string and moved under a "Details" disclosure.
-- Expiry reads as one line, "Expires in 6 months · Renew", with Renew as a text link. "Open Adminer" is now a filled button; the outline one was barely visible in light mode.
-- The Users and Invitations tabs lost their card and the dashed box around the empty state (box in a box); content sits directly on the page.
+- The connection card follows Supabase / Neon: a "String / Parameters" toggle switches between the connection string (now a wrapping code block, no longer cut off on mobile) and host, port, database and user as separate copyable rows for GUI clients like DBeaver or Compass. "Open Adminer" is now a filled button; the outline one was barely visible in light mode.
+- Expiry moved into a muted card footer: status dot, "Expires in 6 months", Renew button on the right.
+- The Users and Invitations tabs lost their card and the dashed box around the empty state (box in a box); content sits directly on the page. Without the card, tab labels and table text were indented differently from the page header, so line tabs and the outer table cells no longer pad their text: everything starts on one edge, app-wide.
 
 ## 2026-11-26: Quieter admin page
 - The two stat cards are gone; the counts now sit in the section headings ("Databases (12)", "Users (40)"). They come from the lists the page already loads, so the frontend no longer calls `/metrics` (the endpoint still exists in the backend).

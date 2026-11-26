@@ -66,3 +66,18 @@ describe("<DatabaseOverviewPanel /> expiry", () => {
     expect(screen.queryByRole("button", { name: "Renew" })).not.toBeInTheDocument();
   });
 });
+
+describe("<DatabaseOverviewPanel /> connection", () => {
+  it("switches from the connection string to copyable parameters", async () => {
+    render(<DatabaseOverviewPanel database={database(null)} user={user} />);
+
+    expect(screen.getByText(/^psql "postgresql:\/\/owner@/)).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Parameters" }));
+
+    expect(screen.getByText("Host")).toBeInTheDocument();
+    expect(screen.getByText("customer_db")).toBeInTheDocument();
+    expect(screen.getByText("owner")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Copy port" })).toBeInTheDocument();
+  });
+});
