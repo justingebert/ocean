@@ -110,8 +110,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onS
                 <Field data-invalid={invalid}>
                   <FieldLabel htmlFor={field.name}>Database name</FieldLabel>
                   <FieldDescription id="database-name-description">
-                    Lowercase letters, digits and underscores, starting with a letter. Up to 32
-                    characters.
+                    Lowercase letters, digits and underscores, starting with a letter.
                   </FieldDescription>
                   <InputGroup>
                     <InputGroupInput
