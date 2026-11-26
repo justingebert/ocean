@@ -9,8 +9,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table.tsx";
+import { EllipsisIcon, Trash2Icon } from "lucide-react";
+
 import { Button } from "@/components/ui/button.tsx";
-import { Switch } from "@/components/ui/switch";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu.tsx";
 import { Database } from "@/features/databases/model/database.ts";
 import { DeleteDatabaseDialog } from "@/features/databases/components/DeleteDatabaseDialog";
 import { getDatabaseEngineTitle } from "@/features/databases/components/DatabaseList/databaseListFormat";
@@ -48,7 +57,6 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
             <TableHead>Engine</TableHead>
             <TableHead>Created</TableHead>
             <TableHead>Expires</TableHead>
-            <TableHead>Never expires</TableHead>
             <TableHead className="w-0" />
           </TableRow>
         </TableHeader>
@@ -70,24 +78,39 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
               <TableCell className="text-muted-foreground">
                 <ExpiryStatus expiresAt={database.expiresAt} />
               </TableCell>
-              <TableCell>
-                <Switch
-                  aria-label={`Never expires: ${database.name}`}
-                  checked={database.expiresAt === null}
-                  onCheckedChange={(checked) => onNeverExpiresChange?.(database, checked)}
-                />
-              </TableCell>
               <TableCell className="text-right">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setDatabaseToDelete(database);
-                    setConfirmOpen(true);
-                  }}
-                >
-                  Delete
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={`Actions: ${database.name}`}
+                      />
+                    }
+                  >
+                    <EllipsisIcon />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuCheckboxItem
+                      checked={database.expiresAt === null}
+                      onCheckedChange={(checked) => onNeverExpiresChange?.(database, checked)}
+                    >
+                      Never expires
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => {
+                        setDatabaseToDelete(database);
+                        setConfirmOpen(true);
+                      }}
+                    >
+                      <Trash2Icon />
+                      Delete database
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           ))}

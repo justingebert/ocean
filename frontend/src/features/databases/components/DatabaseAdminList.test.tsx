@@ -55,7 +55,10 @@ describe("<DatabaseAdminList />", () => {
       .getAllByRole("row")
       .find((row) => within(row).queryByText("Database 1"));
 
-    await userEvent.click(within(database1Row!).getByRole("button", { name: "Delete" }));
+    await userEvent.click(
+      within(database1Row!).getByRole("button", { name: "Actions: Database 1" }),
+    );
+    await userEvent.click(await screen.findByRole("menuitem", { name: "Delete database" }));
     expect(mockOnDelete).not.toHaveBeenCalled();
 
     const dialog = await screen.findByRole("alertdialog");
@@ -73,7 +76,13 @@ describe("<DatabaseAdminList />", () => {
     expect(databaseNames).toEqual(["Database 2", "Database 1"]);
   });
 
-  it("checks the never-expires switch only for databases without an expiry date", () => {
+  it("shows Never in the Expires column for databases without an expiry date", () => {
+    render(<DatabaseAdminList databases={[mockData[0]]} />);
+
+    expect(screen.getByRole("cell", { name: "Never" })).toBeInTheDocument();
+  });
+
+  it("checks Never expires in the row menu only for databases without an expiry date", async () => {
     const databases = [
       new Database({ ...mockData[0].props, expiresAt: new Date(2027, 4, 6) }),
       mockData[1],
@@ -81,11 +90,17 @@ describe("<DatabaseAdminList />", () => {
 
     render(<DatabaseAdminList databases={databases} />);
 
-    expect(screen.getByRole("switch", { name: "Never expires: Database 1" })).not.toBeChecked();
-    expect(screen.getByRole("switch", { name: "Never expires: Database 2" })).toBeChecked();
+    await userEvent.click(screen.getByRole("button", { name: "Actions: Database 1" }));
+    expect(
+      await screen.findByRole("menuitemcheckbox", { name: "Never expires" }),
+    ).not.toBeChecked();
+    await userEvent.keyboard("{Escape}");
+
+    await userEvent.click(screen.getByRole("button", { name: "Actions: Database 2" }));
+    expect(await screen.findByRole("menuitemcheckbox", { name: "Never expires" })).toBeChecked();
   });
 
-  it("calls onNeverExpiresChange when the switch is toggled", async () => {
+  it("calls onNeverExpiresChange when Never expires is toggled", async () => {
     const onNeverExpiresChange = vi.fn();
     const database = new Database({ ...mockData[0].props, expiresAt: new Date(2027, 4, 6) });
 
@@ -93,7 +108,8 @@ describe("<DatabaseAdminList />", () => {
       <DatabaseAdminList databases={[database]} onNeverExpiresChange={onNeverExpiresChange} />,
     );
 
-    await userEvent.click(screen.getByRole("switch", { name: "Never expires: Database 1" }));
+    await userEvent.click(screen.getByRole("button", { name: "Actions: Database 1" }));
+    await userEvent.click(await screen.findByRole("menuitemcheckbox", { name: "Never expires" }));
 
     expect(onNeverExpiresChange).toHaveBeenCalledWith(database, true);
   });
