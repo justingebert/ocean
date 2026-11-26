@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { OceanLogo } from "@/components/common/OceanLogo";
 
 type AppShellLoadingProps = {
   label: string;
@@ -13,7 +14,7 @@ export function AppShellLoading({ label }: AppShellLoadingProps) {
       aria-busy="true"
     >
       <aside className="hidden w-64 shrink-0 flex-col gap-8 bg-sidebar p-4 md:flex">
-        <img className="h-8 w-auto self-start" src="/ocean-logo.png" alt="" />
+        <OceanLogo className="self-start" alt="" />
         <div className="flex flex-col gap-3">
           <Skeleton className="h-9 w-full" />
           <Skeleton className="h-9 w-4/5" />

@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { OceanLogo } from "@/components/common/OceanLogo";
 import { getNavigationSection } from "./utils";
 
 type AppSidebarProps = {
@@ -53,7 +54,7 @@ export function AppSidebar({ navigationItems }: AppSidebarProps) {
             className="flex h-12 items-center px-3"
             onClick={closeMobileSidebar}
           >
-            <img className="h-8 w-auto" src="/ocean-logo.png" alt="Ocean logo" />
+            <OceanLogo />
           </Link>
         </SidebarHeader>
 
