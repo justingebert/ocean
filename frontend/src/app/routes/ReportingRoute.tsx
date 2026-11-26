@@ -5,13 +5,11 @@ import { buttonVariants } from "@/components/ui/button";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import ErrorState from "@/components/common/ErrorState";
 import ListSkeleton from "@/components/common/ListSkeleton";
-import { useMetricsQuery } from "@/features/reporting/hooks/useMetricsQuery";
 import {
   useDatabasesQuery,
   useDeleteDatabaseWithPermissionMutation,
   useSetDatabaseNeverExpiresMutation,
 } from "@/features/databases/hooks/useDatabaseQuery";
-import { IStats, Stats } from "@/features/reporting/Stats";
 import { DatabaseAdminList } from "@/features/databases/components/DatabaseAdminList";
 import { useUsersQuery } from "@/features/users/hooks/useUserQuery";
 import { UserAdminList } from "@/features/users/components/UserAdminList";
@@ -23,33 +21,16 @@ const monitoringLinks = [
 ];
 
 const ReportingRoute = () => {
-  const metricsQuery = useMetricsQuery();
   const databasesQuery = useDatabasesQuery();
   const deleteDatabaseWithPermissionMutation = useDeleteDatabaseWithPermissionMutation({
     onError: () => toast.error("Couldn't delete database"),
-    onSettled: () => {
-      databasesQuery.refetch();
-      metricsQuery.refetch();
-    },
+    onSettled: () => databasesQuery.refetch(),
   });
   const setNeverExpiresMutation = useSetDatabaseNeverExpiresMutation({
     onError: () => toast.error("Couldn't change expiry"),
     onSettled: () => databasesQuery.refetch(),
   });
   const usersQuery = useUsersQuery();
-
-  const stats: IStats[] = metricsQuery.data
-    ? [
-        {
-          name: "Databases",
-          value: metricsQuery.data.totalInstances.toLocaleString(),
-        },
-        {
-          name: "Users",
-          value: metricsQuery.data.totalUsers.toLocaleString(),
-        },
-      ]
-    : [];
 
   const usernames = new Map(usersQuery.data?.map((user) => [user.id, user.username]));
 
@@ -75,19 +56,10 @@ const ReportingRoute = () => {
         }
       />
       <div className="flex flex-col gap-10">
-        {metricsQuery.isPending ? (
-          <ListSkeleton rows={2} />
-        ) : metricsQuery.isError ? (
-          <ErrorState title="Couldn't load metrics" onRetry={() => metricsQuery.refetch()} />
-        ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {stats.map((item) => (
-              <Stats key={item.name} name={item.name} value={item.value} />
-            ))}
-          </div>
-        )}
         <section className="flex flex-col gap-4">
-          <SectionHeading>Databases</SectionHeading>
+          <SectionHeading>
+            Databases <Count value={databasesQuery.data?.length} />
+          </SectionHeading>
           {databasesQuery.isPending ? (
             <ListSkeleton rows={4} />
           ) : databasesQuery.isError ? (
@@ -104,7 +76,9 @@ const ReportingRoute = () => {
           )}
         </section>
         <section className="flex flex-col gap-4">
-          <SectionHeading>Users</SectionHeading>
+          <SectionHeading>
+            Users <Count value={usersQuery.data?.length} />
+          </SectionHeading>
           {usersQuery.isPending ? (
             <ListSkeleton rows={4} />
           ) : usersQuery.isError ? (
@@ -117,5 +91,12 @@ const ReportingRoute = () => {
     </>
   );
 };
+
+const Count = ({ value }: { value: number | undefined }) =>
+  value === undefined ? null : (
+    <span className="font-normal text-muted-foreground tabular-nums">
+      ({value.toLocaleString()})
+    </span>
+  );
 
 export default ReportingRoute;
