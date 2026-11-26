@@ -1,6 +1,6 @@
 import React from "react";
 import { compareDesc } from "date-fns";
-import { ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import {
   Table,
@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table.tsx";
-import { Badge } from "@/components/ui/badge.tsx";
 import { cn } from "cn";
 import { formatDate, getDatabaseEngineTitle, isExpiringSoon } from "./databaseListFormat.ts";
 import DatabaseEngineLogo from "./DatabaseEngineLogo.tsx";
@@ -18,11 +17,10 @@ import { DatabaseProperties } from "@/features/databases/model/database.ts";
 
 export interface DatabaseListProps {
   databases: ReadonlyArray<DatabaseProperties>;
-
-  onClick?: (id: number) => void;
+  getHref: (id: number) => string;
 }
 
-const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
+const DatabaseList: React.FC<DatabaseListProps> = ({ databases, getHref }) => {
   const sortedDatabases = databases
     .slice(0)
     .sort((left, right) => compareDesc(left.createdAt, right.createdAt));
@@ -32,43 +30,38 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
-          <TableHead>Engine</TableHead>
+          <TableHead className="hidden sm:table-cell">Engine</TableHead>
           <TableHead className="hidden text-right md:table-cell">Created</TableHead>
           <TableHead className="text-right">Expires</TableHead>
-          <TableHead className="w-0" />
         </TableRow>
       </TableHeader>
       <TableBody>
         {sortedDatabases.map((database) => (
-          <TableRow
-            key={database.id}
-            onClick={() => onClick?.(database.id)}
-            className="cursor-pointer"
-          >
+          <TableRow key={database.id} className="relative">
             <TableCell className="font-medium">
-              <div className="flex items-center gap-2">
-                <DatabaseEngineLogo className="size-5" engine={database.engine} />
+              <Link
+                to={getHref(database.id)}
+                className="flex items-center gap-2 outline-none after:absolute after:inset-0 focus-visible:after:rounded-md focus-visible:after:ring-2 focus-visible:after:ring-ring"
+              >
+                <DatabaseEngineLogo className="size-4" engine={database.engine} />
                 <span className="truncate">{database.name}</span>
-              </div>
+              </Link>
             </TableCell>
-            <TableCell>
-              <Badge variant="secondary">{getDatabaseEngineTitle(database.engine)}</Badge>
+            <TableCell className="hidden text-muted-foreground sm:table-cell">
+              {getDatabaseEngineTitle(database.engine)}
             </TableCell>
-            <TableCell className="hidden text-right text-muted-foreground md:table-cell">
+            <TableCell className="hidden text-right text-muted-foreground tabular-nums md:table-cell">
               <time dateTime={new Date(database.createdAt).toISOString()}>
                 {formatDate(database.createdAt)}
               </time>
             </TableCell>
             <TableCell
               className={cn(
-                "text-right text-muted-foreground",
+                "text-right text-muted-foreground tabular-nums",
                 isExpiringSoon(database.expiresAt) && "font-medium text-destructive",
               )}
             >
               <ExpiryDate expiresAt={database.expiresAt} />
-            </TableCell>
-            <TableCell className="text-right">
-              <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
             </TableCell>
           </TableRow>
         ))}

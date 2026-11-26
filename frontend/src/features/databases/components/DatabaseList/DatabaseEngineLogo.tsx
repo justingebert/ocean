@@ -39,13 +39,14 @@ const DatabaseEngineLogo: React.FC<DatabaseEngineLogoProps> = ({ engine, classNa
 
   if (!logo) {
     return (
-      <DatabaseIcon className={cn("shrink-0 text-muted-foreground", className)} aria-hidden="true" />
+      <DatabaseIcon
+        className={cn("shrink-0 text-muted-foreground", className)}
+        aria-hidden="true"
+      />
     );
   }
 
-  return (
-    <img className={cn("shrink-0 object-contain", className)} src={logo.src} alt={logo.alt} />
-  );
+  return <img className={cn("shrink-0 object-contain", className)} src={logo.src} alt={logo.alt} />;
 };
 
 export default DatabaseEngineLogo;

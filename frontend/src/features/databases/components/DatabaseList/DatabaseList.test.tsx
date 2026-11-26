@@ -1,7 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import DatabaseList from "./DatabaseList.tsx";
 import { DatabaseProperties } from "@/features/databases/model/database.ts";
 import { engineOptions } from "@/features/databases/constants/engines";
@@ -34,11 +33,13 @@ const mockData: readonly DatabaseProperties[] = [
   },
 ];
 
+const href = (id: number) => `/databases/${id}`;
+
 describe("<DatabaseList />", () => {
   it("renders a row per database with its engine and logo", () => {
     render(
       <MemoryRouter>
-        <DatabaseList databases={mockData} />
+        <DatabaseList databases={mockData} getHref={href} />
       </MemoryRouter>,
     );
 
@@ -66,7 +67,7 @@ describe("<DatabaseList />", () => {
   it("renders only the header row when no databases are available", () => {
     render(
       <MemoryRouter>
-        <DatabaseList databases={[]} />
+        <DatabaseList databases={[]} getHref={href} />
       </MemoryRouter>,
     );
 
@@ -75,24 +76,17 @@ describe("<DatabaseList />", () => {
     expect(within(table).getAllByRole("row")).toHaveLength(1);
   });
 
-  it("calls onClick with the database id when its row is clicked", async () => {
-    const mockOnClick = vi.fn();
-
+  it("links each database name to its page", () => {
     render(
       <MemoryRouter>
-        <DatabaseList databases={mockData} onClick={mockOnClick} />
+        <DatabaseList databases={mockData} getHref={href} />
       </MemoryRouter>,
     );
 
-    const table = screen.getByRole("table");
-    const rows = within(table).getAllByRole("row").slice(1);
-    const database1Row = rows.find((row) => within(row).queryByText("Database 1"));
-
-    expect(database1Row).toBeDefined();
-
-    await userEvent.click(database1Row!);
-
-    expect(mockOnClick).toHaveBeenCalledWith(1);
+    expect(screen.getByRole("link", { name: /Database 1/ })).toHaveAttribute(
+      "href",
+      "/databases/1",
+    );
   });
 
   it("shows the expiry date, or Never for databases that never expire", () => {
@@ -103,7 +97,7 @@ describe("<DatabaseList />", () => {
 
     render(
       <MemoryRouter>
-        <DatabaseList databases={databases} />
+        <DatabaseList databases={databases} getHref={href} />
       </MemoryRouter>,
     );
 
