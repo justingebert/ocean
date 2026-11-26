@@ -1,9 +1,10 @@
 package com.htwhub.ocean.engines
 
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.Configuration
-
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class PostgreSQLEngine @Inject() (config: Configuration)(implicit ec: ExecutionContext) {

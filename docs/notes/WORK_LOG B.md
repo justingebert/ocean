@@ -1,5 +1,12 @@
 # Ocean — Work Log B
 
+## 2026-11-24: Database expiry, part 2: reminder mails and daily cleanup job
+- A daily job in the backend reminds owners 30, 7 and 1 day(s) before expiry and deletes a database once it has expired and all three reminders were actually sent, followed by a confirmation mail. Mails go through the HTW relay already used for the Beszel alerts, German first, then English, with a link to the database page and how to export it.
+- Runs at a fixed time (20:00) instead of on boot, so redeploys can't send several reminders on one day. At most one reminder per run: after an outage or a failed mail the missing ones catch up day by day, and the date in the mail moves out accordingly, so nobody gets less warning than promised.
+- A renew while a reminder is being sent can't be overwritten: the reminder only counts if the database is still in the state the job read.
+- Off by default and mails mocked; production gets the switches in its env file, still off. Tested end to end against the local stack: reminder sent and counted, expired database dropped from the cluster, never-expiring one untouched.
+- A review found five holes, all fixed: the job now refuses to run while mails are mocked (logged-only reminders would have counted toward deletion); it rereads a database right before deleting it, so a renew during the run still saves it; the next run is planned only after the previous one finished, from the Berlin calendar day (no drift at daylight saving changes, no overlapping or catch-up runs); the date in the mail is the day of the run that actually deletes; and the frontend now returns to the requested page after login, so the mail link lands on the database.
+
 ## 2026-11-17: Database expiry, part 1: expiry dates and renew API
 - Every database now has an expiry date (creation + 180 days, configurable) and a count of reminders sent. Existing databases get 180 days from the deploy, hard-coded in the migration because migrations can't read the app config.
 - Owners can renew a database (a full lifetime from now); admins can mark one as never expiring and switch it back. Both reset the reminder count, so a renewed database goes through the full warning sequence again. Renewing a never-expiring database changes nothing, so owners can't undo an admin's exemption.

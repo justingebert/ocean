@@ -11,7 +11,11 @@ import play.api.Configuration
 @Singleton
 class CleanupConfig @Inject() (config: Configuration) {
 
+  val enabled: Boolean = config.get[Boolean]("ocean.cleanup.enabled")
+
   val lifetime: Duration = Duration.ofDays(config.get[Int]("ocean.cleanup.lifetime-days"))
+
+  val reminderDays: Seq[Int] = config.get[Seq[Int]]("ocean.cleanup.reminder-days").sorted.reverse
 
   /** Expiry date for a database created or renewed at `now`. */
   def expiresAtFrom(now: Instant): Timestamp = Timestamp.from(now.plus(lifetime))

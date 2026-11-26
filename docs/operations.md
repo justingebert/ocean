@@ -85,6 +85,22 @@ is deleted. Log in as the monitoring user (`mon@ocean.de`, password in
    Durations max out at 60 min (Beszel keeps 1-minute samples for one hour
    only). A VM added later doesn't get the rules on its own: repeat this step.
 
+## Database expiry
+
+Managed databases expire 180 days after creation or the owner's last renew
+(design: [`plans/db-expiry.md`](plans/db-expiry.md)). A daily job in the
+backend, at 20:00 Berlin time, emails the owner 30, 7 and 1 day(s) before and
+deletes the database once it has expired and all three reminders went out. It
+sends at most one reminder per database per run, so after an outage the missing
+ones go out on the following days and deletion waits for them. A failed mail is
+logged and retried the next day. The job refuses to start while mails are mocked
+(it logs an error instead), since mocked reminders would otherwise count and
+databases would be deleted without a real warning. Set
+`OCEAN_CLEANUP_ENABLED=true` and `OCEAN_MAIL_MOCK=false` together.
+
+Admins exempt a database with "never expires". The backend logs every
+reminder, deletion and failure (`CleanupJob` in Dozzle).
+
 ## Persistent data and destructive commands
 
 Normal Ansible redeploys and `docker compose down` preserve `/srv/ocean` because

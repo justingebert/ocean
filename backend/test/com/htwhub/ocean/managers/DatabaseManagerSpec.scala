@@ -44,7 +44,13 @@ class DatabaseManagerSpec extends AsyncWordSpec with Matchers with MockitoSugar 
   val defaultPostgreSQLEngine: PostgreSQLEngine = mock[PostgreSQLEngine]
   val defaultMongoDBEngine: MongoDBEngine = mock[MongoDBEngine]
   val defaultRoleManager: RoleManager = mock[RoleManager]
-  val cleanupConfig = new CleanupConfig(Configuration("ocean.cleanup.lifetime-days" -> 180))
+  val cleanupConfig = new CleanupConfig(
+    Configuration(
+      "ocean.cleanup.lifetime-days" -> 180,
+      "ocean.cleanup.reminder-days" -> Seq(30, 7, 1),
+      "ocean.cleanup.enabled" -> false
+    )
+  )
 
   private def createDatabaseManager(
     instanceService: InstanceService = defaultInstanceService,

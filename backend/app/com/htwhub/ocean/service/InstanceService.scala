@@ -102,6 +102,20 @@ class InstanceService @Inject() (instanceRepository: InstanceRepository)(implici
         case None           => Future.failed(NotFound())
       }
 
+  /** All databases that have an expiry date, for the cleanup job. No permission check. */
+  def getExpiringInstances: Future[Seq[Instance]] =
+    instanceRepository.getExpiringInstances
+      .recoverWith { case t: Throwable =>
+        internalError(t.getMessage)
+      }
+
+  def incrementRemindersSent(instance: Instance): Future[Int] =
+    instanceRepository
+      .incrementRemindersSent(instance)
+      .recoverWith { case t: Throwable =>
+        internalError(t.getMessage)
+      }
+
   def deleteInstance(instanceId: InstanceId, userId: UserId): Future[Int] =
     getUserInstanceById(instanceId, userId)
       .flatMap(instance =>

@@ -1,4 +1,5 @@
 import com.google.inject.AbstractModule
+import com.htwhub.ocean.cleanup.CleanupScheduler
 import com.htwhub.ocean.service.OnStartupService
 import java.time.Clock
 
@@ -15,5 +16,7 @@ class Module extends AbstractModule {
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone)
     // Use the service to check if all environment requirements are satisfied
     bind(classOf[OnStartupService]).asEagerSingleton()
+    // Schedules the daily database expiry cleanup
+    bind(classOf[CleanupScheduler]).asEagerSingleton()
   }
 }

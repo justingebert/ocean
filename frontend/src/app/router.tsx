@@ -1,5 +1,12 @@
 import React, { Suspense } from "react";
-import { BrowserRouter as Router, Route, Navigate, Routes, Outlet } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Navigate,
+  Routes,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
 
 import { useAuth } from "@/features/auth/authContext";
 import { AuthLoadingScreen } from "@/features/auth/components/AuthLoadingScreen";
@@ -63,12 +70,18 @@ const RootView: React.FC = () => {
 
 const ProtectedRoute = () => {
   const { status } = useAuth();
+  const location = useLocation();
 
   if (status === "checking") {
     return <AuthLoadingScreen />;
   }
 
-  return status === "authenticated" ? <Outlet /> : <Navigate to={routePaths.login} replace />;
+  // Keep the requested page (e.g. a database link from an expiry mail) for after sign-in.
+  return status === "authenticated" ? (
+    <Outlet />
+  ) : (
+    <Navigate to={routePaths.login} replace state={{ from: location }} />
+  );
 };
 
 export default RootView;

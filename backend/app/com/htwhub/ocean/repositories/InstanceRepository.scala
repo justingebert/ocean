@@ -78,6 +78,24 @@ class InstanceRepository @Inject() (dbConfigProvider: DatabaseConfigProvider, us
       instances.filter(_.id === instanceId).map(i => (i.expiresAt, i.remindersSent)).update((expiresAt, 0))
     )
 
+  def getExpiringInstances: Future[Seq[Instance]] =
+    dbConfig.db.run(
+      instances.filter(_.expiresAt.isDefined).result
+    )
+
+  /** Counts one more reminder, unless the database was renewed or reminded since `instance` was read. Returns the
+    * number of updated rows.
+    */
+  def incrementRemindersSent(instance: Instance): Future[Int] =
+    dbConfig.db.run(
+      instances
+        .filter(i =>
+          i.id === instance.id && i.remindersSent === instance.remindersSent && i.expiresAt === instance.expiresAt
+        )
+        .map(_.remindersSent)
+        .update(instance.remindersSent + 1)
+    )
+
   def deleteInstanceById(instanceId: InstanceId): Future[Int] =
     dbConfig.db.run(
       instances.filter(_.id === instanceId).delete

@@ -17,6 +17,7 @@ object Dependencies {
     val jackson = "2.12.2"
     val swaggerAnnotations = "1.6.12"
     val swaggerUi = "5.32.8"
+    val playMailer = "10.1.0"
 
     // test
     val scalaTest = "3.2.19"
@@ -37,6 +38,8 @@ object Dependencies {
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % Version.jackson,
     "io.swagger" % "swagger-annotations" % Version.swaggerAnnotations,
     "org.webjars" % "swagger-ui" % Version.swaggerUi,
+    "org.playframework" %% "play-mailer" % Version.playMailer,
+    "org.playframework" %% "play-mailer-guice" % Version.playMailer,
   )
 
   val test: Seq[ModuleID] = Seq(

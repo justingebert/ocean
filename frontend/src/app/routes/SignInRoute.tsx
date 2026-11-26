@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { type Location, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "@/features/auth/authContext";
 import { routePaths } from "@/app/navigation/routes.ts";
@@ -9,13 +9,18 @@ import SignInForm from "@/features/auth/components/SignInForm";
 
 const SignInRoute: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { status, loginPending, loginError, login } = useAuth();
+
+  // Set by ProtectedRoute when it sent the user here.
+  const from = (location.state as { from?: Location } | null)?.from;
+  const target = from ? `${from.pathname}${from.search}` : routePaths.overview;
 
   useEffect(() => {
     if (status === "authenticated") {
-      navigate(routePaths.overview, { replace: true });
+      void navigate(target, { replace: true });
     }
-  }, [status, navigate]);
+  }, [status, navigate, target]);
 
   const onSubmit = (credentials: CredentialProperties) => {
     void login(credentials);
