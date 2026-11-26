@@ -6,6 +6,7 @@ import { routePaths } from "@/app/navigation/routes.ts";
 import { CredentialProperties } from "@/api/sessionClient";
 
 import SignInForm from "@/features/auth/components/SignInForm";
+import { OceanLogo } from "@/components/common/OceanLogo";
 
 const SignInRoute: React.FC = () => {
   const navigate = useNavigate();
@@ -27,14 +28,20 @@ const SignInRoute: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-semibold tracking-tight text-foreground">
-          Sign in to your HTW account
-        </h2>
+    <main className="flex min-h-svh flex-col items-center justify-center bg-background px-4 py-12">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <OceanLogo className="size-10" alt="" />
+          <div>
+            <h1 className="font-heading text-xl font-semibold tracking-tight text-foreground">
+              Sign in to Ocean
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">Use your HTW account.</p>
+          </div>
+        </div>
+        <SignInForm loading={loginPending} errorMessage={loginError} onSubmit={onSubmit} />
       </div>
-      <SignInForm loading={loginPending} errorMessage={loginError} onSubmit={onSubmit} />
-    </div>
+    </main>
   );
 };
 

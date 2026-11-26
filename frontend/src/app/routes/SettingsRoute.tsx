@@ -15,7 +15,7 @@ const SettingsRoute: React.FC = () => {
 
   return (
     <div>
-      <PageHeader title="Profile" />
+      <PageHeader title="Profile" description="Your account comes from the HTW directory." />
       {userQuery.isError ? (
         <ErrorState title="Couldn't load profile" onRetry={() => userQuery.refetch()} />
       ) : (
