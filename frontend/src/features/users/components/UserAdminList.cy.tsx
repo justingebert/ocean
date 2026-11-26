@@ -42,17 +42,16 @@ describe("UserAdminList Component", () => {
   it("renders the table with headers", () => {
     cy.get("table").should("exist");
 
-    cy.contains("thead th", "ID").should("exist");
+    cy.contains("thead th", "ID").should("not.exist");
     cy.contains("thead th", "Name").should("exist");
     cy.contains("thead th", "Username").should("exist");
     cy.contains("thead th", "Type").should("exist");
   });
 
   it("renders users in descending order of ID", () => {
-    cy.get("tbody tr").eq(0).contains("td", "3");
-
-    cy.get("tbody tr").eq(1).contains("td", "2");
-    cy.get("tbody tr").eq(2).contains("td", "1");
+    cy.get("tbody tr").eq(0).contains("td", "johndoe");
+    cy.get("tbody tr").eq(1).contains("td", "alicebrown");
+    cy.get("tbody tr").eq(2).contains("td", "janesmith");
   });
 
   it("displays the correct user data", () => {

@@ -23,7 +23,6 @@ export const UserAdminList: React.FC<UserAdminListProps> = ({ users }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-16">ID</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Username</TableHead>
             <TableHead>Type</TableHead>
@@ -32,7 +31,6 @@ export const UserAdminList: React.FC<UserAdminListProps> = ({ users }) => {
         <TableBody>
           {sortedUsers.map((user) => (
             <TableRow key={user.id}>
-              <TableCell className="text-muted-foreground tabular-nums">{user.id}</TableCell>
               <TableCell className="font-medium">{User.getDisplayName(user)}</TableCell>
               <TableCell className="text-muted-foreground">{user.username}</TableCell>
               <TableCell>

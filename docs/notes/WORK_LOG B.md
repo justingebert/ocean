@@ -1,5 +1,11 @@
 # Ocean — Work Log B
 
+## 2026-11-26: Quieter admin page
+- The two stat cards are gone; the counts now sit in the section headings ("Databases (12)", "Users (40)"). They come from the lists the page already loads, so the frontend no longer calls `/metrics` (the endpoint still exists in the backend).
+- Per-row "Delete" and the "Never expires" switch column moved into a row "…" menu; the Expires column already shows "Never".
+- Dropped the ID column from the users table.
+- Database names are not linked: the database detail endpoints only answer the owner, so admins cannot open other users' databases without a backend change.
+
 ## 2026-11-26: Clearer new-database form
 - Each engine option now carries a one-line hint ("Relational, SQL" / "Documents, JSON") so students who do not know the engines can choose.
 - A note under the create button says databases expire after 6 months and can be renewed. The text is fixed; the backend lifetime is configurable (`OCEAN_DB_LIFETIME_DAYS`, default 180 days), so the two must be kept in step.
