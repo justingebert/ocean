@@ -42,11 +42,10 @@ describe("UserAdminList Component", () => {
   it("renders the table with headers", () => {
     cy.get("table").should("exist");
 
-    cy.contains("thead th", "User ID").should("exist");
-    cy.contains("thead th", "Firstname").should("exist");
-    cy.contains("thead th", "Lastname").should("exist");
+    cy.contains("thead th", "ID").should("exist");
+    cy.contains("thead th", "Name").should("exist");
     cy.contains("thead th", "Username").should("exist");
-    cy.contains("thead th", "Employee").should("exist");
+    cy.contains("thead th", "Type").should("exist");
   });
 
   it("renders users in descending order of ID", () => {

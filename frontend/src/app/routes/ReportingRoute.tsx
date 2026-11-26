@@ -50,64 +50,68 @@ const ReportingRoute = () => {
       ]
     : [];
 
+  const usernames = new Map(usersQuery.data?.map((user) => [user.id, user.username]));
+
   return (
-    <div>
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <PageHeader title="Administration" />
-        {config.monitoringUrl ? (
-          <div className="flex flex-wrap gap-2">
-            {monitoringLinks.map((link) => (
-              <a
-                key={link.path}
-                href={`${config.monitoringUrl}${link.path}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={buttonVariants({ variant: "outline", size: "sm" })}
-              >
-                <ExternalLinkIcon />
-                {link.label}
-              </a>
-            ))}
-          </div>
-        ) : null}
-      </div>
+    <div className="flex flex-col gap-10">
+      <PageHeader
+        className="mb-0"
+        title="Administration"
+        actions={
+          config.monitoringUrl
+            ? monitoringLinks.map((link) => (
+                <a
+                  key={link.path}
+                  href={`${config.monitoringUrl}${link.path}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={buttonVariants({ variant: "outline", size: "sm" })}
+                >
+                  <ExternalLinkIcon data-icon="inline-start" />
+                  {link.label}
+                </a>
+              ))
+            : undefined
+        }
+      />
       {metricsQuery.isPending ? (
-        <ListSkeleton className="mt-5" rows={2} />
+        <ListSkeleton rows={2} />
       ) : metricsQuery.isError ? (
         <ErrorState title="Couldn't load metrics" onRetry={() => metricsQuery.refetch()} />
       ) : (
-        <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {stats.map((item) => (
             <Stats key={item.name} name={item.name} value={item.value} />
           ))}
         </div>
       )}
-      <div>
-        <SectionHeading className="mt-10">Databases</SectionHeading>
+      <section className="flex flex-col gap-4">
+        <SectionHeading>Databases</SectionHeading>
         {databasesQuery.isPending ? (
-          <ListSkeleton className="mt-8" rows={4} />
+          <ListSkeleton rows={4} />
         ) : databasesQuery.isError ? (
           <ErrorState title="Couldn't load databases" onRetry={() => databasesQuery.refetch()} />
         ) : (
           <DatabaseAdminList
             databases={databasesQuery.data}
+            getOwnerName={(userId) => usernames.get(userId)}
             onDelete={(database) => deleteDatabaseWithPermissionMutation.mutate(database.id)}
             onNeverExpiresChange={(database, neverExpires) =>
               setNeverExpiresMutation.mutate({ id: database.id, neverExpires })
             }
           />
         )}
-      </div>
-      <div>
-        <SectionHeading className="mt-10">Users</SectionHeading>
+      </section>
+      <section className="flex flex-col gap-4">
+        <SectionHeading>Users</SectionHeading>
         {usersQuery.isPending ? (
-          <ListSkeleton className="mt-8" rows={4} />
+          <ListSkeleton rows={4} />
         ) : usersQuery.isError ? (
           <ErrorState title="Couldn't load users" onRetry={() => usersQuery.refetch()} />
         ) : (
           <UserAdminList users={usersQuery.data} />
         )}
-      </div>
+      </section>
     </div>
   );
 };

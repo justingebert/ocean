@@ -97,4 +97,20 @@ describe("<DatabaseAdminList />", () => {
 
     expect(onNeverExpiresChange).toHaveBeenCalledWith(database, true);
   });
+
+  it("shows the owner's username when it is known", () => {
+    render(
+      <DatabaseAdminList
+        databases={mockData}
+        getOwnerName={(userId) => (userId === 100 ? "ada" : undefined)}
+      />,
+    );
+
+    const rows = screen.getAllByRole("row").slice(1);
+    const database1Row = rows.find((row) => within(row).queryByText("Database 1"));
+    const database2Row = rows.find((row) => within(row).queryByText("Database 2"));
+
+    expect(within(database1Row!).getByText("ada")).toBeInTheDocument();
+    expect(within(database2Row!).getByText("101")).toBeInTheDocument();
+  });
 });

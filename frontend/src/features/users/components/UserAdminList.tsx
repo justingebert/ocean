@@ -19,24 +19,24 @@ export const UserAdminList: React.FC<UserAdminListProps> = ({ users }) => {
   const sortedUsers = users.slice(0).sort((left, right) => right.id - left.id);
 
   return (
-    <div className="mt-8">
+    <div>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>User ID</TableHead>
-            <TableHead>Firstname</TableHead>
-            <TableHead>Lastname</TableHead>
+            <TableHead className="w-16">ID</TableHead>
+            <TableHead>Name</TableHead>
             <TableHead>Username</TableHead>
-            <TableHead>Employee</TableHead>
+            <TableHead>Type</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedUsers.map((user) => (
             <TableRow key={user.id}>
-              <TableCell className="font-medium">{user.id}</TableCell>
-              <TableCell>{user.firstName}</TableCell>
-              <TableCell>{user.lastName}</TableCell>
-              <TableCell>{user.username}</TableCell>
+              <TableCell className="text-muted-foreground tabular-nums">{user.id}</TableCell>
+              <TableCell className="font-medium">
+                {user.firstName} {user.lastName}
+              </TableCell>
+              <TableCell className="text-muted-foreground">{user.username}</TableCell>
               <TableCell>
                 <Badge variant="secondary" className="capitalize">
                   {user.employeeType}

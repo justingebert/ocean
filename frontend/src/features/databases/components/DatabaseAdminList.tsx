@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table.tsx";
-import { Badge } from "@/components/ui/badge.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Switch } from "@/components/ui/switch";
 import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteDialog";
@@ -26,12 +25,15 @@ export interface DatabaseAdminListProps {
   databases: ReadonlyArray<Database>;
   onDelete?: (database: Database) => void;
   onNeverExpiresChange?: (database: Database, neverExpires: boolean) => void;
+  /** Shows the owner's username instead of their numeric id when known. */
+  getOwnerName?: (userId: number) => string | undefined;
 }
 
 export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
   databases,
   onDelete,
   onNeverExpiresChange,
+  getOwnerName,
 }) => {
   const [databaseToDelete, setDatabaseToDelete] = useState<Database>();
   const sortedDatabases = databases
@@ -39,12 +41,12 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
     .sort((left, right) => compareDesc(left.createdAt, right.createdAt));
 
   return (
-    <div className="mt-8">
+    <div>
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
-            <TableHead>Owner ID</TableHead>
+            <TableHead>Owner</TableHead>
             <TableHead>Engine</TableHead>
             <TableHead>Created</TableHead>
             <TableHead>Expires</TableHead>
@@ -56,9 +58,11 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
           {sortedDatabases.map((database) => (
             <TableRow key={database.id}>
               <TableCell className="font-medium">{database.name}</TableCell>
-              <TableCell className="text-muted-foreground">{database.userId}</TableCell>
-              <TableCell>
-                <Badge variant="secondary">{getDatabaseEngineTitle(database.engine)}</Badge>
+              <TableCell className="text-muted-foreground">
+                {getOwnerName?.(database.userId) ?? database.userId}
+              </TableCell>
+              <TableCell className="text-muted-foreground">
+                {getDatabaseEngineTitle(database.engine)}
               </TableCell>
               <TableCell className="text-muted-foreground">
                 <time dateTime={new Date(database.createdAt).toISOString()}>
@@ -81,11 +85,7 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
                 />
               </TableCell>
               <TableCell className="text-right">
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => setDatabaseToDelete(database)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setDatabaseToDelete(database)}>
                   Delete
                 </Button>
               </TableCell>
