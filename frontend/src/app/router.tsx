@@ -15,7 +15,6 @@ import SignInRoute from "./routes/SignInRoute";
 import LoadingRoute from "./routes/LoadingRoute";
 
 const AppLayout = React.lazy(() => import("./layout/AppLayout"));
-const OverviewRoute = React.lazy(() => import("./routes/OverviewRoute"));
 const DatabasesRoute = React.lazy(() => import("./routes/DatabasesRoute"));
 const CreateDatabaseRoute = React.lazy(() => import("./routes/CreateDatabaseRoute"));
 const DatabaseDetailRoute = React.lazy(() => import("./routes/DatabaseDetailRoute"));
@@ -39,7 +38,7 @@ const RootView: React.FC = () => {
             path={routePaths.root}
             element={
               <Navigate
-                to={status === "authenticated" ? routePaths.overview : routePaths.login}
+                to={status === "authenticated" ? routePaths.databases : routePaths.login}
                 replace
               />
             }
@@ -49,7 +48,8 @@ const RootView: React.FC = () => {
 
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
-              <Route path={routePaths.overview} element={<OverviewRoute />} />
+              {/* Old home page, kept so bookmarks still land somewhere useful. */}
+              <Route path="/overview" element={<Navigate to={routePaths.databases} replace />} />
               <Route path={routePaths.databases} element={<DatabasesRoute />} />
               <Route path={routePaths.createDatabase} element={<CreateDatabaseRoute />} />
               <Route path={routePaths.databaseDetail} element={<DatabaseDetailRoute />} />

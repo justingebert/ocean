@@ -18,7 +18,7 @@ function renderSignIn(state?: unknown) {
     <MemoryRouter initialEntries={[{ pathname: "/login", state }]}>
       <Routes>
         <Route path="/login" element={<SignInRoute />} />
-        <Route path="/overview" element={<div>overview</div>} />
+        <Route path="/databases" element={<div>databases</div>} />
         <Route path="/databases/:id" element={<div>database page</div>} />
       </Routes>
     </MemoryRouter>,
@@ -32,9 +32,9 @@ describe("SignInRoute", () => {
     expect(await screen.findByText("database page")).toBeInTheDocument();
   });
 
-  it("goes to the overview without a requested page", async () => {
+  it("goes to the databases without a requested page", async () => {
     renderSignIn();
 
-    expect(await screen.findByText("overview")).toBeInTheDocument();
+    expect(await screen.findByText("databases")).toBeInTheDocument();
   });
 });

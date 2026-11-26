@@ -1,7 +1,6 @@
 import {
   CircleHelpIcon,
   DatabaseIcon,
-  HouseIcon,
   ShieldCheckIcon,
   UserRoundIcon,
   type LucideIcon,
@@ -18,13 +17,6 @@ export type Navigation = LinkProps & {
   section: "primary" | "secondary";
   requiredPermission?: string;
   icon: LucideIcon;
-};
-
-export const HomeNavigation: Navigation = {
-  name: "Home",
-  to: routePaths.overview,
-  section: "primary",
-  icon: HouseIcon,
 };
 
 export const DatabasesNavigation: Navigation = {
@@ -57,7 +49,6 @@ export const AdministrationNavigation: Navigation = {
 };
 
 export const navigation: Navigation[] = [
-  HomeNavigation,
   DatabasesNavigation,
   AdministrationNavigation,
   HelpNavigation,

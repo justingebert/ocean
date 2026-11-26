@@ -1,7 +1,6 @@
 export const routePaths = {
   root: "/",
   login: "/login",
-  overview: "/overview",
   databases: "/databases",
   createDatabase: "/databases/new",
   databaseDetail: "/databases/:id",

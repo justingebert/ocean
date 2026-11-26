@@ -14,7 +14,7 @@ const SignInRoute: React.FC = () => {
 
   // Set by ProtectedRoute when it sent the user here.
   const from = (location.state as { from?: Location } | null)?.from;
-  const target = from ? `${from.pathname}${from.search}` : routePaths.overview;
+  const target = from ? `${from.pathname}${from.search}` : routePaths.databases;
 
   useEffect(() => {
     if (status === "authenticated") {

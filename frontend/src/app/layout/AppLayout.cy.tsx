@@ -17,7 +17,7 @@ describe("AppLayout Tests", () => {
     cy.viewport(1280, 800);
     cy.intercept("GET", "/v1/user", { body: mockUser }).as("getUser");
     localStorage.setItem("accessToken", "test-access-token");
-    window.history.pushState({}, "", routePaths.overview);
+    window.history.pushState({}, "", routePaths.databases);
 
     mount(
       <QueryClientProvider client={queryClient}>
@@ -60,7 +60,7 @@ describe("AppLayout Tests", () => {
     cy.wait("@getUser");
 
     cy.get("nav[aria-label='Sidebar'] a[aria-current='page']")
-      .should("contain.text", "Home")
+      .should("contain.text", "Databases")
       .and("have.attr", "data-active");
 
     cy.get("nav[aria-label='Sidebar'] a[aria-current='page'] svg").should("exist");

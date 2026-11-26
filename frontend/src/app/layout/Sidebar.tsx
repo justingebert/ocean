@@ -2,7 +2,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { PlusIcon } from "lucide-react";
 
 import type { Navigation } from "@/app/navigation/navigation";
-import { HomeNavigation } from "@/app/navigation/navigation";
+import { DatabasesNavigation } from "@/app/navigation/navigation";
 import { routePaths } from "@/app/navigation/routes";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,7 +59,7 @@ export function AppSidebar({ navigationItems, user, userLoading, onLogout }: App
       <nav className="flex min-h-0 flex-1 flex-col" aria-label="Sidebar">
         <SidebarHeader className="flex-row items-center justify-between">
           <Link
-            to={HomeNavigation.to}
+            to={DatabasesNavigation.to}
             className="flex items-center gap-2 rounded-md p-1 text-sm font-semibold"
             onClick={closeMobileSidebar}
           >
