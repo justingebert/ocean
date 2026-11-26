@@ -21,7 +21,7 @@ export function DatabaseDetailHeader({ database, onDelete }: DatabaseDetailHeade
       </div>
       <div className="min-w-0 flex-1">
         {database ? (
-          <div className="text-2xl font-bold leading-7 text-foreground sm:truncate sm:text-3xl">
+          <div className="font-heading text-xl font-semibold tracking-tight text-foreground sm:truncate">
             {database.name}
           </div>
         ) : (

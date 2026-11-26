@@ -8,11 +8,11 @@ export interface PageHeaderProps {
 
 export function PageHeader({ title, description, className }: PageHeaderProps) {
   return (
-    <header className={cn("mb-8", className)}>
-      <h1 className="font-heading text-3xl font-semibold tracking-tight text-balance text-foreground sm:text-4xl">
+    <header className={cn("mb-6", className)}>
+      <h1 className="font-heading text-xl font-semibold tracking-tight text-balance text-foreground">
         {title}
       </h1>
-      {description ? <p className="mt-2 text-pretty text-muted-foreground">{description}</p> : null}
+      {description ? <p className="mt-1 text-sm text-pretty text-muted-foreground">{description}</p> : null}
     </header>
   );
 }

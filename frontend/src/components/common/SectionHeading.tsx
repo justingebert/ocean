@@ -9,9 +9,7 @@ export interface SectionHeadingProps {
 
 export function SectionHeading({ children, className }: SectionHeadingProps) {
   return (
-    <h2
-      className={cn("font-heading text-xl font-semibold tracking-tight text-foreground", className)}
-    >
+    <h2 className={cn("font-heading text-base font-semibold text-foreground", className)}>
       {children}
     </h2>
   );
