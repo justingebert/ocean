@@ -1,5 +1,11 @@
 # Ocean — Work Log B
 
+## 2026-11-26: Review follow-ups for the UI cleanup
+- All delete confirmations now behave the same: the dialog shows a spinner until the delete finishes, then closes, and failures are toasted. Before, only the detail page waited; the admin list and the users panel closed at once, and a failed admin delete was silent.
+- People are shown by full name everywhere (account menu, admin users, invitations) instead of a mix with "F. Last".
+- Smaller consistency fixes: one shared date formatter, the database detail header reuses the page header, the dark-mode control is a standard menu checkbox item (a checkmark instead of the switch), and engine logos next to a name are decorative.
+- The Cypress e2e specs still target the old UI (the /overview route, old button texts). They are not run in CI and are left for a separate change.
+
 ## 2026-11-26: Dark-mode switch in the account menu
 - The Light / Dark / System radio list in the account menu is now a single "Dark mode" switch. Until someone flips it the app follows the OS setting; flipping it stores an explicit light or dark choice in the browser (next-themes already persisted the theme, so only the UI changed). There is no way back to "follow system" short of clearing site data, which seemed an acceptable trade for the simpler control.
 ## 2026-11-26: Frontend UI cleanup
