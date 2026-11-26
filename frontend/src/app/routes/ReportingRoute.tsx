@@ -1,4 +1,5 @@
 import { ExternalLinkIcon } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { buttonVariants } from "@/components/ui/button";
 import { SectionHeading } from "@/components/common/SectionHeading";
@@ -8,6 +9,7 @@ import { useMetricsQuery } from "@/features/reporting/hooks/useMetricsQuery";
 import {
   useDatabasesQuery,
   useDeleteDatabaseWithPermissionMutation,
+  useSetDatabaseNeverExpiresMutation,
 } from "@/features/databases/hooks/useDatabaseQuery";
 import { IStats, Stats } from "@/features/reporting/Stats";
 import { DatabaseAdminList } from "@/features/databases/components/DatabaseAdminList";
@@ -28,6 +30,10 @@ const ReportingRoute = () => {
       databasesQuery.refetch();
       metricsQuery.refetch();
     },
+  });
+  const setNeverExpiresMutation = useSetDatabaseNeverExpiresMutation({
+    onError: () => toast.error("Something went wrong", { description: "Expiry was not changed" }),
+    onSettled: () => databasesQuery.refetch(),
   });
   const usersQuery = useUsersQuery();
 
@@ -86,6 +92,9 @@ const ReportingRoute = () => {
           <DatabaseAdminList
             databases={databasesQuery.data}
             onDelete={(database) => deleteDatabaseWithPermissionMutation.mutate(database.id)}
+            onNeverExpiresChange={(database, neverExpires) =>
+              setNeverExpiresMutation.mutate({ id: database.id, neverExpires })
+            }
           />
         )}
       </div>

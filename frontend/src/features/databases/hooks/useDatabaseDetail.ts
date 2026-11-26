@@ -5,6 +5,7 @@ import { DatabaseClient } from "@/features/databases/api/databaseClient";
 import { InvitationClient } from "@/features/databases/api/invitationClient";
 import { RoleClient } from "@/features/databases/api/roleClient";
 import { UserClient } from "@/api/userClient.ts";
+import { formatExpiryDate } from "@/features/databases/components/DatabaseList/databaseListFormat";
 import { Database } from "@/features/databases/model/database.ts";
 import {
   Invitation,
@@ -124,6 +125,24 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
     },
   });
 
+  const renewDatabaseMutation = useMutation({
+    mutationFn: () => DatabaseClient.renewDatabase(databaseId),
+    onSuccess: (renewed) => {
+      queryClient.setQueryData(["database", databaseId], renewed);
+      queryClient.invalidateQueries({ queryKey: ["databases"] });
+      toast.success("Database renewed", {
+        description: renewed.expiresAt
+          ? `Expires on ${formatExpiryDate(renewed.expiresAt)}`
+          : undefined,
+      });
+    },
+    onError: () => {
+      toast.error("Something went wrong", {
+        description: "Database was not renewed",
+      });
+    },
+  });
+
   const users = usersQuery.data ?? [];
   const currentUser = currentUserQuery.data;
   const roles = rolesQuery.data ?? [];
@@ -134,6 +153,7 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
   const invitedUsers = Invitation.getInvitedUsers(otherUsers, invitations);
   const selectedInvitationUserIds = Invitation.getUserIds(invitations);
   const mongoUser = roles.find((role) => role.name === database?.name);
+  const isOwner = database !== undefined && database.userId === currentUser?.id;
 
   const deleteInvitationForUser = (userId: number) => {
     const invitation = invitations.find((value) => value.userId === userId);
@@ -155,13 +175,16 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
     invitedUsers,
     selectedInvitationUserIds,
     mongoUser,
+    isOwner,
     isCreatingRole: createRoleMutation.isPending,
     isDeletingDatabase: deleteDatabaseMutation.isPending,
+    isRenewingDatabase: renewDatabaseMutation.isPending,
     createRole: (role: UpstreamCreateRoleProperties) => createRoleMutation.mutate(role),
     deleteRole: (roleId: number) => deleteRoleMutation.mutate(roleId),
     createInvitation: (userId: number) =>
       createInvitationMutation.mutate({ instanceId: databaseId, userId }),
     deleteInvitationForUser,
     deleteDatabase: () => deleteDatabaseMutation.mutate(),
+    renewDatabase: () => renewDatabaseMutation.mutate(),
   };
 }

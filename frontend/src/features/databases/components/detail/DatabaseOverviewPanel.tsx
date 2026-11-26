@@ -1,8 +1,15 @@
 import { useState } from "react";
-import { CopyIcon, DownloadIcon, ExternalLinkIcon, EyeIcon, EyeOffIcon } from "lucide-react";
+import {
+  CopyIcon,
+  DownloadIcon,
+  ExternalLinkIcon,
+  EyeIcon,
+  EyeOffIcon,
+  RefreshCwIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   InputGroup,
@@ -11,6 +18,11 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import {
+  formatExpiryDate,
+  isExpiringSoon,
+} from "@/features/databases/components/DatabaseList/databaseListFormat";
 import { Database } from "@/features/databases/model/database.ts";
 import { EngineType } from "@/features/databases/model/engine.ts";
 import { RoleProperties } from "@/features/databases/model/role";
@@ -22,9 +34,19 @@ interface DatabaseOverviewPanelProps {
   database?: Database;
   user?: UserProperties;
   mongoUser?: RoleProperties;
+  canRenew?: boolean;
+  isRenewing?: boolean;
+  onRenew?: () => void;
 }
 
-export function DatabaseOverviewPanel({ database, user, mongoUser }: DatabaseOverviewPanelProps) {
+export function DatabaseOverviewPanel({
+  database,
+  user,
+  mongoUser,
+  canRenew = false,
+  isRenewing = false,
+  onRenew,
+}: DatabaseOverviewPanelProps) {
   const [revealed, setRevealed] = useState(false);
 
   const connectionString = getEngineConnectionString(database, user, mongoUser);
@@ -58,6 +80,40 @@ export function DatabaseOverviewPanel({ database, user, mongoUser }: DatabaseOve
             value={database ? database.port.toString() : undefined}
             skeletonWidth="w-16"
           />
+          <div className="sm:col-span-2">
+            <dt className="text-sm font-medium text-muted-foreground">Expiry</dt>
+            {database ? (
+              <dd className="mt-1 flex flex-wrap items-center gap-3 text-sm">
+                {database.expiresAt === null ? (
+                  <span className="text-foreground">Never expires</span>
+                ) : (
+                  <>
+                    <span
+                      className={cn(
+                        "text-foreground",
+                        isExpiringSoon(database.expiresAt) && "font-medium text-destructive",
+                      )}
+                    >
+                      Expires on{" "}
+                      <time dateTime={new Date(database.expiresAt).toISOString()}>
+                        {formatExpiryDate(database.expiresAt)}
+                      </time>
+                    </span>
+                    {canRenew ? (
+                      <Button variant="outline" size="sm" onClick={onRenew} disabled={isRenewing}>
+                        <RefreshCwIcon />
+                        Renew
+                      </Button>
+                    ) : null}
+                  </>
+                )}
+              </dd>
+            ) : (
+              <dd className="mt-1">
+                <Skeleton className="h-5 w-40" />
+              </dd>
+            )}
+          </div>
         </dl>
 
         <div>

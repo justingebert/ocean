@@ -6,6 +6,8 @@ export interface DatabaseProperties {
   name: string;
   engine: EngineTypeValues;
   createdAt: Date;
+  /** `null` means the database never expires. */
+  expiresAt: Date | null;
   userId: number;
 }
 
@@ -18,6 +20,7 @@ export class Database {
   public readonly name: string;
   public readonly engine: EngineTypeValues;
   public readonly createdAt: Date;
+  public readonly expiresAt: Date | null;
   public readonly userId: number;
 
   constructor(props: DatabaseProperties) {
@@ -27,6 +30,7 @@ export class Database {
     this.name = props.name;
     this.engine = props.engine;
     this.createdAt = props.createdAt;
+    this.expiresAt = props.expiresAt;
     this.userId = props.userId;
   }
 

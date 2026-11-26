@@ -11,6 +11,7 @@ const mockData: ReadonlyArray<Database> = [
     name: "Database 1",
     engine: EngineType.PostgreSQL,
     createdAt: new Date("2023-01-01T00:00:00Z"),
+    expiresAt: null,
     userId: 100,
   }),
   new Database({
@@ -18,6 +19,7 @@ const mockData: ReadonlyArray<Database> = [
     name: "Database 2",
     engine: EngineType.MongoDB,
     createdAt: new Date("2023-02-01T00:00:00Z"),
+    expiresAt: null,
     userId: 101,
   }),
 ];
@@ -66,5 +68,30 @@ describe("<DatabaseAdminList />", () => {
     const databaseNames = rows.map((row) => within(row).getByText(/Database \d+/).textContent);
 
     expect(databaseNames).toEqual(["Database 2", "Database 1"]);
+  });
+
+  it("checks the never-expires switch only for databases without an expiry date", () => {
+    const databases = [
+      new Database({ ...mockData[0].props, expiresAt: new Date(2027, 4, 6) }),
+      mockData[1],
+    ];
+
+    render(<DatabaseAdminList databases={databases} />);
+
+    expect(screen.getByRole("switch", { name: "Never expires: Database 1" })).not.toBeChecked();
+    expect(screen.getByRole("switch", { name: "Never expires: Database 2" })).toBeChecked();
+  });
+
+  it("calls onNeverExpiresChange when the switch is toggled", async () => {
+    const onNeverExpiresChange = vi.fn();
+    const database = new Database({ ...mockData[0].props, expiresAt: new Date(2027, 4, 6) });
+
+    render(
+      <DatabaseAdminList databases={[database]} onNeverExpiresChange={onNeverExpiresChange} />,
+    );
+
+    await userEvent.click(screen.getByRole("switch", { name: "Never expires: Database 1" }));
+
+    expect(onNeverExpiresChange).toHaveBeenCalledWith(database, true);
   });
 });

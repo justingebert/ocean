@@ -49,6 +49,9 @@ export function DatabaseDetailPage({ databaseId, onDeleted }: DatabaseDetailPage
             database={detail.databaseModel}
             user={detail.currentUser}
             mongoUser={detail.mongoUser}
+            canRenew={detail.isOwner}
+            isRenewing={detail.isRenewingDatabase}
+            onRenew={detail.renewDatabase}
           />
         </TabsContent>
         <TabsContent value="users" className="mt-4">

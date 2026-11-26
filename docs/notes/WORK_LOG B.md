@@ -1,5 +1,10 @@
 # Ocean — Work Log B
 
+## 2026-11-26: Database expiry, part 3: UI
+- The database page shows the expiry date with a Renew button for the owner, or "Never expires". The databases list and the admin list get an expiry column, highlighted in red from 30 days before expiry, so the first reminder mail and the UI warning line up.
+- Admins switch "never expires" per database directly in the admin list.
+- No Renew button on never-expiring databases, matching the backend, where a renew leaves the admin's exemption alone.
+
 ## 2026-11-24: Database expiry, part 2: reminder mails and daily cleanup job
 - A daily job in the backend reminds owners 30, 7 and 1 day(s) before expiry and deletes a database once it has expired and all three reminders were actually sent, followed by a confirmation mail. Mails go through the HTW relay already used for the Beszel alerts, German first, then English, with a link to the database page and how to export it.
 - Runs at a fixed time (20:00) instead of on boot, so redeploys can't send several reminders on one day. At most one reminder per run: after an outage or a failed mail the missing ones catch up day by day, and the date in the mail moves out accordingly, so nobody gets less warning than promised.

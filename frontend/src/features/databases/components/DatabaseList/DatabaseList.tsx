@@ -11,7 +11,13 @@ import {
   TableRow,
 } from "@/components/ui/table.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
-import { getDatabaseCreatedAt, getDatabaseEngineTitle } from "./databaseListFormat.ts";
+import { cn } from "@/lib/utils";
+import {
+  formatExpiryDate,
+  getDatabaseCreatedAt,
+  getDatabaseEngineTitle,
+  isExpiringSoon,
+} from "./databaseListFormat.ts";
 import DatabaseEngineLogo from "./DatabaseEngineLogo.tsx";
 import { DatabaseProperties } from "@/features/databases/model/database.ts";
 
@@ -33,6 +39,7 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
           <TableHead>Name</TableHead>
           <TableHead>Engine</TableHead>
           <TableHead className="hidden text-right md:table-cell">Created</TableHead>
+          <TableHead className="text-right">Expires</TableHead>
           <TableHead className="w-0" />
         </TableRow>
       </TableHeader>
@@ -57,6 +64,14 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
                 {getDatabaseCreatedAt(database.createdAt)}
               </time>
             </TableCell>
+            <TableCell
+              className={cn(
+                "text-right text-muted-foreground",
+                isExpiringSoon(database.expiresAt) && "font-medium text-destructive",
+              )}
+            >
+              <ExpiryDate expiresAt={database.expiresAt} />
+            </TableCell>
             <TableCell className="text-right">
               <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
             </TableCell>
@@ -66,5 +81,13 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, onClick }) => {
     </Table>
   );
 };
+
+export function ExpiryDate({ expiresAt }: { expiresAt: Date | null }) {
+  if (expiresAt === null) {
+    return <>Never</>;
+  }
+
+  return <time dateTime={new Date(expiresAt).toISOString()}>{formatExpiryDate(expiresAt)}</time>;
+}
 
 export default DatabaseList;

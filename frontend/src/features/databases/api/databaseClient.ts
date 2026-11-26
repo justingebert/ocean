@@ -48,6 +48,24 @@ export class DatabaseClient {
     return availabilityDatabaseSchema.parse(data).availability;
   };
 
+  public static renewDatabase = async (id: number): Promise<DatabaseProperties> => {
+    const { data } = await axiosInstance.post<DatabaseProperties>(
+      `/databases/${id.toString()}/renew`,
+    );
+    return data;
+  };
+
+  public static setDatabaseNeverExpires = async (
+    id: number,
+    neverExpires: boolean,
+  ): Promise<DatabaseProperties> => {
+    const { data } = await axiosInstance.put<DatabaseProperties>(
+      `/databases/${id.toString()}/expiry`,
+      { neverExpires },
+    );
+    return data;
+  };
+
   public static deleteDatabase = async (id: number): Promise<void> => {
     await axiosInstance.delete(`/databases/${id.toString()}`);
   };

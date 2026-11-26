@@ -13,6 +13,7 @@ const mockData: readonly DatabaseProperties[] = [
     name: "Database 1",
     engine: engineOptions.find((e) => e.label === "PostgreSQL")?.value as EngineTypeValues,
     createdAt: new Date("2023-01-01T00:00:00Z"),
+    expiresAt: null,
     userId: 100,
   },
   {
@@ -20,6 +21,7 @@ const mockData: readonly DatabaseProperties[] = [
     name: "Database 2",
     engine: engineOptions.find((e) => e.label === "MongoDB")?.value as EngineTypeValues,
     createdAt: new Date("2023-02-01T00:00:00Z"),
+    expiresAt: null,
     userId: 101,
   },
   {
@@ -27,6 +29,7 @@ const mockData: readonly DatabaseProperties[] = [
     name: "Database 3",
     engine: "X" as EngineTypeValues,
     createdAt: new Date("2023-03-01T00:00:00Z"),
+    expiresAt: null,
     userId: 102,
   },
 ];
@@ -90,5 +93,25 @@ describe("<DatabaseList />", () => {
     await userEvent.click(database1Row!);
 
     expect(mockOnClick).toHaveBeenCalledWith(1);
+  });
+
+  it("shows the expiry date, or Never for databases that never expire", () => {
+    const databases: DatabaseProperties[] = [
+      { ...mockData[0], expiresAt: new Date(2027, 4, 6) },
+      { ...mockData[1], expiresAt: null },
+    ];
+
+    render(
+      <MemoryRouter>
+        <DatabaseList databases={databases} />
+      </MemoryRouter>,
+    );
+
+    const rows = within(screen.getByRole("table")).getAllByRole("row").slice(1);
+    const database1Row = rows.find((row) => within(row).queryByText("Database 1"));
+    const database2Row = rows.find((row) => within(row).queryByText("Database 2"));
+
+    expect(within(database1Row!).getByText("06.05.2027")).toBeInTheDocument();
+    expect(within(database2Row!).getByText("Never")).toBeInTheDocument();
   });
 });

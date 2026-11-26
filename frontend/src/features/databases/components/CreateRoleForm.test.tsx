@@ -20,6 +20,7 @@ describe("CreateRoleForm", () => {
     id: 1234,
     engine: EngineType.PostgreSQL,
     createdAt: new Date("2023-01-01T00:00:00Z"),
+    expiresAt: null,
     userId: 5678,
   };
 

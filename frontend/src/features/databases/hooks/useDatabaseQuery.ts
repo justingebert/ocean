@@ -25,3 +25,17 @@ export const useDeleteDatabaseWithPermissionMutation = (
     ...options,
   });
 };
+
+export const useSetDatabaseNeverExpiresMutation = (
+  options?: Omit<
+    UseMutationOptions<unknown, Error, { id: number; neverExpires: boolean }>,
+    "mutationFn"
+  >,
+) => {
+  return useMutation({
+    mutationFn: async ({ id, neverExpires }: { id: number; neverExpires: boolean }) => {
+      return DatabaseClient.setDatabaseNeverExpires(id, neverExpires);
+    },
+    ...options,
+  });
+};

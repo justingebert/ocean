@@ -27,6 +27,7 @@ describe("Database", () => {
       name,
       engine: EngineType.PostgreSQL,
       createdAt: new Date(),
+      expiresAt: null,
       userId: 1,
     };
 
@@ -41,6 +42,7 @@ describe("Database", () => {
       name,
       engine: EngineType.MongoDB,
       createdAt: new Date(),
+      expiresAt: null,
       userId: 1,
     };
 
