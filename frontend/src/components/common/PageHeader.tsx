@@ -1,18 +1,25 @@
+import type { ReactNode } from "react";
 import { cn } from "cn";
 
 export interface PageHeaderProps {
   title: string;
   description?: string;
+  actions?: ReactNode;
   className?: string;
 }
 
-export function PageHeader({ title, description, className }: PageHeaderProps) {
+export function PageHeader({ title, description, actions, className }: PageHeaderProps) {
   return (
-    <header className={cn("mb-6", className)}>
-      <h1 className="font-heading text-xl font-semibold tracking-tight text-balance text-foreground">
-        {title}
-      </h1>
-      {description ? <p className="mt-1 text-sm text-pretty text-muted-foreground">{description}</p> : null}
+    <header className={cn("mb-6 flex flex-wrap items-start justify-between gap-4", className)}>
+      <div className="min-w-0">
+        <h1 className="font-heading text-xl font-semibold tracking-tight text-balance text-foreground">
+          {title}
+        </h1>
+        {description ? (
+          <p className="mt-1 text-sm text-pretty text-muted-foreground">{description}</p>
+        ) : null}
+      </div>
+      {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
     </header>
   );
 }

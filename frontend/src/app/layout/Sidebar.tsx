@@ -1,10 +1,14 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { PlusIcon } from "lucide-react";
 
 import type { Navigation } from "@/app/navigation/navigation";
 import { HomeNavigation } from "@/app/navigation/navigation";
+import { routePaths } from "@/app/navigation/routes";
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -14,13 +18,18 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { OceanLogo } from "@/components/common/OceanLogo";
+import { UserProperties } from "@/types/user";
+import { ProfileMenu } from "./ProfileMenu";
 import { getNavigationSection } from "./utils";
 
 type AppSidebarProps = {
   navigationItems: Navigation[];
+  user: UserProperties | undefined;
+  userLoading: boolean;
+  onLogout: () => void;
 };
 
-export function AppSidebar({ navigationItems }: AppSidebarProps) {
+export function AppSidebar({ navigationItems, user, userLoading, onLogout }: AppSidebarProps) {
   const location = useLocation();
   const { setOpenMobile } = useSidebar();
   const primaryItems = getNavigationSection(navigationItems, "primary");
@@ -48,14 +57,24 @@ export function AppSidebar({ navigationItems }: AppSidebarProps) {
   return (
     <Sidebar>
       <nav className="flex min-h-0 flex-1 flex-col" aria-label="Sidebar">
-        <SidebarHeader>
+        <SidebarHeader className="flex-row items-center justify-between">
           <Link
             to={HomeNavigation.to}
-            className="flex h-12 items-center px-3"
+            className="flex items-center gap-2 rounded-md p-1 text-sm font-semibold"
             onClick={closeMobileSidebar}
           >
-            <OceanLogo />
+            <OceanLogo alt="" />
+            Ocean
           </Link>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label="New database"
+            title="New database"
+            render={<Link to={routePaths.createDatabase} onClick={closeMobileSidebar} />}
+          >
+            <PlusIcon />
+          </Button>
         </SidebarHeader>
 
         <SidebarContent>
@@ -71,6 +90,19 @@ export function AppSidebar({ navigationItems }: AppSidebarProps) {
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
+
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <ProfileMenu
+                user={user}
+                loading={userLoading}
+                onLogout={onLogout}
+                onNavigate={closeMobileSidebar}
+              />
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
       </nav>
     </Sidebar>
   );

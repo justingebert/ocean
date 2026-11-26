@@ -59,7 +59,6 @@ export const AdministrationNavigation: Navigation = {
 export const navigation: Navigation[] = [
   HomeNavigation,
   DatabasesNavigation,
-  ProfileNavigation,
   AdministrationNavigation,
   HelpNavigation,
 ];

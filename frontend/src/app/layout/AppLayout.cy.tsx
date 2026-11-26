@@ -1,5 +1,6 @@
 import React from "react";
 import { mount } from "cypress/react";
+import "@/index.css";
 import AppLayout from "./AppLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -13,6 +14,7 @@ const mockUser = { firstName: "John", lastName: "Doe", employeeType: "Staff" };
 
 describe("AppLayout Tests", () => {
   beforeEach(() => {
+    cy.viewport(1280, 800);
     cy.intercept("GET", "/v1/user", { body: mockUser }).as("getUser");
     localStorage.setItem("accessToken", "test-access-token");
     window.history.pushState({}, "", routePaths.overview);
@@ -50,7 +52,7 @@ describe("AppLayout Tests", () => {
   it("renders static sidebar on larger screens", () => {
     cy.viewport(1280, 800);
     cy.get("nav[aria-label='Sidebar']").should("exist");
-    cy.get("button[aria-label='Open sidebar']").should("not.exist");
+    cy.get("button[aria-label='Open sidebar']").should("not.be.visible");
   });
 
   it("highlights the selected desktop navigation item", () => {
@@ -85,14 +87,14 @@ describe("AppLayout Tests", () => {
   });
 
   it("handles profile dropdown actions", () => {
-    cy.get("button").contains("Open user menu").click();
+    cy.contains("button", "Open user menu").click();
 
     cy.contains("Profile").should("exist").and("have.attr", "href", ProfileNavigation.to);
 
     cy.contains("Profile").click({ force: true });
     cy.url().should("include", ProfileNavigation.to);
-    cy.get("button").contains("Open user menu").click();
+    cy.contains("button", "Open user menu").click();
 
-    cy.contains("Logout").should("exist").click();
+    cy.contains("Sign out").should("exist").click();
   });
 });

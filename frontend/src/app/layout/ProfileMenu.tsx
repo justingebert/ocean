@@ -1,15 +1,21 @@
 import { Link } from "react-router-dom";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronsUpDownIcon, LogOutIcon, UserRoundIcon } from "lucide-react";
+import { useTheme } from "next-themes";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { ProfileNavigation } from "@/app/navigation/navigation.ts";
 import { UserProperties } from "@/types/user.ts";
 import { getUserInitials } from "@/app/layout/utils.ts";
@@ -18,37 +24,57 @@ type ProfileMenuProps = {
   user: UserProperties | undefined;
   loading: boolean;
   onLogout: () => void;
+  onNavigate?: () => void;
 };
 
-export function ProfileMenu({ user, loading, onLogout }: ProfileMenuProps) {
-  if (loading) {
+export function ProfileMenu({ user, loading, onLogout, onNavigate }: ProfileMenuProps) {
+  const { theme, setTheme } = useTheme();
+
+  if (loading && !user) {
     return (
-      <div className="flex items-center gap-3 lg:p-2">
+      <div className="flex items-center gap-2 p-2">
         <Skeleton className="size-8 rounded-full" />
-        <Skeleton className="hidden h-4 w-20 lg:block" />
+        <Skeleton className="h-4 w-24" />
       </div>
     );
   }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={<Button variant="ghost" className="h-auto gap-2 lg:px-2 lg:py-1.5" />}
-      >
-        <Avatar>
-          <AvatarFallback>{getUserInitials(user)}</AvatarFallback>
+      <DropdownMenuTrigger render={<SidebarMenuButton size="lg" />}>
+        <Avatar className="size-7">
+          <AvatarFallback className="text-xs">{getUserInitials(user)}</AvatarFallback>
         </Avatar>
-        <span className="hidden text-sm font-medium lg:block">
+        <span className="min-w-0 flex-1 truncate text-left">
           <span className="sr-only">Open user menu for </span>
-          {user?.firstName}
+          {user ? `${user.firstName} ${user.lastName}` : ""}
         </span>
-        <ChevronDownIcon data-icon="inline-end" className="hidden text-muted-foreground lg:block" />
+        <ChevronsUpDownIcon className="text-muted-foreground" aria-hidden="true" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem render={<Link to={ProfileNavigation.to} />}>Profile</DropdownMenuItem>
-        <DropdownMenuItem variant={"destructive"} onClick={() => onLogout()}>
-          Logout
-        </DropdownMenuItem>
+      <DropdownMenuContent side="top" align="start" className="w-(--anchor-width) min-w-56">
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="truncate">{user?.username}</DropdownMenuLabel>
+          <DropdownMenuItem render={<Link to={ProfileNavigation.to} onClick={onNavigate} />}>
+            <UserRoundIcon />
+            Profile
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Theme</DropdownMenuLabel>
+          <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+            <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem onClick={onLogout}>
+            <LogOutIcon />
+            Sign out
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
