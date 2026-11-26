@@ -19,9 +19,7 @@ import {
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "cn";
-import { isExpiringSoon } from "@/features/databases/components/DatabaseList/databaseListFormat";
-import { formatDate } from "@/lib/format";
+import { ExpiryStatus } from "@/features/databases/components/ExpiryStatus";
 import { Database } from "@/features/databases/model/database.ts";
 import { EngineType } from "@/features/databases/model/engine.ts";
 import { RoleProperties } from "@/features/databases/model/role";
@@ -156,15 +154,10 @@ export function DatabaseOverviewPanel({
                   <span className="text-foreground">Never expires</span>
                 ) : (
                   <>
-                    <time
-                      dateTime={new Date(database.expiresAt).toISOString()}
-                      className={cn(
-                        "text-foreground tabular-nums",
-                        isExpiringSoon(database.expiresAt) && "font-medium text-destructive",
-                      )}
-                    >
-                      {formatDate(database.expiresAt)}
-                    </time>
+                    <ExpiryStatus
+                      expiresAt={database.expiresAt}
+                      className="text-foreground tabular-nums"
+                    />
                     {canRenew ? (
                       <Button variant="outline" size="xs" onClick={onRenew} disabled={isRenewing}>
                         <RefreshCwIcon data-icon="inline-start" />

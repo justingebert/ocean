@@ -10,11 +10,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table.tsx";
-import { cn } from "cn";
 import { formatDate } from "@/lib/format";
-import { getDatabaseEngineTitle, isExpiringSoon } from "./databaseListFormat.ts";
+import { getDatabaseEngineTitle } from "./databaseListFormat.ts";
 import DatabaseEngineLogo from "./DatabaseEngineLogo.tsx";
 import { DatabaseProperties } from "@/features/databases/model/database.ts";
+import { ExpiryStatus } from "@/features/databases/components/ExpiryStatus";
 
 export interface DatabaseListProps {
   databases: ReadonlyArray<DatabaseProperties>;
@@ -56,13 +56,9 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, getHref }) => {
                 {formatDate(database.createdAt)}
               </time>
             </TableCell>
-            <TableCell
-              className={cn(
-                "text-right text-muted-foreground tabular-nums",
-                isExpiringSoon(database.expiresAt) && "font-medium text-destructive",
-              )}
-            >
-              <ExpiryDate expiresAt={database.expiresAt} />
+            <TableCell className="text-right text-muted-foreground tabular-nums">
+              {/* relative: lifts the tooltip trigger above the row link's overlay */}
+              <ExpiryStatus expiresAt={database.expiresAt} className="relative" />
             </TableCell>
           </TableRow>
         ))}
@@ -70,13 +66,5 @@ const DatabaseList: React.FC<DatabaseListProps> = ({ databases, getHref }) => {
     </Table>
   );
 };
-
-export function ExpiryDate({ expiresAt }: { expiresAt: Date | null }) {
-  if (expiresAt === null) {
-    return <>Never</>;
-  }
-
-  return <time dateTime={new Date(expiresAt).toISOString()}>{formatDate(expiresAt)}</time>;
-}
 
 export default DatabaseList;

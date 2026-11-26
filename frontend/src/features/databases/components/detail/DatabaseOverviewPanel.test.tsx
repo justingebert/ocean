@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DatabaseOverviewPanel } from "./DatabaseOverviewPanel";
 import { Database } from "@/features/databases/model/database";
@@ -27,7 +27,16 @@ const database = (expiresAt: Date | null) =>
   });
 
 describe("<DatabaseOverviewPanel /> expiry", () => {
-  it("shows the expiry date and lets the owner renew", async () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 10, 6));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("shows the expiry as relative time and lets the owner renew", async () => {
     const onRenew = vi.fn();
 
     render(
@@ -39,7 +48,7 @@ describe("<DatabaseOverviewPanel /> expiry", () => {
       />,
     );
 
-    expect(screen.getByText("6 May 2027")).toBeInTheDocument();
+    expect(screen.getByText("in 6 months")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Renew" }));
     expect(onRenew).toHaveBeenCalledOnce();
   });

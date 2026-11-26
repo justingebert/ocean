@@ -1,6 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import DatabaseList from "./DatabaseList.tsx";
 import { DatabaseProperties } from "@/features/databases/model/database.ts";
 import { engineOptions } from "@/features/databases/constants/engines";
@@ -90,7 +90,10 @@ describe("<DatabaseList />", () => {
     );
   });
 
-  it("shows the expiry date, or Never for databases that never expire", () => {
+  it("shows the expiry as relative time, or Never for databases that never expire", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 10, 6));
+
     const databases: DatabaseProperties[] = [
       { ...mockData[0], expiresAt: new Date(2027, 4, 6) },
       { ...mockData[1], expiresAt: null },
@@ -106,7 +109,9 @@ describe("<DatabaseList />", () => {
     const database1Row = rows.find((row) => within(row).queryByText("Database 1"));
     const database2Row = rows.find((row) => within(row).queryByText("Database 2"));
 
-    expect(within(database1Row!).getByText("6 May 2027")).toBeInTheDocument();
+    expect(within(database1Row!).getByText("in 6 months")).toBeInTheDocument();
     expect(within(database2Row!).getByText("Never")).toBeInTheDocument();
+
+    vi.useRealTimers();
   });
 });

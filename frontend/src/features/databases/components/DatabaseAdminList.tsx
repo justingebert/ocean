@@ -11,15 +11,11 @@ import {
 } from "@/components/ui/table.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Switch } from "@/components/ui/switch";
-import { cn } from "cn";
 import { Database } from "@/features/databases/model/database.ts";
 import { DeleteDatabaseDialog } from "@/features/databases/components/DeleteDatabaseDialog";
-import {
-  getDatabaseEngineTitle,
-  isExpiringSoon,
-} from "@/features/databases/components/DatabaseList/databaseListFormat";
+import { getDatabaseEngineTitle } from "@/features/databases/components/DatabaseList/databaseListFormat";
 import { formatDate } from "@/lib/format";
-import { ExpiryDate } from "@/features/databases/components/DatabaseList/DatabaseList";
+import { ExpiryStatus } from "@/features/databases/components/ExpiryStatus";
 
 export interface DatabaseAdminListProps {
   databases: ReadonlyArray<Database>;
@@ -71,13 +67,8 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
                   {formatDate(database.createdAt)}
                 </time>
               </TableCell>
-              <TableCell
-                className={cn(
-                  "text-muted-foreground",
-                  isExpiringSoon(database.expiresAt) && "font-medium text-destructive",
-                )}
-              >
-                <ExpiryDate expiresAt={database.expiresAt} />
+              <TableCell className="text-muted-foreground">
+                <ExpiryStatus expiresAt={database.expiresAt} />
               </TableCell>
               <TableCell>
                 <Switch
