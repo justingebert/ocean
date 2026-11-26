@@ -28,6 +28,9 @@ describe("Login and Navigate to FAQ", () => {
         employeeType: "Admin",
       },
     }).as("getUser");
+
+    // Sign-in lands on the databases list.
+    cy.intercept("GET", "**/v1/databases", { statusCode: 200, body: [] });
   });
 
   it("logs in, navigates to the FAQ, and expands its answers", () => {
