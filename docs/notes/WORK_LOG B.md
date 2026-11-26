@@ -1,5 +1,12 @@
 # Ocean — Work Log B
 
+## 2026-11-26: Frontend UI cleanup
+- Reviewed the frontend after the shadcn migration: it worked, but looked like a template (pill-shaped everything, marketing-sized headings, cards inside cards, an Overview page that only repeated the sidebar). Fixed it in small steps, one commit each.
+- Bugs first: deleting a database user or (as admin) any database now asks for confirmation; the Users and Invitations tabs get empty states; the German FAQ is now English and all dates share one format; the logo stays visible in dark mode. Removing an invitation still has no confirmation because it can simply be re-sent.
+- Switched the shadcn style from `luma` to `nova` (small radii, flat panels, 32px controls), cut the palette to one accent colour, and gave pages an app-sized type scale. The components had no local changes, so they were re-added from the registry.
+- The desktop top bar is gone: logo, "New database" and the account menu (now with the theme switch) live in the sidebar. Databases is the home page; `/overview` redirects there. Database rows are real links, so the list works by keyboard.
+- Database page leads with the connection string, deleting moved into a "…" menu, admin list shows owners by username. Labels and toasts were unified ("New database", "Add user", "Couldn't …").
+- The Cypress e2e suite (not in CI) was already failing on `main` (19 of 21); the branch keeps the same two passing tests. Unit and component tests all pass.
 ## 2026-11-26: Frontend switched to shadcn's `cn` package
 - shadcn now ships its class-name helper as its own `cn` npm package, which replaces clsx and tailwind-merge with the same output. Migrated with the official `shadcn migrate cn`, then pointed every import straight at `cn` and dropped the local `lib/utils` wrapper, so new components from the CLI and our own code use the same import.
 - The `utils` alias stays in `components.json` only because the CLI refuses the config without it. It no longer points at a real file.
