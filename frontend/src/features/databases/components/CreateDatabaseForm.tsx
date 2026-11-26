@@ -72,8 +72,9 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onS
 
   return (
     <>
-      <PageHeader title="Create a database" />
+      <PageHeader title="New database" />
       <form
+        className="max-w-lg"
         onSubmit={form.handleSubmit((values) => {
           if (availabilityStatus === "available") {
             onSubmit(values);
@@ -82,10 +83,7 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onS
       >
         <FieldGroup>
           <FieldSet>
-            <FieldLegend>Choose a database engine</FieldLegend>
-            <FieldDescription>
-              A database runs a single database engine that powers one or more individual databases.
-            </FieldDescription>
+            <FieldLegend variant="label">Engine</FieldLegend>
             <Controller
               name="engine"
               control={form.control}
@@ -112,8 +110,8 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onS
                 <Field data-invalid={invalid}>
                   <FieldLabel htmlFor={field.name}>Database name</FieldLabel>
                   <FieldDescription id="database-name-description">
-                    Names must be lowercase and start with a letter. They can be up to 32 characters
-                    long and may contain digits and underscores.
+                    Lowercase letters, digits and underscores, starting with a letter. Up to 32
+                    characters.
                   </FieldDescription>
                   <InputGroup>
                     <InputGroupInput
@@ -164,10 +162,10 @@ const CreateDatabaseForm: React.FC<CreateDatabaseFormProps> = ({ processing, onS
             <Button
               type="submit"
               disabled={!form.formState.isValid || availabilityStatus !== "available" || processing}
-              className="w-full"
+              className="self-start"
             >
               {processing && <Spinner data-icon="inline-start" />}
-              {processing ? "Creating database..." : "Create a database"}
+              {processing ? "Creating database..." : "Create database"}
             </Button>
           </Field>
         </FieldGroup>

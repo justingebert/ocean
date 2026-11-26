@@ -36,9 +36,9 @@ export const EngineGroup: React.FC<EngineSelectorProps> = ({
         <ToggleGroupItem
           key={engineOption.id}
           value={engineOption.value}
-          className="h-auto w-full flex-col gap-3 p-4"
+          className="h-auto w-full justify-start gap-3 p-3 aria-pressed:border-primary aria-pressed:bg-primary/5"
         >
-          <img className="h-12 w-auto" src={engineOption.imageSrc} alt="" aria-hidden="true" />
+          <img className="size-6" src={engineOption.imageSrc} alt="" aria-hidden="true" />
           <span>{engineOption.label}</span>
         </ToggleGroupItem>
       ))}

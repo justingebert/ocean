@@ -31,19 +31,17 @@ describe("CreateDatabaseForm", () => {
   it("renders the form and input fields", () => {
     render(<CreateDatabaseForm {...defaultProps} />);
 
-    expect(
-      screen.getByRole("heading", { name: "Create a database", level: 1 }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "New database", level: 1 })).toBeInTheDocument();
     expect(screen.getByLabelText(/database name/i)).toBeInTheDocument();
 
-    expect(screen.getByRole("button", { name: "Create a database" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Create database" })).toBeInTheDocument();
   });
 
   it("validates the name field and shows error messages", async () => {
     render(<CreateDatabaseForm {...defaultProps} />);
 
     const nameInput = screen.getByLabelText(/database name/i);
-    const submitButton = screen.getByRole("button", { name: "Create a database" });
+    const submitButton = screen.getByRole("button", { name: "Create database" });
 
     expect(submitButton).toBeDisabled();
 
