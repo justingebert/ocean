@@ -1,3 +1,5 @@
+import { UsersIcon } from "lucide-react";
+
 import {
   Combobox,
   ComboboxContent,
@@ -11,6 +13,13 @@ import { Field, FieldLabel } from "@/components/ui/field.tsx";
 import { SectionHeading } from "@/components/common/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   Table,
   TableBody,
@@ -50,36 +59,50 @@ export function DatabaseInvitationsPanel({
           <SectionHeading>Invitations</SectionHeading>
           <p className="mt-1 text-sm text-muted-foreground">Invite other people</p>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Username</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead className="w-0">
-                <span className="sr-only">Action</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {invitedUsers.map((invitedUser) => (
-              <TableRow key={invitedUser.invitationId}>
-                <TableCell className="font-medium">{invitedUser.username}</TableCell>
-                <TableCell className="text-muted-foreground">
-                  {User.getDisplayName({ ...invitedUser, mail: "", employeeType: "" })}
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => onDeselectUser(invitedUser.id)}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
+        {invitedUsers.length === 0 ? (
+          <Empty className="border">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <UsersIcon aria-hidden="true" />
+              </EmptyMedia>
+              <EmptyTitle>Not shared with anyone</EmptyTitle>
+              <EmptyDescription>
+                Invite people to give them access to this database.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Username</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead className="w-0">
+                  <span className="sr-only">Action</span>
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {invitedUsers.map((invitedUser) => (
+                <TableRow key={invitedUser.invitationId}>
+                  <TableCell className="font-medium">{invitedUser.username}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {User.getDisplayName({ ...invitedUser, mail: "", employeeType: "" })}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => onDeselectUser(invitedUser.id)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
     </Card>
   );

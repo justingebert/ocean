@@ -76,4 +76,18 @@ describe("<DatabaseUsersPanel />", () => {
 
     expect(onDeleteRole).toHaveBeenCalledWith(7);
   });
+
+  it("shows an empty state instead of an empty table", () => {
+    render(
+      <DatabaseUsersPanel
+        roles={[]}
+        isCreatingRole={false}
+        onAddUser={vi.fn()}
+        onDeleteRole={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    expect(screen.getByText("No users yet")).toBeInTheDocument();
+  });
 });
