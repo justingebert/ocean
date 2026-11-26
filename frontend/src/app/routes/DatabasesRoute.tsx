@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { PlusIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { getGreeting } from "@/lib/greeting";
 
 const DatabasesRoute: React.FC = () => {
+  // Rolled once per visit, so the greeting doesn't change on re-render.
+  const [greetingRoll] = useState(Math.random);
   const userQuery = useQuery({
     queryKey: ["user"],
     queryFn: () => UserClient.getUser(),
@@ -32,7 +34,7 @@ const DatabasesRoute: React.FC = () => {
   return (
     <>
       <PageHeader
-        title={getGreeting(userQuery.data?.firstName)}
+        title={getGreeting(userQuery.data?.firstName, greetingRoll)}
         description={databases.length > 0 ? summarizeDatabases(databases) : undefined}
         actions={
           databases.length > 0 ? (
