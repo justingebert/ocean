@@ -1,12 +1,14 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import SignInRoute from "./SignInRoute";
 
+let authStatus: "authenticated" | "unauthenticated" = "authenticated";
+
 vi.mock("@/features/auth/authContext", () => ({
   useAuth: () => ({
-    status: "authenticated",
+    status: authStatus,
     loginPending: false,
     loginError: null,
     login: vi.fn(),
@@ -26,6 +28,10 @@ function renderSignIn(state?: unknown) {
 }
 
 describe("SignInRoute", () => {
+  beforeEach(() => {
+    authStatus = "authenticated";
+  });
+
   it("returns to the page that required sign-in", async () => {
     renderSignIn({ from: { pathname: "/databases/42", search: "" } });
 
@@ -36,5 +42,20 @@ describe("SignInRoute", () => {
     renderSignIn();
 
     expect(await screen.findByText("databases")).toBeInTheDocument();
+  });
+
+  it("links to the legal notice and privacy policy on the sign-in page", () => {
+    authStatus = "unauthenticated";
+    renderSignIn();
+
+    const legalNotice = screen.getByRole("link", { name: "Legal notice" });
+    expect(legalNotice).toHaveAttribute("href", "https://www.htw-berlin.de/impressum/");
+    expect(legalNotice).toHaveAttribute("target", "_blank");
+    expect(legalNotice).toHaveAttribute("rel", "noopener noreferrer");
+
+    const privacyPolicy = screen.getByRole("link", { name: "Privacy policy" });
+    expect(privacyPolicy).toHaveAttribute("href", "https://www.htw-berlin.de/datenschutz/");
+    expect(privacyPolicy).toHaveAttribute("target", "_blank");
+    expect(privacyPolicy).toHaveAttribute("rel", "noopener noreferrer");
   });
 });

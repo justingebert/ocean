@@ -1,5 +1,8 @@
 # Ocean — Work Log B
 
+## 2026-11-26: Legal links on the sign-in page
+- Added subtle footer links to the HTW legal notice (Impressum) and privacy policy (Datenschutz) on the sign-in page so they are reachable before logging in, as required by the university.
+
 ## 2026-11-26: UI polish: greeting, relative expiry, copy confirmation
 - The databases page greets by name ("Good morning, …") with one status line: how many databases, and how many expire within 30 days.
 - Expiry is shown as relative time ("in 6 months") with a status dot that turns amber within 30 days and red once past; the exact date is in a tooltip. This replaces red date text in the list, admin list and overview.
