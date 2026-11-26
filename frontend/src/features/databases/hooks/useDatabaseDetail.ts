@@ -155,14 +155,13 @@ export function useDatabaseDetail(databaseId: number, options: UseDatabaseDetail
     mongoUser,
     isOwner,
     isCreatingRole: createRoleMutation.isPending,
-    isDeletingDatabase: deleteDatabaseMutation.isPending,
     isRenewingDatabase: renewDatabaseMutation.isPending,
     createRole: (role: UpstreamCreateRoleProperties) => createRoleMutation.mutate(role),
-    deleteRole: (roleId: number) => deleteRoleMutation.mutate(roleId),
+    deleteRole: (roleId: number) => deleteRoleMutation.mutateAsync(roleId),
     createInvitation: (userId: number) =>
       createInvitationMutation.mutate({ instanceId: databaseId, userId }),
     deleteInvitationForUser,
-    deleteDatabase: () => deleteDatabaseMutation.mutate(),
+    deleteDatabase: () => deleteDatabaseMutation.mutateAsync(),
     renewDatabase: () => renewDatabaseMutation.mutate(),
   };
 }

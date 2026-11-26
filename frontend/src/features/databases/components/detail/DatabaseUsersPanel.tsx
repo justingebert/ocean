@@ -32,7 +32,7 @@ interface DatabaseUsersPanelProps {
   roles: RoleProperties[];
   isCreatingRole: boolean;
   onAddUser: () => void;
-  onDeleteRole: (roleId: number) => void;
+  onDeleteRole: (roleId: number) => Promise<unknown> | void;
 }
 
 export function DatabaseUsersPanel({
@@ -41,7 +41,9 @@ export function DatabaseUsersPanel({
   onAddUser,
   onDeleteRole,
 }: DatabaseUsersPanelProps) {
+  // Kept after closing so the title doesn't change during the close animation.
   const [roleToDelete, setRoleToDelete] = useState<RoleProperties>();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
     <Card>
@@ -80,21 +82,25 @@ export function DatabaseUsersPanel({
             </TableHeader>
             <TableBody>
               {roles.map((role) => (
-                <RoleTableRow key={role.id} role={role} onDelete={setRoleToDelete} />
+                <RoleTableRow
+                  key={role.id}
+                  role={role}
+                  onDelete={(role) => {
+                    setRoleToDelete(role);
+                    setConfirmOpen(true);
+                  }}
+                />
               ))}
             </TableBody>
           </Table>
         )}
       </CardContent>
       <ConfirmDeleteDialog
-        open={roleToDelete !== undefined}
-        onOpenChange={(open) => !open && setRoleToDelete(undefined)}
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
         title={`Delete ${roleToDelete?.name ?? "user"}?`}
         description="Anything connecting as this user loses access. This can't be undone."
-        onConfirm={() => {
-          if (roleToDelete) onDeleteRole(roleToDelete.id);
-          setRoleToDelete(undefined);
-        }}
+        onConfirm={() => roleToDelete && onDeleteRole(roleToDelete.id)}
       />
     </Card>
   );

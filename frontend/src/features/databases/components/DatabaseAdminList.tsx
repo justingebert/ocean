@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/table.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Switch } from "@/components/ui/switch";
-import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteDialog";
 import { cn } from "cn";
 import { Database } from "@/features/databases/model/database.ts";
+import { DeleteDatabaseDialog } from "@/features/databases/components/DeleteDatabaseDialog";
 import {
   formatDate,
   getDatabaseEngineTitle,
@@ -23,7 +23,7 @@ import { ExpiryDate } from "@/features/databases/components/DatabaseList/Databas
 
 export interface DatabaseAdminListProps {
   databases: ReadonlyArray<Database>;
-  onDelete?: (database: Database) => void;
+  onDelete?: (database: Database) => Promise<unknown> | void;
   onNeverExpiresChange?: (database: Database, neverExpires: boolean) => void;
   /** Shows the owner's username instead of their numeric id when known. */
   getOwnerName?: (userId: number) => string | undefined;
@@ -35,7 +35,9 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
   onNeverExpiresChange,
   getOwnerName,
 }) => {
+  // Kept after closing so the title doesn't change during the close animation.
   const [databaseToDelete, setDatabaseToDelete] = useState<Database>();
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const sortedDatabases = databases
     .slice(0)
     .sort((left, right) => compareDesc(left.createdAt, right.createdAt));
@@ -85,7 +87,14 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
                 />
               </TableCell>
               <TableCell className="text-right">
-                <Button variant="ghost" size="sm" onClick={() => setDatabaseToDelete(database)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setDatabaseToDelete(database);
+                    setConfirmOpen(true);
+                  }}
+                >
                   Delete
                 </Button>
               </TableCell>
@@ -93,15 +102,11 @@ export const DatabaseAdminList: React.FC<DatabaseAdminListProps> = ({
           ))}
         </TableBody>
       </Table>
-      <ConfirmDeleteDialog
-        open={databaseToDelete !== undefined}
-        onOpenChange={(open) => !open && setDatabaseToDelete(undefined)}
-        title={`Delete ${databaseToDelete?.name ?? "database"}?`}
-        description="All data in this database is permanently removed. This can't be undone."
-        onConfirm={() => {
-          if (databaseToDelete) onDelete?.(databaseToDelete);
-          setDatabaseToDelete(undefined);
-        }}
+      <DeleteDatabaseDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        databaseName={databaseToDelete?.name}
+        onConfirm={() => databaseToDelete && onDelete?.(databaseToDelete)}
       />
     </div>
   );

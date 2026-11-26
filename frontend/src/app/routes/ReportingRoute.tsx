@@ -26,6 +26,7 @@ const ReportingRoute = () => {
   const metricsQuery = useMetricsQuery();
   const databasesQuery = useDatabasesQuery();
   const deleteDatabaseWithPermissionMutation = useDeleteDatabaseWithPermissionMutation({
+    onError: () => toast.error("Couldn't delete database"),
     onSettled: () => {
       databasesQuery.refetch();
       metricsQuery.refetch();
@@ -95,7 +96,7 @@ const ReportingRoute = () => {
           <DatabaseAdminList
             databases={databasesQuery.data}
             getOwnerName={(userId) => usernames.get(userId)}
-            onDelete={(database) => deleteDatabaseWithPermissionMutation.mutate(database.id)}
+            onDelete={(database) => deleteDatabaseWithPermissionMutation.mutateAsync(database.id)}
             onNeverExpiresChange={(database, neverExpires) =>
               setNeverExpiresMutation.mutate({ id: database.id, neverExpires })
             }

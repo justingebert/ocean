@@ -12,7 +12,7 @@ import { DatabaseDetailHeader } from "./DatabaseDetailHeader";
 import { DatabaseInvitationsPanel } from "./DatabaseInvitationsPanel";
 import { DatabaseOverviewPanel } from "./DatabaseOverviewPanel";
 import { DatabaseUsersPanel } from "./DatabaseUsersPanel";
-import { ConfirmDeleteDialog } from "@/components/common/ConfirmDeleteDialog";
+import { DeleteDatabaseDialog } from "@/features/databases/components/DeleteDatabaseDialog";
 
 interface DatabaseDetailPageProps {
   databaseId: number;
@@ -72,13 +72,11 @@ export function DatabaseDetailPage({ databaseId, onDeleted }: DatabaseDetailPage
           />
         </TabsContent>
       </Tabs>
-      <ConfirmDeleteDialog
+      <DeleteDatabaseDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        title={`Delete ${detail.database?.name ?? "database"}?`}
-        description="All data in this database is permanently removed. This can't be undone."
+        databaseName={detail.database?.name}
         onConfirm={detail.deleteDatabase}
-        processing={detail.isDeletingDatabase}
       />
       <CreateRoleDialog
         database={detail.database}

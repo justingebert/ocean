@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { TriangleAlertIcon } from "lucide-react";
 
 import {
@@ -12,25 +12,42 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Spinner } from "@/components/ui/spinner";
 
 export interface ConfirmDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
   description: ReactNode;
-  onConfirm: () => void;
-  processing?: boolean;
+  /** May return a promise; the dialog shows a spinner until it settles. */
+  onConfirm: () => Promise<unknown> | void;
 }
 
-/** Asks before an irreversible delete. Stays open on confirm; the caller closes it. */
+/**
+ * Asks before an irreversible delete and closes once `onConfirm` settles. Errors are left to
+ * the caller, which already reports them (the mutations toast on failure).
+ */
 export function ConfirmDeleteDialog({
   open,
   onOpenChange,
   title,
   description,
   onConfirm,
-  processing = false,
 }: ConfirmDeleteDialogProps) {
+  const [processing, setProcessing] = useState(false);
+
+  const confirm = async () => {
+    setProcessing(true);
+    try {
+      await onConfirm();
+    } catch {
+      // Reported by the caller.
+    } finally {
+      setProcessing(false);
+      onOpenChange(false);
+    }
+  };
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -51,9 +68,10 @@ export function ConfirmDeleteDialog({
             disabled={processing}
             onClick={(event) => {
               event.preventDefault();
-              onConfirm();
+              void confirm();
             }}
           >
+            {processing && <Spinner data-icon="inline-start" />}
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>
