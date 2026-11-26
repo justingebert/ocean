@@ -1,17 +1,16 @@
 import { Link } from "react-router-dom";
-import { ChevronsUpDownIcon, LogOutIcon, UserRoundIcon } from "lucide-react";
+import { ChevronsUpDownIcon, LogOutIcon, MoonIcon, UserRoundIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -28,7 +27,8 @@ type ProfileMenuProps = {
 };
 
 export function ProfileMenu({ user, loading, onLogout, onNavigate }: ProfileMenuProps) {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   if (loading && !user) {
     return (
@@ -61,12 +61,22 @@ export function ProfileMenu({ user, loading, onLogout, onNavigate }: ProfileMenu
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Theme</DropdownMenuLabel>
-          <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
-            <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
+          <DropdownMenuItem
+            closeOnClick={false}
+            role="menuitemcheckbox"
+            aria-checked={isDark}
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+          >
+            <MoonIcon />
+            Dark mode
+            <Switch
+              checked={isDark}
+              size="sm"
+              tabIndex={-1}
+              aria-hidden="true"
+              className="pointer-events-none ml-auto"
+            />
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>

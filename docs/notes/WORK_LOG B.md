@@ -1,5 +1,7 @@
 # Ocean — Work Log B
 
+## 2026-11-26: Dark-mode switch in the account menu
+- The Light / Dark / System radio list in the account menu is now a single "Dark mode" switch. Until someone flips it the app follows the OS setting; flipping it stores an explicit light or dark choice in the browser (next-themes already persisted the theme, so only the UI changed). There is no way back to "follow system" short of clearing site data, which seemed an acceptable trade for the simpler control.
 ## 2026-11-26: Frontend UI cleanup
 - Reviewed the frontend after the shadcn migration: it worked, but looked like a template (pill-shaped everything, marketing-sized headings, cards inside cards, an Overview page that only repeated the sidebar). Fixed it in small steps, one commit each.
 - Bugs first: deleting a database user or (as admin) any database now asks for confirmation; the Users and Invitations tabs get empty states; the German FAQ is now English and all dates share one format; the logo stays visible in dark mode. Removing an invitation still has no confirmation because it can simply be re-sent.
