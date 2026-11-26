@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { DownloadIcon, ExternalLinkIcon, EyeIcon, EyeOffIcon, RefreshCwIcon } from "lucide-react";
+import {
+  ChevronRightIcon,
+  DownloadIcon,
+  ExternalLinkIcon,
+  EyeIcon,
+  EyeOffIcon,
+} from "lucide-react";
 
 import { CopyButton } from "@/components/common/CopyButton";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group";
+import { InputGroupButton } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExpiryStatus } from "@/features/databases/components/ExpiryStatus";
@@ -57,16 +58,11 @@ export function DatabaseOverviewPanel({
         <div className="flex flex-col gap-2">
           <h2 className="text-sm font-medium text-foreground">Connection string</h2>
           {database && user ? (
-            <InputGroup>
-              <InputGroupInput
-                aria-label="Connection string"
-                className="font-mono text-xs"
-                value={displayedConnectionString}
-                readOnly
-                spellCheck={false}
-                autoComplete="off"
-              />
-              <InputGroupAddon align="inline-end">
+            <div className="flex items-start gap-2 rounded-lg border bg-muted/50 py-1 pr-1 pl-3">
+              <code className="min-w-0 flex-1 py-0.5 font-mono text-xs leading-5 break-all whitespace-pre-wrap">
+                {displayedConnectionString}
+              </code>
+              <div className="flex shrink-0 items-center gap-0.5">
                 {hasSecret ? (
                   <InputGroupButton
                     size="icon-xs"
@@ -83,8 +79,8 @@ export function DatabaseOverviewPanel({
                   aria-label="Copy connection string"
                   title="Copy connection string"
                 />
-              </InputGroupAddon>
-            </InputGroup>
+              </div>
+            </div>
           ) : (
             <Skeleton className="h-8 w-full" />
           )}
@@ -95,7 +91,7 @@ export function DatabaseOverviewPanel({
                   href={adminToolUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={buttonVariants({ variant: "outline", size: "sm" })}
+                  className={buttonVariants({ size: "sm" })}
                 >
                   <ExternalLinkIcon data-icon="inline-start" />
                   Open {database.adminToolName}
@@ -120,41 +116,55 @@ export function DatabaseOverviewPanel({
 
         <Separator />
 
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
-          <DetailField label="Host" value={database?.hostname} skeletonWidth="w-40" />
-          <DetailField
-            label="Port"
-            value={database ? database.port.toString() : undefined}
-            skeletonWidth="w-16"
-          />
-          <div className="col-span-2 sm:col-span-1">
-            <dt className="text-sm text-muted-foreground">Expires</dt>
-            {database ? (
-              <dd className="mt-1 flex flex-wrap items-center gap-2 text-sm">
-                {database.expiresAt === null ? (
-                  <span className="text-foreground">Never expires</span>
-                ) : (
-                  <>
-                    <ExpiryStatus
-                      expiresAt={database.expiresAt}
-                      className="text-foreground tabular-nums"
-                    />
-                    {canRenew ? (
-                      <Button variant="outline" size="xs" onClick={onRenew} disabled={isRenewing}>
-                        <RefreshCwIcon data-icon="inline-start" />
+        <div className="flex flex-col gap-3">
+          {database ? (
+            <p className="flex flex-wrap items-center gap-x-2 text-sm text-foreground">
+              {database.expiresAt === null ? (
+                "Never expires"
+              ) : (
+                <>
+                  <ExpiryStatus expiresAt={database.expiresAt} verb className="tabular-nums" />
+                  {canRenew ? (
+                    <>
+                      <span aria-hidden className="text-muted-foreground">
+                        ·
+                      </span>
+                      <Button
+                        variant="link"
+                        size="xs"
+                        className="h-auto px-0 text-sm"
+                        onClick={onRenew}
+                        disabled={isRenewing}
+                      >
                         Renew
                       </Button>
-                    ) : null}
-                  </>
-                )}
-              </dd>
-            ) : (
-              <dd className="mt-1">
-                <Skeleton className="h-5 w-40" />
-              </dd>
-            )}
-          </div>
-        </dl>
+                    </>
+                  ) : null}
+                </>
+              )}
+            </p>
+          ) : (
+            <Skeleton className="h-5 w-48" />
+          )}
+
+          <details className="group">
+            <summary className="flex w-fit cursor-pointer list-none items-center gap-1 rounded-sm text-sm text-muted-foreground outline-none select-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
+              <ChevronRightIcon
+                aria-hidden
+                className="size-4 transition-transform group-open:rotate-90 motion-reduce:transition-none"
+              />
+              Details
+            </summary>
+            <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-4 pl-5 sm:grid-cols-3">
+              <DetailField label="Host" value={database?.hostname} skeletonWidth="w-40" />
+              <DetailField
+                label="Port"
+                value={database ? database.port.toString() : undefined}
+                skeletonWidth="w-16"
+              />
+            </dl>
+          </details>
+        </div>
       </CardContent>
     </Card>
   );

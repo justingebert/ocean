@@ -10,13 +10,15 @@ import { formatDate } from "@/lib/format";
 
 /**
  * Expiry as relative time with a status dot ("in 6 months", amber "in 12 days").
- * The exact date is in a tooltip.
+ * The exact date is in a tooltip. With `verb`, reads as a sentence: "Expires in 6 months".
  */
 export function ExpiryStatus({
   expiresAt,
+  verb = false,
   className,
 }: {
   expiresAt: Date | null;
+  verb?: boolean;
   className?: string;
 }) {
   if (expiresAt === null) {
@@ -41,7 +43,10 @@ export function ExpiryStatus({
             expired && "bg-destructive",
           )}
         />
-        <time dateTime={new Date(expiresAt).toISOString()}>{formatExpiry(expiresAt, now)}</time>
+        <span>
+          {verb ? (expired ? "Expired " : "Expires ") : null}
+          <time dateTime={new Date(expiresAt).toISOString()}>{formatExpiry(expiresAt, now)}</time>
+        </span>
       </TooltipTrigger>
       <TooltipContent>{formatDate(expiresAt)}</TooltipContent>
     </Tooltip>
