@@ -12,7 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
+import { cn } from "cn";
 import { Database } from "@/features/databases/model/database.ts";
 import {
   getDatabaseCreatedAt,

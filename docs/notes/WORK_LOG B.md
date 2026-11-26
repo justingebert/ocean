@@ -1,5 +1,9 @@
 # Ocean — Work Log B
 
+## 2026-11-26: Frontend switched to shadcn's `cn` package
+- shadcn now ships its class-name helper as its own `cn` npm package, which replaces clsx and tailwind-merge with the same output. Migrated with the official `shadcn migrate cn`, then pointed every import straight at `cn` and dropped the local `lib/utils` wrapper, so new components from the CLI and our own code use the same import.
+- The `utils` alias stays in `components.json` only because the CLI refuses the config without it. It no longer points at a real file.
+
 ## 2026-11-26: Database expiry, part 3: UI
 - The database page shows the expiry date with a Renew button for the owner, or "Never expires". The databases list and the admin list get an expiry column, highlighted in red from 30 days before expiry, so the first reminder mail and the UI warning line up.
 - Admins switch "never expires" per database directly in the admin list.

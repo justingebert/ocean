@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
-import { cn } from "@/lib/utils";
+import { cn } from "cn";
 import {
   formatExpiryDate,
   getDatabaseCreatedAt,

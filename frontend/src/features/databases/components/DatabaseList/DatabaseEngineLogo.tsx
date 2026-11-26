@@ -4,7 +4,7 @@ import { DatabaseIcon } from "lucide-react";
 import mongodbLogo from "@/features/databases/assets/mongodb-logo.svg";
 import postgresqlLogo from "@/features/databases/assets/postgresql-logo.svg";
 import { EngineType } from "@/features/databases/model/engine.ts";
-import { cn } from "@/lib/utils.ts";
+import { cn } from "cn";
 
 interface DatabaseEngineLogoProps {
   engine: string;
